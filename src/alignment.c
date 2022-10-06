@@ -2,8 +2,8 @@
 
 /*****************************************************************************
  *****************************************************************************
- *                                                                           *
- *  Copyright (C) 2010 - 2014 Genome Research Ltd.                           * 
+ *                                                                           *<<<<<<< Updated upstream
+ *  Copyright (C) 2010 - 2014 Genome Research Ltd.                           *
  *                                                                           *
  *  Author: Hannes Ponstingl (hp3@sanger.ac.uk)                              *
  *                                                                           *
@@ -79,7 +79,7 @@ typedef unsigned char ALIDIRECT_t;
 typedef signed char ALIMATSCOR_t;
 
 typedef struct _ALICPLX { /**< Stats for complexity scaling of Smith-Waterman score */
-  int *countp;   /**< Array of size n_types, used as buffer for complexity scaling of 
+  int *countp;   /**< Array of size n_types, used as buffer for complexity scaling of
 		  * alignment score */
   short n_types; /**< Number of distinct nucleotide types (size of array countp). */
   double lambda;
@@ -91,17 +91,17 @@ typedef struct _ALIBAND {  /**< delimiters of alignment band */
   int r_edge_orig; /**< original right(higher) edge of band (along profiled sequence) */
   int l_edge;      /**< Absolute left (lower) edge of alignment band along profiled sequence
 		    * (adjusted for segment start points s_left and conting from 0) */
-  int r_edge;      /**< Absolute right (higer) edge of alignment band along unprofiled sequence 
+  int r_edge;      /**< Absolute right (higer) edge of alignment band along unprofiled sequence
 		    * (adjusted for segment start point s_left and counting from 0) */
-  int s_left_orig; /**< original left (lower, starting) position of the subject segment 
+  int s_left_orig; /**< original left (lower, starting) position of the subject segment
 		    * (counting starts from 0) */
-  int s_left;      /**< starting position of the subject segment adjusted to the 
+  int s_left;      /**< starting position of the subject segment adjusted to the
 		    * alignment band (counting from 0) */
   int s_len;       /**< Length of the subject segment adjusted to the alignment band */
   int s_totlen;    /**< Original length of the subject segment */
-  int q_left_orig; /**< original left (lower, starting) position of the query  segment 
+  int q_left_orig; /**< original left (lower, starting) position of the query  segment
 		    * counting from 0 */
-  int q_left;      /**< starting position of the query (profiled) sequence segment 
+  int q_left;      /**< starting position of the query (profiled) sequence segment
 		    * adjusted to band width (counting from 0) */
   int q_len;       /**< Length of the query (profiled) sequence segment adjusted
 		    * to band width */
@@ -117,7 +117,7 @@ typedef struct _ALITRACK { /**< Directions for back tracking */
   ALIDPMSCOR_t max_scor; /**<  Maximum score */
   ALIDIRECT_t *bdp; /**< directions for back tracking bdp[k] is the element of the DPM [i,j] with
 		     * k = (i-ALIBAND.s_left)*ALIBAND.bandwidth + (j-ALIBAND.l_edge) - (i-ALIBAND.s_left).
-		     * Each element consists of a combination of ALIBACKTRACK_BITFLAGS 
+		     * Each element consists of a combination of ALIBACKTRACK_BITFLAGS
 		     * representing direction indicators (see annotation of ALIBACKTRACK_BITFLAGS) */
   size_t blksz;     /**< Block size (granularity) for memory (re-) allocation */
   size_t n_alloc;   /**< Currently allocated memory as the number of elements in bdp */
@@ -157,7 +157,7 @@ typedef struct _ALIRESULT { /**< Contains result of pairwise alignment of two se
   DiffStr diffstr; /**< Short-hand alignment string (along profiled sequence) */
 } ALIRESULT;
 
-struct _AliRsltSet { /**< Set of aligned segments obtained for one 
+struct _AliRsltSet { /**< Set of aligned segments obtained for one
 		      * pairwise alignment task */
   ALIRESULT *rsp; /**< Array of results */
   short nres;     /**< Number of results (size of array) */
@@ -176,7 +176,7 @@ struct _AliRsltSet { /**< Set of aligned segments obtained for one
 /******************************************************************************
  ******************************* Public Methods *******************************
  ******************************************************************************/
-int aliScoreDiffStr(int *swscor, const char *unprofiled_seqp, int unprofiled_seqlen, 
+int aliScoreDiffStr(int *swscor, const char *unprofiled_seqp, int unprofiled_seqlen,
 		    unsigned int profiled_offs,
 		    const DIFFSTR_T *diffstrp, int diffstrlen, const ScoreProfile *scpp)
 {
@@ -187,7 +187,7 @@ int aliScoreDiffStr(int *swscor, const char *unprofiled_seqp, int unprofiled_seq
   UCHAR is_open = 0;
   DIFFSTR_T j, count, typ;
   signed char *const *scorepp = scoreGetProfile(NULL, &profiled_len, &gap_init, &gap_ext, scpp);
-  
+
   *swscor = 0;
   rs = 0;
   for (i=0; i < diffstrlen && (diffstrp[i]); i++) {
@@ -265,7 +265,7 @@ static void blankALICPLX(ALICPLX *p)
   return;
 }
 
-static int scaleALICPLX(int *adj_score, int orig_score, 
+static int scaleALICPLX(int *adj_score, int orig_score,
 			/* int pos_score, */
 			const ALICPLX *cplxp)
 {
@@ -286,7 +286,7 @@ static int scaleALICPLX(int *adj_score, int orig_score,
   t_factor /=  t_counts * log((n_letters > 4) ? 1. / n_letters : .25);
   /* old_adj_score = orig_score + t_factor * pos_score - pos_score + .5; */
   *adj_score = orig_score + t_sum / cplxp->lambda + .999;
-  
+
   if ((*adj_score) > orig_score) {
 #ifdef alignment_debug
     fprintf(stderr, "\nScore increase: %d %d", orig_score, *adj_score);
@@ -316,16 +316,16 @@ static int initALIBAND(ALIBAND *abp,
    * Return ERRCODE_FAILURE if limits are inconsistent.
    *
    * Nomenclature:
-   * 'query sequence'(q):   the profiled sequence. 
+   * 'query sequence'(q):   the profiled sequence.
    * 'subject sequence' (s): the sequence to be aligned against the profile.
    * all positions/coordinates are 0-based.
-   * 
+   *
    * \note Left and right edge of the alignment band are specified along the profiled sequence
    * (0 based). Position counting in sequence starts from 1.
    *
-   * \param l_edge  ablsolute left (lower) edge of the alignment band along the profiled sequence 
+   * \param l_edge  ablsolute left (lower) edge of the alignment band along the profiled sequence
    *                (0 based).
-   * \param r_edge  absolute right (higher) edge of the alignment band along profiled sequence 
+   * \param r_edge  absolute right (higher) edge of the alignment band along profiled sequence
    *                (0 based).
    * \param q_left  start of the query (profiled) segment (0 based)
    * \param q_right end of the query (profiled) segment (0 based)
@@ -338,10 +338,10 @@ static int initALIBAND(ALIBAND *abp,
   /* Segment [s_left, s_right] on unprofiled sequence determines
    * segment [abp->q_left, abp->q_len-1] on the profiled squence
    * (origin (q=0, s=0)). The band [l_edge, r_edge] is specified along
-   * profiled sequence with origin (q=0, s=0) for both sequences. 
+   * profiled sequence with origin (q=0, s=0) for both sequences.
    *
    * Relevant to the dynamic programming:
-   * At the start: 
+   * At the start:
    * [abp->l_edge, abp->r_edge] are the band limits at the
    * start of the alignment (upper left corner). [abp->s_left,
    * abp->s_len-1] is the segment to be aligned on unprofiled
@@ -382,7 +382,7 @@ static int initALIBAND(ALIBAND *abp,
     abp->r_edge += abp->s_left;
     if (abp->r_edge < abp->q_left) {
       /* Band at beginning of unprofiled segment (abp->s_left) does not overlap with
-       * profiled segment -> move the band down diagonal until right end overlaps with start 
+       * profiled segment -> move the band down diagonal until right end overlaps with start
        * of segment [q_start, q_end] on profiled sequence */
       abp->s_left += abp->q_left - abp->r_edge;
       abp->l_edge += abp->q_left - abp->r_edge;
@@ -428,7 +428,7 @@ static void printEncSeq(FILE *fp, const char *seqp)
 /******************************************************************************
  ********************** Private Methods of Type ALITRACK **********************
  ******************************************************************************/
-static void cleanupALITRACK(ALITRACK *p) 
+static void cleanupALITRACK(ALITRACK *p)
 {
   if (p) {
     free(p->bdp);
@@ -442,7 +442,7 @@ static int initALITRACK(ALITRACK *p, size_t blksz, size_t n_alloc_thresh)
   ECALLOCP(blksz, p->bdp);
   if (!(p->bdp))
     return ERRCODE_NOMEM;
- 
+
   p->n_alloc = p->blksz = blksz;
   p->n_alloc_thresh = (n_alloc_thresh < 1)? ALIBKTRK_MEMLIM_DEFAULT: n_alloc_thresh;
   p->max_i = p->max_j = 0;
@@ -461,7 +461,7 @@ static int setMemALITRACK(ALITRACK *btrkp, ALIBAND *bandp)
 
   newsiz = bandp->band_width*(bandp->s_len - bandp->s_left);
 
-  if (newsiz > btrkp->n_alloc || 
+  if (newsiz > btrkp->n_alloc ||
       (newsiz + btrkp->blksz < btrkp->n_alloc && btrkp->n_alloc > btrkp->n_alloc_thresh)) {
     newsiz = ((newsiz-1)/btrkp->blksz + 1)*btrkp->blksz;
     hp = EREALLOCP(btrkp->bdp, newsiz);
@@ -503,7 +503,7 @@ static int fprintALITRACK(FILE *fp, const ALIBAND *bandp, const ALITRACK *trackp
       delta_band = 0;
       jl = bandp->l_edge - bandp->q_left;
     }
-  
+
     fprintf(fp, "\n     ");
     for (j=0; j<delta_band; j++)
       fprintf(fp, "   ");
@@ -515,7 +515,7 @@ static int fprintALITRACK(FILE *fp, const ALIBAND *bandp, const ALITRACK *trackp
 	fprintf(fp, "   ");
       }
     }
-    
+
     fprintf(fp, "\n     ");
     for (j=0; j<delta_band; j++)
       fprintf(fp, "   ");
@@ -528,13 +528,13 @@ static int fprintALITRACK(FILE *fp, const ALIBAND *bandp, const ALITRACK *trackp
     for (j=0; j<jl+delta_band; j++)
       fprintf(fp, "---");
     fprintf(fp, "\n");
-    
+
     il = bandp->q_len - bandp->q_left;
     dp = trackp->bdp;
     if (il < 0) return ERRCODE_ASSERT;
     for (i=0; i<il; i++) {
       fprintf(fp, "%3i |", i);
-      for (j=0; j<i; j++) 
+      for (j=0; j<i; j++)
 	fprintf(fp, "   ");
       for (j=0; j<bandp->band_width; j++) {
 	fprintf(fp, " %1.1i ", (int) (*dp));
@@ -632,7 +632,7 @@ static int makeMetaFromTrack(ALIMETA *metap,
 			     const ScoreProfile *qp,
 #ifdef alignment_debug
 			     const SeqCodec *codecp,
-			     const char *profiled_seq, 
+			     const char *profiled_seq,
 #endif
 			     const char *unprofiled_seq)
      /**< Make a short-hand alignment string from back-tracking directions.
@@ -646,7 +646,7 @@ static int makeMetaFromTrack(ALIMETA *metap,
   ALIDPMSCOR_t s, checksum_score = 0; /* pos_score = 0 */
   const ALIDIRECT_t *dp;
   ALIMATSCOR_t score_gap_open, score_gap_ext;
-  ALIMATSCOR_t * const *scorepp = scoreGetProfile(NULL, NULL, &score_gap_open, 
+  ALIMATSCOR_t * const *scorepp = scoreGetProfile(NULL, NULL, &score_gap_open,
 						  &score_gap_ext, qp);
   DiffStr *const dfsp = &metap->dfs;
 #ifdef alignment_debug
@@ -666,17 +666,17 @@ static int makeMetaFromTrack(ALIMETA *metap,
     return errcode;\
   (dfsp)->dstrp[dfsp->len++] = (nmatch) + (((unsigned char) (typ)) << DIFFSTR_TYPSHIFT);
 
-/* end of macros */ 
+/* end of macros */
   DIFFSTR_LENGTH(dfsp) = 0;
   nmatch = 0;
-  if (cplxp) 
+  if (cplxp)
     blankALICPLX(cplxp);
 
   i = tp->max_i - bp->s_left;
   dp = tp->bdp + i * (bp->band_width - 1) + tp->max_j - bp->l_edge;
   i = tp->max_i;
   j = tp->max_j;
-  for (i=tp->max_i, j=tp->max_j;  i >= bp->s_left && j >= bp->q_left && (*dp);) { 
+  for (i=tp->max_i, j=tp->max_j;  i >= bp->s_left && j >= bp->q_left && (*dp);) {
     if (*dp == ALIBKTRKCOD_DIA) {
       /* diagonal move */
       s = scorepp[(unprofiled_seq[i]&SEQCOD_ALPHA_MASK)][j];
@@ -715,7 +715,7 @@ static int makeMetaFromTrack(ALIMETA *metap,
     if ((is_gap_open)) {
       checksum_score -= score_gap_ext;
     } else {
-      checksum_score -= score_gap_open;	
+      checksum_score -= score_gap_open;
       is_gap_open = TRUE;
     }
 
@@ -732,10 +732,10 @@ static int makeMetaFromTrack(ALIMETA *metap,
       dp -= bp->band_width-1;
       i--;
       continue;
-    } 
+    }
     if (!((*dp) & ALIBKTRKCOD_ROW))
       return ERRCODE_ASSERT;
-    
+
     /* move along row */
     SETDIFF(dfsp, nmatch, DIFFCOD_I);
     nmatch = 0;
@@ -744,7 +744,7 @@ static int makeMetaFromTrack(ALIMETA *metap,
     alistr_noprof[k] = ALIMETA_SPACER;
     alistr_cons[k] = ALIMETA_SPACER;
     k++;
-#endif 
+#endif
     dp--;
     j--;
   }
@@ -764,13 +764,13 @@ static int makeMetaFromTrack(ALIMETA *metap,
   metap->prof_start = j+1;
   metap->prof_end = tp->max_j;
 
-  if (checksum_score != tp->max_scor) 
+  if (checksum_score != tp->max_scor)
     errcode = ERRCODE_SWATSCOR;
   else if (cplxp)
-    errcode = scaleALICPLX(&checksum_score, tp->max_scor, 
+    errcode = scaleALICPLX(&checksum_score, tp->max_scor,
 			   /* pos_score, */
 			   cplxp);
-   
+
   metap->score = checksum_score;
 
 #ifdef alignment_debug
@@ -829,11 +829,11 @@ static int alignSmiWatBand(ALITRACK *bktp,
   max_scor = (H);\
 }
 #endif
-  scorpp = scoreGetProfile(NULL, 
+  scorpp = scoreGetProfile(NULL,
 #ifdef alignment_debug
 			   &splen,
 #else
-			   NULL, 
+			   NULL,
 #endif
 			   &gap_init, &gap_ext, profp);
 
@@ -883,17 +883,17 @@ static int alignSmiWatBand(ALITRACK *bktp,
 #endif
       /* inner loop */
       H = currH + rowscorp[j]; /* H[i-1,j-1] + W[i,j] */
-      currH = Hp[j];        
-      if (F > 0) { 
+      currH = Hp[j];
+      if (F > 0) {
 	/* F[i,j] = max(F[i,j-1] - gap_ext, H[i,j-1] - gap_init) > 0 */
-	if (Ep[j] > 0) { 
+	if (Ep[j] > 0) {
 	  /****************
 	   * E > 0, F > 0 *
-	   ****************/	  
+	   ****************/
 	  /* E[i,j] = max(E[i-1,j] - gap_ext, H[i-1,j] - gap_init) > 0 */
-	  if (H > Ep[j]) { 
+	  if (H > Ep[j]) {
 	    /* H[i-1,j-1] + W[i,j] > E */
-	    if (H > F) { 
+	    if (H > F) {
 	      /* max(H, E, F, 0) = H[i-1,j-1] + W[i,j] */
 	      Hp[j] = H; /* H[i,j] = H[i-1,j-1] + W[i,j] */
 	      F -= gap_ext;
@@ -905,7 +905,7 @@ static int alignSmiWatBand(ALITRACK *bktp,
 		if (F < tmp) F = tmp; /* max(F[i,j] - gap_ext, H[i,j] - gap_init) */
 		if (Ep[j] < tmp) Ep[j] = tmp; /* E[i,j] = max(E[i,j] - gap_ext, H[i,j] - gap_init) */
 	      }
-	    } else { 
+	    } else {
 	      /* F >= H[i-1,j-1] + W[i,j] > E, i.e. F > E */
 	      Hp[j] = F;
 	      F -= gap_ext;
@@ -925,10 +925,10 @@ static int alignSmiWatBand(ALITRACK *bktp,
 	    Ep[j] -= gap_ext;
 	    F -= gap_ext;
 	  }
-	} else { 
+	} else {
 	  /*****************
 	   * E <= 0, F > 0 *
-	   *****************/	  
+	   *****************/
 	  if (H > F) {
 	    Hp[j] = H;
 	    F -= gap_ext;
@@ -937,7 +937,7 @@ static int alignSmiWatBand(ALITRACK *bktp,
 	      RECORD_MAXIMUM_SCORE(H);
 	      Ep[j] = H - gap_init;
 	      if (F < Ep[j]) F = Ep[j]; /* F = max(F[i,j] - gap_ext, H[i,j] - gap_init) */
-	    } 	  
+	    }
 	  } else {
 	    /* H[i-1,j-1] + W[i,j] <= max(F[i,j-1] - gap_ext, H[i,j-1] - gap_init) */
 	    Hp[j] = F;
@@ -948,7 +948,7 @@ static int alignSmiWatBand(ALITRACK *bktp,
       } else if (Ep[j] > 0) {
 	/*****************
 	 * E > 0, F <= 0 *
-	 *****************/	  
+	 *****************/
 	if (H > Ep[j]) {
 	  Hp[j] = H;
 	  Ep[j] -= gap_ext;
@@ -957,7 +957,7 @@ static int alignSmiWatBand(ALITRACK *bktp,
 	    RECORD_MAXIMUM_SCORE(H);
 	    F = H - gap_init;
 	    if (Ep[j] < F) Ep[j] = F;
-	  } 
+	  }
 	} else {
 	  /* H[i-1,j-1] + W[i,j] <= max(E[i-1,j] - gap_ext, H[i,j-1] - gap_init) */
 	  Hp[j] = Ep[j];
@@ -967,7 +967,7 @@ static int alignSmiWatBand(ALITRACK *bktp,
       } else {
 	/******************
 	 * E <= 0, F <= 0 *
-	 ******************/	  
+	 ******************/
 	if (H > 0) {
 	  Hp[j] = H;
 	  *dirp = ALIBKTRKCOD_DIA;
@@ -994,10 +994,10 @@ static int alignSmiWatBand(ALITRACK *bktp,
       printf("%3i|", Hp[j]);
     printf("\nEp[%i,%i]: |", i, j_curr_start);
     for (j=j_curr_start; j<j_curr_len; j++)
-      printf("%3i|", Ep[j]);  
+      printf("%3i|", Ep[j]);
     printf("\nFp[%i,%i]: |", i, j_curr_start);
     for (j=j_curr_start; j<j_curr_len; j++)
-      printf("%3i|", Fp[j-j_curr_start]);      
+      printf("%3i|", Fp[j-j_curr_start]);
     printf("\ndi[%i,%i]: |", i, j_curr_start);
     for (; dir_refp < dirp; dir_refp++)
       printf(" %1i |", *dir_refp);
@@ -1015,7 +1015,7 @@ static int alignSmiWatBand(ALITRACK *bktp,
     } else {
       dirp += delta_band_end++;
     }
-      
+
   }
   bktp->max_i = max_i;
   bktp->max_j = max_j;
@@ -1058,11 +1058,11 @@ static int alignSmiWatBandFast(int *maxswscor,
 #define RECORD_MAXIMUM_SCORE_FAST(H) if ((H) > max_scor) max_scor = (H);
 
   *maxswscor = 0;
-  scorpp = scoreGetProfile(NULL, 
+  scorpp = scoreGetProfile(NULL,
 #ifdef alignment_debug
 			   &splen,
 #else
-			   NULL, 
+			   NULL,
 #endif
 			   &gap_init, &gap_ext, profp);
 
@@ -1108,17 +1108,17 @@ static int alignSmiWatBandFast(int *maxswscor,
 #endif
       /* inner loop */
       H = currH + rowscorp[j]; /* H[i-1,j-1] + W[i,j] */
-      currH = Hp[j];        
-      if (F > 0) { 
+      currH = Hp[j];
+      if (F > 0) {
 	/* F[i,j] = max(F[i,j-1] - gap_ext, H[i,j-1] - gap_init) > 0 */
-	if (Ep[j] > 0) { 
+	if (Ep[j] > 0) {
 	  /****************
 	   * E > 0, F > 0 *
-	   ****************/	  
+	   ****************/
 	  /* E[i,j] = max(E[i-1,j] - gap_ext, H[i-1,j] - gap_init) > 0 */
-	  if (H > Ep[j]) { 
+	  if (H > Ep[j]) {
 	    /* H[i-1,j-1] + W[i,j] > E */
-	    if (H > F) { 
+	    if (H > F) {
 	      /* max(H, E, F, 0) = H[i-1,j-1] + W[i,j] */
 	      Hp[j] = H; /* H[i,j] = H[i-1,j-1] + W[i,j] */
 	      F -= gap_ext;
@@ -1129,7 +1129,7 @@ static int alignSmiWatBandFast(int *maxswscor,
 		if (F < tmp) F = tmp; /* max(F[i,j] - gap_ext, H[i,j] - gap_init) */
 		if (Ep[j] < tmp) Ep[j] = tmp; /* E[i,j] = max(E[i,j] - gap_ext, H[i,j] - gap_init) */
 	      }
-	    } else { 
+	    } else {
 	      /* F >= H[i-1,j-1] + W[i,j] > E, i.e. F > E */
 	      Hp[j] = F;
 	      F -= gap_ext;
@@ -1146,10 +1146,10 @@ static int alignSmiWatBandFast(int *maxswscor,
 	    Ep[j] -= gap_ext;
 	    F -= gap_ext;
 	  }
-	} else { 
+	} else {
 	  /*****************
 	   * E <= 0, F > 0 *
-	   *****************/	  
+	   *****************/
 	  if (H > F) {
 	    Hp[j] = H;
 	    F -= gap_ext;
@@ -1157,7 +1157,7 @@ static int alignSmiWatBandFast(int *maxswscor,
 	      RECORD_MAXIMUM_SCORE_FAST(H);
 	      Ep[j] = H - gap_init;
 	      if (F < Ep[j]) F = Ep[j]; /* F = max(F[i,j] - gap_ext, H[i,j] - gap_init) */
-	    } 	  
+	    }
 	  } else {
 	    /* H[i-1,j-1] + W[i,j] <= max(F[i,j-1] - gap_ext, H[i,j-1] - gap_init) */
 	    Hp[j] = F;
@@ -1167,7 +1167,7 @@ static int alignSmiWatBandFast(int *maxswscor,
       } else if (Ep[j] > 0) {
 	/*****************
 	 * E > 0, F <= 0 *
-	 *****************/	  
+	 *****************/
 	if (H > Ep[j]) {
 	  Hp[j] = H;
 	  Ep[j] -= gap_ext;
@@ -1175,7 +1175,7 @@ static int alignSmiWatBandFast(int *maxswscor,
 	    RECORD_MAXIMUM_SCORE_FAST(H);
 	    F = H - gap_init;
 	    if (Ep[j] < F) Ep[j] = F;
-	  } 
+	  }
 	} else {
 	  /* H[i-1,j-1] + W[i,j] <= max(E[i-1,j] - gap_ext, H[i,j-1] - gap_init) */
 	  Hp[j] = Ep[j];
@@ -1184,7 +1184,7 @@ static int alignSmiWatBandFast(int *maxswscor,
       } else {
 	/******************
 	 * E <= 0, F <= 0 *
-	 ******************/	  
+	 ******************/
 	if (H > 0) {
 	  Hp[j] = H;
 	  if (H > gap_init) {
@@ -1209,10 +1209,10 @@ static int alignSmiWatBandFast(int *maxswscor,
       printf("%3i|", Hp[j]);
     printf("\nEp[%i,%i]: |", i, j_curr_start);
     for (j=j_curr_start; j<j_curr_len; j++)
-      printf("%3i|", Ep[j]);  
+      printf("%3i|", Ep[j]);
     printf("\nFp[%i,%i]: |", i, j_curr_start);
     for (j=j_curr_start; j<j_curr_len; j++)
-      printf("%3i|", Fp[j-j_curr_start]);      
+      printf("%3i|", Fp[j-j_curr_start]);
     printf("\n\n");
 #endif
     if (delta_band_start > 0) {
@@ -1223,7 +1223,7 @@ static int alignSmiWatBandFast(int *maxswscor,
     }
     if (j_curr_len < bandp->q_len) {
       j_curr_len++;
-    }       
+    }
   }
   *maxswscor = max_scor;
 #ifdef alignment_matrix_debug
@@ -1243,7 +1243,7 @@ static int reallocRsltSet(AliRsltSet *arp, short newsiz)
   short i;
   size_t ns = (newsiz + arp->blksz - 1)/arp->blksz;
 
-  if (newsiz < 0) 
+  if (newsiz < 0)
     return ERRCODE_ASSERT;
 
   ns *= arp->blksz;
@@ -1260,7 +1260,7 @@ static int reallocRsltSet(AliRsltSet *arp, short newsiz)
   hp = EREALLOCP(arp->rsp, ns);
   if (!hp)
     return ERRCODE_NOMEM;
-  
+
   arp->rsp = (ALIRESULT *) hp;
   for (i=arp->n_alloc;i<(short) ns; i++) {
     if ((errcode = diffStrInit(&(arp->rsp[i].diffstr), (int) arp->dfblksz)))
@@ -1269,7 +1269,7 @@ static int reallocRsltSet(AliRsltSet *arp, short newsiz)
   arp->n_alloc = (short) ns;
   if (arp->nres > arp->n_alloc)
     arp->nres = arp->n_alloc;
-  
+
   return errcode;
 }
 
@@ -1285,12 +1285,12 @@ static int addALIMETAtoRsltSet(AliRsltSet *p)
       return errcode;
 
   arp = p->rsp + p->nres;
-  
+
   arp->score = mp->score;
   arp->qs = mp->prof_start;
   arp->qe = mp->prof_end;
   arp->rs = mp->nonprof_start;
-  arp->re = mp->nonprof_end; 
+  arp->re = mp->nonprof_end;
   diffStrReverse(&arp->diffstr, mp->dfs.dstrp);
 
   p->nres++;
@@ -1322,7 +1322,7 @@ static int alignSmiWatBandRecursive(
   int s_start, s_end;
   ALIBAND band;
 
-#ifdef alignment_debug  
+#ifdef alignment_debug
   ++*level;
 #endif
   if (minscorlen < 2)
@@ -1330,13 +1330,13 @@ static int alignSmiWatBandRecursive(
 
   /* return without raising error if the limits and the alignment
    * band are inconsistent (end of recursion). */
-  if (initALIBAND(&band, 
+  if (initALIBAND(&band,
 		  l_edge, r_edge,
 		  q_left, q_right, q_len,
 		  s_left, s_right, s_len
 		  ))
     return ERRCODE_SUCCESS;
-  
+
 #ifdef alignment_debug_limits
   printf("swat.c::SwatRecursive:\n");
   printf(">Query\n");
@@ -1352,8 +1352,8 @@ static int alignSmiWatBandRecursive(
   if ((errcode = setMemALITRACK(&rssp->track, &band)))
     return errcode;
 
-  if ((errcode = alignSmiWatBand(&rssp->track, bufp, &band, 
-				 q_profp, 
+  if ((errcode = alignSmiWatBand(&rssp->track, bufp, &band,
+				 q_profp,
 #ifdef alignment_matrix_debug
 				 q_seqp,
 				 codecp,
@@ -1363,12 +1363,12 @@ static int alignSmiWatBandRecursive(
 
   if (rssp->track.max_scor < minscore)
     return ERRCODE_SUCCESS;
-    
-  errcode = makeMetaFromTrack(&rssp->meta, rssp->cplxp, &rssp->track, 
+
+  errcode = makeMetaFromTrack(&rssp->meta, rssp->cplxp, &rssp->track,
 			      &band, q_profp,
 #ifdef alignment_debug
 			      codecp,
-			      q_seqp, 
+			      q_seqp,
 #endif
 			      s_seqp);
 
@@ -1398,13 +1398,13 @@ static int alignSmiWatBandRecursive(
 #endif
 			     q_len,
 			     s_seqp, s_len,
-			     l_edge, r_edge, 
-			     q_left, q_right, 
+			     l_edge, r_edge,
+			     q_left, q_right,
 			     s_left, s_start-1,
-			     minscore, 
+			     minscore,
 			     minscorlen
 			     );
-    if (errcode) 
+    if (errcode)
       return errcode;
   }
 
@@ -1420,13 +1420,13 @@ static int alignSmiWatBandRecursive(
 #endif
 			     q_len,
 			     s_seqp, s_len,
-			     l_edge, r_edge, 
+			     l_edge, r_edge,
 			     q_left, q_right,
 			     s_end+1, s_right,
 			     minscore,
 			     minscorlen
 			     );
-    if (errcode) 
+    if (errcode)
       return errcode;
   }
 
@@ -1437,18 +1437,18 @@ static int alignSmiWatBandRecursive(
  *********************** Public Methods of Type AliRsltSet ********************
  ******************************************************************************/
 
-AliRsltSet *aliRsltSetCreate(const ScoreMatrix *smp, 
+AliRsltSet *aliRsltSetCreate(const ScoreMatrix *smp,
 			     short blksz, short diffblksz,
 			     int track_blksz, int track_thresh)
 {
   int errcode = ERRCODE_SUCCESS;
   short i;
   AliRsltSet *p;
- 
+
   EMALLOCP0(p);
   if (!p) return NULL;
 
-  if (blksz < 1) 
+  if (blksz < 1)
     blksz = ALIRSLTSET_DEFAULT_BLKSZ;
 
   ECALLOCP(blksz, p->rsp);
@@ -1515,16 +1515,16 @@ short aliRsltSetGetSize(const AliRsltSet *arp)
   return arp->nres;
 }
 
-int aliRsltSetFetchData(const AliRsltSet *arp, short idx, int *score, 
+int aliRsltSetFetchData(const AliRsltSet *arp, short idx, int *score,
 		       int *ps_start, int *ps_end, int *us_start, int *us_end,
 		       const DiffStr **dfsp)
 {
   const ALIRESULT *rp;
-  if (idx >= arp->nres) 
+  if (idx >= arp->nres)
     return ERRCODE_FAILURE;
 
   rp = arp->rsp + idx;
-  
+
   if (score)
     *score = rp->score;
   if (ps_start)
@@ -1577,7 +1577,7 @@ int aliSmiWatInBand(AliRsltSet *rssp,
   scoreGetProfile(NULL, &qlen, NULL, NULL, profp);
   if (qlen > INT_MAX)
     return ERRCODE_SEQLEN;
-  
+
 #ifdef alignment_debug
   if ((errcode = setALIMETA(&rssp->meta, unprofiled_seqlen + qlen + 1)))
     return errcode;
@@ -1617,17 +1617,17 @@ int aliSmiWatInBandFast(ALIDPMSCOR_t *maxswscor,
   int errcode;
   unsigned int qlen;
   ALIBAND band;
-  
+
   scoreGetProfile(NULL, &qlen, NULL, NULL, profp);
-  if ((errcode = initALIBAND(&band, 
+  if ((errcode = initALIBAND(&band,
 			     l_edge, r_edge,
 			     profiled_left, profiled_right, qlen,
 			     unprofiled_left, unprofiled_right, unprofiled_seqlen
 			     )))
     return errcode;
-  
-  errcode = alignSmiWatBandFast(maxswscor, bufp, &band, 
-				profp, 
+
+  errcode = alignSmiWatBandFast(maxswscor, bufp, &band,
+				profp,
 #ifdef alignment_matrix_debug
 				profiled_seqp,
 				codecp,
@@ -1657,31 +1657,31 @@ int aliDebugFullSmiWat(AliRsltSet *rssp, AliBuffer *bufp,
 
   if (ps_len > INT_MAX)
     return ERRCODE_SEQLEN;
-  
+
   if ((errcode = setALIMETA(&rssp->meta, us_len + ps_len + 1)))
     return errcode;
 
-  if ((errcode = initALIBAND(&band, 
+  if ((errcode = initALIBAND(&band,
 			     l_edge, r_edge,
 			     ps_start, ps_end, (int) ps_len,
 			     us_start, us_end, us_len)))
     return errcode;
 
-  
+
   if (!(errcode = setMemALITRACK(&rssp->track, &band))) {
-    errcode = alignSmiWatBand(&rssp->track, bufp, 
-			      &band, profp, 
+    errcode = alignSmiWatBand(&rssp->track, bufp,
+			      &band, profp,
 #ifdef alignment_matrix_debug
 			      psqp,
 			      codecp,
-#endif 
+#endif
 			      usqp);
   }
-  
+
   if (errcode)
     return errcode;
-  errcode = makeMetaFromTrack(&rssp->meta, NULL, &rssp->track, 
-			      &band, profp, 
+  errcode = makeMetaFromTrack(&rssp->meta, NULL, &rssp->track,
+			      &band, profp,
 			      codecp,
 			      psqp, usqp);
 
@@ -1728,30 +1728,29 @@ int aliSmiWatInBandDirect(AliRsltSet *rssp, AliBuffer *bufp,
   if (ps_len > INT_MAX)
     return ERRCODE_SEQLEN;
 
-#ifdef alignment_debug  
+#ifdef alignment_debug
   if ((errcode = setALIMETA(&rssp->meta, us_len + ps_len + 1)))
     return errcode;
 #endif
-  if ((errcode = initALIBAND(&band, 
+  if ((errcode = initALIBAND(&band,
 			     l_edge, r_edge,
 			     ps_start, ps_end, (int) ps_len,
 			     us_start, us_end, us_len)))
     return errcode;
 
-  
+
   if (!(errcode = setMemALITRACK(&rssp->track, &band))) {
-    errcode = alignSmiWatBand(&rssp->track, bufp, 
-			      &band, profp, 
+    errcode = alignSmiWatBand(&rssp->track, bufp,
+			      &band, profp,
 #ifdef alignment_matrix_debug
 			      psqp,
 			      codecp,
-#endif 
+#endif
 			      usqp);
   }
-  
+
   if (!errcode)
     *maxscor = rssp->track.max_scor;
   return errcode;
 }
 #endif //#ifdef alignment_timing
-		  

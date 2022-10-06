@@ -9,7 +9,7 @@
 #############################################################################
 #############################################################################
 #                                                                           #
-#  Copyright (C) 2013 - 2014 Genome Research Ltd.                           # 
+#  Copyright (C) 2013 - 2014 Genome Research Ltd.                           #
 #                                                                           #
 #  Author: Hannes Ponstingl (hp3@sanger.ac.uk)                              #
 #                                                                           #
@@ -32,7 +32,7 @@
 #############################################################################
 
 from sys import path
-path.append('../misc') # find SAM.py 
+path.append('../misc') # find SAM.py
 
 PROGNAM = "./smalt_Xali_test"
 PROGNAM_REVCOMP = "./sequenceReverseComplement_test"
@@ -58,7 +58,7 @@ READS = (
 "tgtagtaatagtgaaggagcttgcgctccatat"\
 "cgacgattgcacgtatgcgacaaaaatatggtaaaaatgg",
 "tgtagtaatagtgaaggagcttgcgctccatat"\
-"cgcgattgcacgtatgcgacaaaaatatggtaaaaatgg",  
+"cgcgattgcacgtatgcgacaaaaatatggtaaaaatgg",
 )
 
 # ref no, pos, cigar, edit distance
@@ -79,14 +79,14 @@ def asFASTA(seqnamprefix, sequences):
     oustr = ""
     ctr = 1
     for seq in sequences:
-        oustr = oustr + ">%s_%i\n%s\n" % (seqnamprefix, ctr, seq)
+        oustr += ">{:s}_{:d}\n{:s}\n".format(seqnamprefix, ctr, seq)
         ctr = ctr + 1
     return oustr
 
 def makeFASTAfile(df, prefix, sequences):
     from testdata import openFile
 
-    filnam = df.addTMP("%s%s.fa" % (TMPFIL_PREFIX, prefix))
+    filnam = df.addTMP("{:s}{:s}.fa".format(TMPFIL_PREFIX, prefix))
     oufil = openFile(filnam, 'w')
     oustr = asFASTA(prefix, sequences)
     oufil.write(oustr)
@@ -94,7 +94,6 @@ def makeFASTAfile(df, prefix, sequences):
     return filnam
 
 def reverseComplement(df, fastq_name_F, fastq_name_R):
-
     tup = (PROGNAM_REVCOMP,
            fastq_name_F,
            fastq_name_R)
@@ -104,22 +103,26 @@ def reverseComplement(df, fastq_name_F, fastq_name_R):
 
 def smalt_index(df, index_name, fasta_name, kmer, nskip):
     tup = (PROGNAM, 'index',
-           '-k', '%i' % (int(kmer)),
-           '-s', '%i' % (int(nskip)),
+           '-k', '{:d}'.format(int(kmer)),
+           '-s', '{:d}'.format(int(nskip)),
            index_name,
            fasta_name)
 
     df.call(tup, "when indexing")
 
+    return
+
 def smalt_map(df, oufilnam, indexnam, readfil, option=[]):
     tup = [PROGNAM, 'map', '-f', 'sam:x', '-o', oufilnam]
-    
+
     if option:
         tup.extend(option)
-    
+
     tup.extend([indexnam, readfil])
-               
+
     df.call(tup, "when mapping")
+
+    return
 
 def refnoFromNam(refnam):
     m = REFNAMNO.search(refnam)
@@ -135,29 +138,29 @@ def checkSAM(df, filnam_sam, results):
         sam.next(infil)
 
         if not sam.ok:
-            df.exitErr("ERROR: Could not parse file '%s'" % (filnam_sam))
+            exit("ERROR: Could not parse file '{:s}'".format(filnam_sam))
 
         refno = refnoFromNam(sam.rname)
         if refno != res[0]:
-            df.exitErr("ERROR: wrong reference sequence %i '%s' (target: %i)" % \
-                       (refno, sam.rname, res[0]))
+            exit("ERROR: wrong reference sequence {:d} '{:s}' (target: {:d})" \
+                 .format(refno, sam.rname, res[0]))
         if sam.pos != res[1]:
-            df.exitErr("ERROR: wrong reference position %i (target:%i)" % (sam.pos, res[1]))
+            exit("ERROR: wrong reference position {:d} (target:{:d})".format(sam.pos, res[1]))
 
         if sam.cigar != res[2]:
-            df.exitErr("ERROR: wrong CIGAR string '%s' (target:'%s')" % (sam.cigar, res[2]))
+            exit("ERROR: wrong CIGAR string '{:s}' (target:'{:s}')".format(sam.cigar, res[2]))
 
         (typ, fld) = sam.tags["NM"]
         edist = int(fld)
         if edist != res[3]:
-            df.exitErr("ERROR: wrong edit distance %i (target: %i)" % (edist, res[3]))
-                          
+            exit("ERROR: wrong edit distance {:d} (target: {:d}".format(edist, res[3]))
+
     infil.close()
     return
 
 if __name__ == '__main__':
     from testdata import DataFiles
-    
+
     df = DataFiles()
 
     indexnam = df.addIndex(TMPFIL_PREFIX)
@@ -166,15 +169,15 @@ if __name__ == '__main__':
     rc_readfilnam = df.addTMP(TMPFIL_PREFIX + "RC.fa")
     samfilnam = df.addTMP(TMPFIL_PREFIX + ".sam")
     rc_samfilnam = df.addTMP(TMPFIL_PREFIX + "RC.sam")
-    
+
     smalt_index(df, indexnam, reffilnam, KMER, NSKIP)
     smalt_map(df, samfilnam, indexnam, readfilnam)
-    checkSAM(df, samfilnam, RESULTS)
     
+    checkSAM(df, samfilnam, RESULTS)
+
     reverseComplement(df, readfilnam, rc_readfilnam)
     smalt_map(df, rc_samfilnam, indexnam, rc_readfilnam)
     checkSAM(df, samfilnam, RESULTS)
-    
+
     df.cleanup()
     exit(0)
-       

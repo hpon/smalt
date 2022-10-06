@@ -22,9 +22,9 @@ def smalt_index(df, index_name, fasta_name, kmer, nskip):
     df.call(tup, "when indexing")
 
 def smalt_sample(df,oufilnam, indexnam, readfil, matefil, option=[]):
- 
+
     tup = [PROGNAM, 'sample']
-    
+
     if option:
         tup.extend(option)
     tup.extend(
@@ -37,7 +37,7 @@ def smalt_sample(df,oufilnam, indexnam, readfil, matefil, option=[]):
 
 def smalt_check(df, readfil, matefil=""):
     tup = [PROGNAM, 'check', readfil]
-    
+
     if len(matefil) > 0:
         tup.append(matefil)
     df.call(tup, "when checking")
@@ -45,9 +45,9 @@ def smalt_check(df, readfil, matefil=""):
 def smalt_map(df, oufilnam, indexnam, samplenam, readfil, matefil, option=[]):
     from sys import exit
     from subprocess import call
- 
+
     tup = [PROGNAM, 'map']
-    
+
     if option:
         tup.extend(option)
     tup.extend(
@@ -57,13 +57,14 @@ def smalt_map(df, oufilnam, indexnam, samplenam, readfil, matefil, option=[]):
          indexnam,
          readfil, matefil]
         )
+    print(tup)
     df.call(tup, "when mapping")
 
 def assess_mapping(oufilnam):
     from formats import Cigar, getNextCigarPair, openFile
 
     infil = openFile(oufilnam, 'r')
-    
+
     cigA = Cigar()
     cigB = Cigar()
 
@@ -78,7 +79,7 @@ def assess_mapping(oufilnam):
             nonproper_ctr = nonproper_ctr + 1
         (isOK, isEOF) = getNextCigarPair(infil, cigA, cigB)
     infil.close()
-    
+
     if pair_ctr != 10000:
         exit("Found %i pairs, but expected 10,000." % pair_ctr)
     if nonproper_ctr > MAXNUM_NONPROPER_PAIRS:
@@ -90,7 +91,7 @@ def compare_mapping(oufilnam1, oufilnam2):
 
     infil1 = openFile(oufilnam1, 'r')
     infil2 = openFile(oufilnam2, 'r')
-    
+
     cig1 = Cigar()
     cig2 = Cigar()
 
@@ -100,7 +101,7 @@ def compare_mapping(oufilnam1, oufilnam2):
         if cig1.next(infil1):
             break
         ctr1 = ctr1 + 1
-        
+
         if cig2.next(infil2):
             break
         ctr2 = ctr2 + 1
@@ -119,12 +120,12 @@ def compare_mapping(oufilnam1, oufilnam2):
              ctr1, ctr2)
     if ctr1 != 20000:
         exit("Expected 20,000 reads, got %i." % ctr1)
-    
+
 if __name__ == '__main__':
     from testdata import DataFiles
-    
+
     df = DataFiles()
-    
+
     refnam = df.joinData(REF_FASTA_NAME)
     readnamA = df.joinData(READ_PREFIX + "_1.fq.gz")
     readnamB = df.joinData(READ_PREFIX + "_2.fq.gz")
@@ -132,7 +133,7 @@ if __name__ == '__main__':
 
     samplenam1 = df.addTMP(TMPFIL_PREFIX + ".1.txt")
     samplenam2 = df.addTMP(TMPFIL_PREFIX + ".2.txt")
-    
+
     oufilnam1 = df.addTMP(TMPFIL_PREFIX + ".1.cig")
     oufilnam2 = df.addTMP(TMPFIL_PREFIX + ".2.cig")
     oufilnam3 = df.addTMP(TMPFIL_PREFIX + ".3.cig")
@@ -144,7 +145,7 @@ if __name__ == '__main__':
     assess_mapping(oufilnam1)
 
     nthread_tup = ['-n', '4']
-    
+
     smalt_sample(df,samplenam2, indexnam, readnamA, readnamB, nthread_tup)
     smalt_map(df,oufilnam2, indexnam, samplenam2, readnamA, readnamB, nthread_tup)
     assess_mapping(oufilnam2)
@@ -152,7 +153,6 @@ if __name__ == '__main__':
     nthread_tup = ['-n', '4', '-O']
     smalt_map(df,oufilnam3, indexnam, samplenam2, readnamA, readnamB, nthread_tup)
     compare_mapping(oufilnam1, oufilnam3)
-    
+
     df.cleanup()
     exit(0)
-              

@@ -20,13 +20,13 @@ def testReadWrite(df, cnam, fnam, tnum):
     is_ok = False
     tmpfilA = df.addTMP(TMPFILA)
     diffilnam = df.addTMP(TMPDIFFIL)
-    
-    fcomtup = ["./%s" % cnam, fnam, tmpfilA, "%i" % tnum]
+
+    fcomtup = ["./{:s}".format(cnam), fnam, tmpfilA, "{:d}".format(tnum)]
     df.call(fcomtup)
 
     tup = ["diff", "-aiws", fnam, tmpfilA]
     df.call(tup, oufilnam = diffilnam)
-    
+
     fdiff = openFile(diffilnam, 'r')
     while 1:
         lin = fdiff.readline()
@@ -46,10 +46,10 @@ def testCompress(df, cnam, fnam, s_start, s_end):
     tmpfilA = df.addTMP(TMPFILA)
     tmpfilB = df.addTMP(TMPFILB)
     diffilnam = df.addTMP(TMPDIFFIL)
-    
-    tup = ["./%s" % cnam, fnam, tmpfilA, tmpfilB, "%i" % s_start, "%i" % s_end]
+
+    tup = ["./{:s}".format(cnam), fnam, tmpfilA, tmpfilB, "{:d}".format(s_start), "{:d}".format(s_end)]
     df.call(tup);
-    
+
     tup = ["diff", "-aiws", tmpfilA, tmpfilB]
     df.call(tup, oufilnam=diffilnam)
 
@@ -76,14 +76,14 @@ def testSetReadWrite(df):
                 is_ok = False
                 break
         if not is_ok: break
-    if is_ok: print "Sequence test %s: ok" % testcom
-    else: print "Sequence test: %s %i failed on '%s'" % (testcom, i, fil)
+    if is_ok: print ("Sequence test {:s}: ok".format(testcom))
+    else: print ("Sequence test: {:s} {:d} failed on '{:s}'".format(testcom, i, fil))
     return  is_ok
 
 def testSetCompress(df):
     arglist = [(df.datafiles[0], (61, 312), (2, 28), (0, 2007540), (2007400,3), (2007491,9)),
                (df.datafiles[3], (0,32),(1,32), (7,25), (8,25), (9,25), (17,13), (16,14))]
-    
+
 
     is_ok = True
     for testcom in TESTPROGRAMS[1:2]:
@@ -93,9 +93,9 @@ def testSetCompress(df):
                     is_ok = False
                     break
             if not is_ok: break
-        if is_ok: print "Sequence test %s: ok" % testcom
+        if is_ok: print ("Sequence test {:s}: ok".format(testcom))
         else:
-            print "Sequence test %s: %s %i %i failed on '%s'" % (testcom, b[0], b[1], a[0])
+            print ("Sequence test %s: %s %i %i failed on '{:s}'".format(testcom, b[0], b[1], a[0]))
         if not is_ok: break
 
     return  is_ok
@@ -109,6 +109,5 @@ if __name__ == '__main__':
         is_ok = testSetCompress(df)
     if is_ok:
         df.cleanup()
-     
+
     sys.exit(not is_ok)
-   

@@ -58,7 +58,7 @@ enum {
   HITINFO_MINCOVER_NKTUP = 3,
   NBITS_PER_BYTE = 8,
 #endif
-  /* HITINFO_SEED_PERCENTILE = 80, */ /**< use only the least frequent seeds, as percentage of total */  
+  /* HITINFO_SEED_PERCENTILE = 80, */ /**< use only the least frequent seeds, as percentage of total */
   NBIT_INT32 = 31,
 
 #ifdef hashhit_debug
@@ -69,7 +69,7 @@ enum {
 			    * don't change that */
   KMER_NHIT_MASK = 0x00ffffff, /** mask set this to (1<<NBIT_KMER_NHIT) - 1; */
   QCLASS_SCALFAC = 10,
-  QCLASS_NUM = 4,          /**< number of k-mer classes */ 
+  QCLASS_NUM = 4,          /**< number of k-mer classes */
 #endif
 #ifdef hashhit_dump_sortarray
   MIN_ARRLEN = 50000,
@@ -108,12 +108,12 @@ typedef uint64_t HASHPACK_t;
 
 /** The following structure contains k-tupe hits for one query
  * sequence either in forward direction (is_reverse == 0) or for the
- * reverse complement (is_reverse == 1).  
+ * reverse complement (is_reverse == 1).
  *
  * When the list is fully set up (status == HASHHIT_SHIFTS) the array
  * sqdat contains k-tuple base offsets in the query sequence (32 bits)
  * and the 'shift' (32 bits) merged into a 64-bit unsigned integer.
- * 
+ *
  * The 'shift' shift = s_pos - q_pos is the position of the hit in the
  * subject sequence s_pos relative to the query sequence q_pos. So
  * that a pair of ktuples of the same shift define between them an
@@ -130,7 +130,7 @@ typedef uint64_t HASHPACK_t;
  * b[j]. For a hit of the reverse complement in the subject sequence
  * (S[j], S[j+1], ..., S[j+kmer-1]) q_pos_rc = i, s_pos_rc = j and
  * shift_rc = q_pos_rc + s_pos_rc;
- * 
+ *
  * to make the number stored as shift >= 0, shift' = s_pos - q_pos + q_len - 1
  * for the forward case (is_reverse == 0)
  */
@@ -150,7 +150,7 @@ typedef struct _SEED {
   HASHNUM_t nhits;      /**< Number of hits */
 #ifdef hashit_basqual
   int qclass;
-#endif  
+#endif
 #ifdef hashhit_debug
   HASHWORD_t kmer_word;
 #endif
@@ -176,7 +176,7 @@ struct _HashHitInfo {
   SEED *seedp;     /**< array of size n_seeds */
   SEQLEN_t *sidxp;   /**< array of size n_seeds, seed indices
 		    * for sorting */
-  SORTKEY_t *nhitqual_sortkeyp; 
+  SORTKEY_t *nhitqual_sortkeyp;
   /**< Array of size n_seeds. The lower NBIT_KMER_NHIT bits of
    * nhitqual_sortkeyp[i] represent the number of hits of the
    * k-mer. If hashhit_basqual is defined, the upper NBIT_UINT32 -
@@ -201,13 +201,13 @@ struct _HashHitInfo {
 		     * hashCalcHitInfoNumberOfHits(,0) was called
 		     * last */
   uint32_t **framep;    /**< Array of size nskip containing for each frame an array of indices of sidxp */
-  uint32_t *countp;   /**< Array of size nskip containing the seed counts for each frame 
+  uint32_t *countp;   /**< Array of size nskip containing the seed counts for each frame
 		     *  this is only used in some applications */
 #endif
-  uint32_t seed_rank; /**< if > 0 only use the first seed_rank seeds in the 
+  uint32_t seed_rank; /**< if > 0 only use the first seed_rank seeds in the
 		     * (sorted) seed array.
 		     * seed_rank is determined such that the sum of all seed hits does
-		     * not exceed the cut-off nhit_total_cutoff. In addition, 
+		     * not exceed the cut-off nhit_total_cutoff. In addition,
 		     * seed_rank <= n_seeds*seed_percentile/100 as long as the coverage of the seeds
 		     * in each frame is at least seed_mincover */
 };
@@ -219,8 +219,8 @@ struct _HashHitList { /**<contains k-tuple hits for one query sequence */
   int nhits_alloc;  /**< Memory for this many hits has been allocated */
   int nhits_blksz;  /**< Block size for memory re-allocation */
   HASHPACK_t *sqdat;/**< [nhits] combined shift and query data for k-tuple hit.
-		  * for status & HASHHIT_SEQASS == 0: 
-		  *      upper 32 bits: ktuple number in subject sequence 
+		  * for status & HASHHIT_SEQASS == 0:
+		  *      upper 32 bits: ktuple number in subject sequence
 		  *      lower 32 bits: ktuple number == base offset in query sequence
 		  * for status & HASHHIT_SHIFTS != 0:
 		  *      upper 32 bits: shift
@@ -242,7 +242,7 @@ typedef struct _FILTERIVAL { /**< Distance interval for filtering hits */
 
 struct _HashHitFilter { /**< Set of intervals for filtering hit lists */
   FILTERIVAL *ivp;      /**< array of filter intervals */
-  short num;            /**< number of filter intervals */ 
+  short num;            /**< number of filter intervals */
   short n_alloc;        /**< allocated memory as number of intervals */
   short blocksiz;
 };
@@ -256,7 +256,7 @@ struct _HashHitFilter { /**< Set of intervals for filtering hit lists */
     (ktup_word) = ((ktup_word)>>2) + (((HASHWORD_t)(((data)^SEQCOD_STDNT_MASK) & SEQCOD_STDNT_MASK))<<(ktup_rc_addpos)); \
   } else {								\
     (ktup_word) = ((ktup_word)<<2) + ((data) & SEQCOD_STDNT_MASK);	\
-  }									
+  }
 
 #ifdef hashhit_basqual
 #define GET_LOWEST_QUAL(minqual_pos, minqual_num, first_pos, last_pos) \
@@ -277,7 +277,7 @@ struct _HashHitFilter { /**< Set of intervals for filtering hit lists */
     (minqual_pos) = (last_pos);						\
     (minqual_num) = 1;}							\
   else if (qualp[(last_pos)] == qualp[(minqual_pos)]) {			\
-    (minqual_num)++;} 
+    (minqual_num)++;}
 #endif
 
 #define SET_NEXT_SHIFT(is_reverse, sqdat, pos, q, nskip, offbit)	\
@@ -323,12 +323,12 @@ static char *writeWord(char *buff, HASHWORD_t key, UCHAR ktup)
 #endif
 
 static BOOL checkForRepeats(TDRFILTR word, TDRFILTR tdrf[])
-     /**< Return TRUE the key occurred the last NREPEATS times. 
+     /**< Return TRUE the key occurred the last NREPEATS times.
       *   FALSE else. */
 {
   BOOL isRepeat = FALSE;
   UCHAR i;
-  
+
   for (i=0; i<NREPEATS; i++)
     if (word == tdrf[i]) {
       isRepeat = TRUE;
@@ -366,7 +366,7 @@ static void initHitInfoFrames(const HashHitInfo *hip)
     frp->cover = 0;
     memset(frp->bufp, 0, hip->frcbufsz*sizeof(QMASK));
   }
-  
+
   for (i=0; i<hip->n_seeds; i++) {
     SEQLEN_t ix = hip->sidxp[i];
     f = (UCHAR) hip->seedp[ix].qoffs%(hip->nskip);
@@ -402,7 +402,7 @@ static void fprintHitInfo(FILE *fp, UCHAR ktup, const HashHitInfo *p)
   for (i=0; i<p->n_seeds; i++) {
     sp = p->seedp + p->sidxp[i];
     fprintf(fp, "[%u] %s qo = %u nh = %i\n", i, writeWord(keybuf, sp->kmer_word, ktup),
-	    sp->qoffs, 
+	    sp->qoffs,
 #ifdef hashhit_basqual
 	    p->nhitqual_sortkeyp[i]&KMER_NHIT_MASK
 #else
@@ -432,15 +432,15 @@ static int reallocHashHitInfo(HashHitInfo *p, uint32_t newlen)
   hp = EREALLOCP(p->qmaskp, siz);
   if (!hp) return ERRCODE_NOMEM;
   p->qmaskp = hp;
-  
+
   hp = EREALLOCP(p->qbufp, siz);
   if (!hp) return ERRCODE_NOMEM;
   p->qbufp = hp;
-  
+
   hp = EREALLOCP(p->sidxp, siz);
   if (!hp) return ERRCODE_NOMEM;
   p->sidxp = hp;
-  
+
   hp = EREALLOCP(p->nhitqual_sortkeyp, siz);
   if (!hp) return ERRCODE_NOMEM;
   p->nhitqual_sortkeyp = hp;
@@ -458,7 +458,7 @@ static int reallocHashHitInfo(HashHitInfo *p, uint32_t newlen)
     if (!hp) return ERRCODE_NOMEM;
     p->frcp->sxp = hp;
     for (o=1; o<p->nskip;o++) p->frcp[o].sxp = p->frcp[0].sxp + o*sz;
-   
+
     hp = EREALLOCP(p->frcp->bufp, sq*p->nskip);
     if (!hp) return ERRCODE_NOMEM;
     p->frcp->bufp = hp;
@@ -512,16 +512,16 @@ static int collectHitInfo(HashHitInfo *hip,
 #endif
   hip->status = 0;
 
-  if (ktup > 31 || ktup != hip->ktup || nskip != hip->nskip) 
+  if (ktup > 31 || ktup != hip->ktup || nskip != hip->nskip)
     return ERRCODE_ASSERT;
 
   if (((short) basqual_threshold) + SEQCOD_QVAL_OFFS > UCHAR_MAX)
     return ERRCODE_QUALVAL;
- 
-  if (codtyp != SEQCOD_MANGLED) 
+
+  if (codtyp != SEQCOD_MANGLED)
     return ERRCODE_SEQCODE;
-  
-  if (seqlen < ktup) 
+
+  if (seqlen < ktup)
     return ERRCODE_SHORTSEQ;
 
   /* qualp might be NULL for FASTA input */
@@ -531,7 +531,7 @@ static int collectHitInfo(HashHitInfo *hip,
   if (seqlen >= hip->n_alloc &&
       (errcode = reallocHashHitInfo(hip, seqlen+1)))
     return errcode;
-  if ((is_reverse)) 
+  if ((is_reverse))
     hip->status |= HITINFO_REVERSE;
   hip->qlen = seqlen;
 
@@ -548,7 +548,7 @@ static int collectHitInfo(HashHitInfo *hip,
 
   initRepeatFilter(tr_filter);
 
-  seedctr = hip->n_seeds = 0;  
+  seedctr = hip->n_seeds = 0;
 
 #ifdef hashhit_basqual
   minqual_pos = 0;
@@ -569,10 +569,10 @@ static int collectHitInfo(HashHitInfo *hip,
       } else if (qualp[s] == qualp[minqual_pos]) {
 	minqual_num++;
       }
-    }     
+    }
 #endif
   }
-  
+
   for(; s <= seq_end; tuplectr++,s++) {
     if ((datap[s]&SEQCOD_STDNT_TESTBIT) || /* do not look up non-standard nt */
 	(qualp != NULL && qualp[s] < minqval)) /* do not look up kmer word with low base quality values */
@@ -580,7 +580,7 @@ static int collectHitInfo(HashHitInfo *hip,
     else if ((non_stdnt))
       non_stdnt--;
     MAKE_NEXT_WORD(ktup_word, datap[s]);
- 
+
     if ((non_stdnt)) {
       qmaskp[tuplectr] = HITQUAL_NONSTDNT;
       continue;
@@ -594,9 +594,9 @@ static int collectHitInfo(HashHitInfo *hip,
       qmaskp[tuplectr] = HITQUAL_REPEAT;
       continue;
     }
-    
+
     nhits = hashTableGetKtupleHits(NULL, &posidx, htp, ktup_word);
-    
+
     if (nhits < 1) {
       qmaskp[tuplectr] = HITQUAL_NOHIT;
       continue;
@@ -631,7 +631,7 @@ static int collectHitInfo(HashHitInfo *hip,
       continue;
     }
     hip->nhitqual_sortkeyp[seedctr] = nhits;
-#endif 
+#endif
 
     qmaskp[tuplectr] = HITQUAL_NORMHIT;
     sp = hip->seedp + seedctr;
@@ -662,9 +662,9 @@ static int collectHitInfo(HashHitInfo *hip,
  * not encode a base quality class in the upper NBIT_KMER_NHIT bits
  * (hashhit_basqual undefined) */
 
-static int getHitInfoStats(const HashHitInfo *hhip, uint32_t *tot, uint32_t *max, uint32_t *min, 
+static int getHitInfoStats(const HashHitInfo *hhip, uint32_t *tot, uint32_t *max, uint32_t *min,
 			   uint32_t *median, uint32_t *quart_lo, uint32_t *quart_hi)
- 
+
 {
   const uint32_t ns = hhip->n_seeds;
   uint32_t * const nhp = hhip->nhitqual_sortkeyp;
@@ -700,11 +700,11 @@ static int getHitInfoStats(const HashHitInfo *hhip, uint32_t *tot, uint32_t *max
 #endif
 
 #ifdef hashhit_minimise_coverdeficit
-static int setHitInfoFrameRanks(COVERAGE mincover, 
+static int setHitInfoFrameRanks(COVERAGE mincover,
 				HASHNUM_t maxnhitsum,
 				HASHNUM_t maxnhit_perTuple,
 				const HashHitInfo *hip)
-/**< Fill SEED indices pointing to hip->seedp in set hip->frcp[f].sxp for 
+/**< Fill SEED indices pointing to hip->seedp in set hip->frcp[f].sxp for
  * each frame 0 <= f < nskip. Set the number of seeds in hip->frcp[f].ns.
  * Then set hip->frcp[f].ns_used
  */
@@ -718,7 +718,7 @@ static int setHitInfoFrameRanks(COVERAGE mincover,
     return ERRCODE_HITINFO;
 
   initHitInfoFrames(hip);
-  
+
   /* make sure,at least mincover bases are covered by k-mer words in each frame */
   for (nFrameUnused=0, nFrameWithMinCover =0;
        (nFrameUnused < nskip) && (nFrameWithMinCover < nskip || nhitsum <= maxnhitsum);
@@ -727,10 +727,10 @@ static int setHitInfoFrameRanks(COVERAGE mincover,
       FRAMECOV *frp = hip->frcp + f;
       if (frp->status & FRAMECOV_INACTIVE)
 	continue;
-      if (frp->ns_used < frp->ns) {      
+      if (frp->ns_used < frp->ns) {
 	const SEED *sp = hip->seedp + frp->sxp[frp->ns_used];
 	const uint64_t hsum = nhitsum + sp->nhits;
-	if (hsum <= maxnhitsum || 
+	if (hsum <= maxnhitsum ||
 	    (maxnhit_perTuple = 0 || sp->nhits < maxnhit_perTuple)) {
 	  SEQLEN_t q =  sp->qoffs/nskip;
 	  SEQLEN_t ru = q/sizeof(QMASK);
@@ -766,10 +766,10 @@ static int setHitInfoFrameRanks(COVERAGE mincover,
 }
 #endif
 
-static int getHitInfoMaxRank(uint32_t *n, 
-			     COVERAGE mincover, 
+static int getHitInfoMaxRank(uint32_t *n,
+			     COVERAGE mincover,
 			     COVERAGE maxcover,
-			     uint32_t maxhit, 
+			     uint32_t maxhit,
 			     const HashHitInfo *hip)
      /**< Return n so that the words {0, 1, ..., n-1} with the lowest
       * hit frequencies cover at least mincover bases of the read in
@@ -807,7 +807,7 @@ static int getHitInfoMaxRank(uint32_t *n,
     SEQLEN_t ix = hip->sidxp[i];
     f = hip->seedp[ix].qoffs%nskip; /* frame index f from {0, ..., nksip-1} */
     hip->framep[f][hip->countp[f]++] = i; /* save the rank */
-  } 
+  }
 #endif
   /*
    * hip->countp[f] is the number of seeds in each of the nskip frames
@@ -817,13 +817,13 @@ static int getHitInfoMaxRank(uint32_t *n,
 #ifdef hashhit_basqual
   ntot = hip->nhitqual_sortkeyp[0]&KMER_NHIT_MASK;
   for (i=1; i<=hip->n_seeds && ntot <= maxhit; i++)
-    ntot += hip->nhitqual_sortkeyp[i]&KMER_NHIT_MASK; 
+    ntot += hip->nhitqual_sortkeyp[i]&KMER_NHIT_MASK;
 #else
   ntot = hip->nhitqual_sortkeyp[0];
   for (i=1; i<=hip->n_seeds && ntot <= maxhit; i++)
-    ntot += hip->nhitqual_sortkeyp[i]; 
+    ntot += hip->nhitqual_sortkeyp[i];
 #endif
- 
+
   *n = nmax = i-1;
 
 #ifdef hashhit_minimise_coverdeficit
@@ -831,7 +831,7 @@ static int getHitInfoMaxRank(uint32_t *n,
     FRAMECOV *frp = hip->frcp + f;
     cover = 0;
     imax = hip->frcp[f].ns;  /* number of seeds in frame f */
-    if (!imax) 
+    if (!imax)
       continue;
     for (i=0; i < frp->ns && cover <= maxcover && (cover < mincover || frp->sxp[i] <= *n); i++) {
       const SEED *sp = hip->seedp + frp->sxp[i];
@@ -859,7 +859,7 @@ static int getHitInfoMaxRank(uint32_t *n,
 #else
   for(f=0; f<nskip; f++) {
     imax =  hip->countp[f]; /* number of seeds in frame f */
-    if (!imax) 
+    if (!imax)
       continue;
 
     memset(qbufp, 0, qmem);
@@ -912,7 +912,7 @@ HashHitInfo *hashCreateHitInfo (int blksz, const HashTable *htp)
   ECALLOCP(blksz, p->sidxp);
   ECALLOCP(blksz, p->nhitqual_sortkeyp);
   ECALLOCP(blksz, p->seedp);
-  if (!((p->qmaskp) && (p->qbufp) && (p->sidxp) && 
+  if (!((p->qmaskp) && (p->qbufp) && (p->sidxp) &&
 	(p->nhitqual_sortkeyp) && (p->seedp))) {
     hashDeleteHitInfo(p);
     return 0;
@@ -921,12 +921,12 @@ HashHitInfo *hashCreateHitInfo (int blksz, const HashTable *htp)
   p->n_alloc = blksz;
   p->ktup = hashTableGetKtupLen(htp, &p->nskip);
 
-#ifdef hashhit_minimise_coverdeficit  
+#ifdef hashhit_minimise_coverdeficit
   ECALLOCP(p->nskip, p->frcp);
   if ((p->frcp)) {
     size_t sz = CALC_FRAM_BLKSZ(blksz, p->nskip);
     size_t sq = CALC_FRAM_BUFSZ(blksz, p->nskip);
- 
+
     ECALLOCP(sz * p->nskip, p->frcp->sxp);
     ECALLOCP(sq * p->nskip, p->frcp->bufp);
     if ((p->frcp->sxp) && (p->frcp->bufp)) {
@@ -952,8 +952,8 @@ HashHitInfo *hashCreateHitInfo (int blksz, const HashTable *htp)
   }
   p->framep[0] = sp;
   dblk = blksz/p->nskip + 1;
-  
-  for (o=1; o<p->nskip; o++) 
+
+  for (o=1; o<p->nskip; o++)
     p->framep[o] = sp + o*dblk;
 #endif
   return p;
@@ -976,7 +976,7 @@ void hashDeleteHitInfo(HashHitInfo *p)
 #else
     free(p->coverp);
     free(p->countp);
-    if (p->framep) 
+    if (p->framep)
       free(p->framep[0]);
     free(p->framep);
 #endif
@@ -996,7 +996,7 @@ int hashCollectHitInfo(HashHitInfo *hhip, BOOL is_reverse, UCHAR basq_thresh,
   errcode = collectHitInfo(hhip, is_reverse, 0, basq_thresh, seq_start, seq_end, seqp, htp);
 
 #ifdef hashhit_debug
-  fprintHitInfo(stdout, ktup, hhip); 
+  fprintHitInfo(stdout, ktup, hhip);
 #endif
 
   hhip->seed_rank = 0;
@@ -1017,12 +1017,12 @@ int hashCollectHitInfoShort(HashHitInfo *hhip, BOOL is_reverse,
   COVERAGE maxcover;
 #endif
 
-  if ((errcode = collectHitInfo(hhip, is_reverse, maxhit_per_tuple, 
+  if ((errcode = collectHitInfo(hhip, is_reverse, maxhit_per_tuple,
 				basq_thresh, 0, 0, seqp, htp)))
     return errcode;
 #ifdef hashhit_debug
   UCHAR ktup = hashTableGetKtupLen(htp, NULL);
-  fprintHitInfo(stdout, ktup, hhip); 
+  fprintHitInfo(stdout, ktup, hhip);
 #endif
 
   if (hhip->n_seeds <= 1) {
@@ -1030,13 +1030,13 @@ int hashCollectHitInfoShort(HashHitInfo *hhip, BOOL is_reverse,
     hhip->seed_rank = hhip->n_seeds;
     return ERRCODE_SUCCESS;
   }
-  
 
-  if ((errcode = sort2UINTarraysByQuickSort(hhip->n_seeds, 
-					    hhip->nhitqual_sortkeyp, 
+
+  if ((errcode = sort2UINTarraysByQuickSort(hhip->n_seeds,
+					    hhip->nhitqual_sortkeyp,
 					    hhip->sidxp)))
     return errcode;
-  
+
   hhip->status |= HITINFO_SORTED;
   hhip->seed_rank = 0;
   seqFastqGetConstSequence(seqp, &slen, NULL);
@@ -1048,7 +1048,7 @@ int hashCollectHitInfoShort(HashHitInfo *hhip, BOOL is_reverse,
      * => relax the constraints */
     mincover = 0;
   }
-  if ((errcode = setHitInfoFrameRanks(mincover, 
+  if ((errcode = setHitInfoFrameRanks(mincover,
 				      maxhit_total, maxhit_per_tuple,
 				      hhip)))
     return errcode;
@@ -1069,13 +1069,13 @@ int hashCollectHitInfoShort(HashHitInfo *hhip, BOOL is_reverse,
     mincover = 0;
     maxcover = slen;
   }
-  if ((errcode = getHitInfoMaxRank(&hhip->seed_rank, 
-				   mincover, maxcover, 
+  if ((errcode = getHitInfoMaxRank(&hhip->seed_rank,
+				   mincover, maxcover,
 				   maxhit_total, hhip)))
     return errcode;
   hhip->status |= HITINFO_RANK;
 #endif
-  
+
   return ERRCODE_SUCCESS;
 }
 
@@ -1084,15 +1084,15 @@ int hashSortHitInfo(HashHitInfo *hhip)
   int errcode = ERRCODE_SUCCESS;
 
   if (hhip->n_seeds>1 && !(hhip->status & HITINFO_SORTED)) {
-    errcode = sort2UINTarraysByQuickSort(hhip->n_seeds, 
-					 hhip->nhitqual_sortkeyp, 
+    errcode = sort2UINTarraysByQuickSort(hhip->n_seeds,
+					 hhip->nhitqual_sortkeyp,
 					 hhip->sidxp);
     if (!errcode)
       hhip->status |= HITINFO_SORTED;
   }
   return errcode;
 }
-  
+
 uint32_t hashCalcHitInfoCoverDeficit(const HashHitInfo *hip)
 {
   UCHAR s;
@@ -1105,7 +1105,7 @@ uint32_t hashCalcHitInfoCoverDeficit(const HashHitInfo *hip)
 #endif
 
   if (hip->status & HITINFO_RANK) {
-    COVERAGE cover, maxcover=0;  
+    COVERAGE cover, maxcover=0;
 #ifndef hashhit_minimise_coverdeficit
     SEQLEN_t *ixp, ix, imax, q;
     UCHAR *qbufp = hip->qbufp;
@@ -1119,7 +1119,7 @@ uint32_t hashCalcHitInfoCoverDeficit(const HashHitInfo *hip)
       cover = hip->frcp[s].cover;
 #else
       imax =  hip->countp[s]; /* number of seeds in frame s */
-      if (!imax) 
+      if (!imax)
 	continue;
 
       memset(qbufp, 0, qmem);
@@ -1154,7 +1154,7 @@ uint32_t hashCalcHitInfoCoverDeficit(const HashHitInfo *hip)
     for (s=0;s<nskip;s++) {
       d = 0;
       for (ctr=0, i=s; i<hip->qlen; i+=nskip) {
-	if (qmaskp[i] == HITQUAL_NORMHIT) 
+	if (qmaskp[i] == HITQUAL_NORMHIT)
 	  ctr = k;
 	else if (ctr)
 	  ctr--;
@@ -1200,7 +1200,7 @@ uint32_t hashCalcHitInfoNumberOfHits(const HashHitInfo *hhip, HASHNUM_t maxhit_p
 uint32_t hashHitInfoCalcHitNumbers(const HashHitInfo *hhip, uint32_t *nhit_rank)
 {
   uint32_t i, ns, nr = 0;
-  
+
   ns = (hhip->seed_rank > 0)? hhip->seed_rank: hhip->n_seeds;
   for (i=0; i<ns; i++)
 #ifdef hashhit_basqual
@@ -1242,7 +1242,7 @@ static int reallocHitList(HashHitList *hlp, size_t newsiz)
   hp = EREALLOCP(hlp->sqdat, nsiz);
   if (!hp) return ERRCODE_NOMEM;
   hlp->sqdat = hp;
-  hlp->nhits_alloc = (int) nsiz; 
+  hlp->nhits_alloc = (int) nsiz;
 
   return ERRCODE_SUCCESS;
 }
@@ -1273,14 +1273,14 @@ static int initHitList(HashHitList *hlp, const HashHitInfo *hip)
     target_size = HITLST_MAXSIZ;
   else if (target_size < HITLST_MINSIZ)
     target_size = HITLST_MINSIZ;
-  
+
   if (target_size > INT_MAX)
     target_size = INT_MAX;
 
   if (((int) target_size) > hlp->nhits_alloc &&
       ((errcode = reallocHitList(hlp, target_size))))
     return errcode;
-  
+
   if (hip->qlen >= hlp->qmask_alloc &&
       ((errcode = reallocQmask(hlp, hip->qlen))))
     return errcode;
@@ -1288,7 +1288,7 @@ static int initHitList(HashHitList *hlp, const HashHitInfo *hip)
   hlp->nhits_max = (int) target_size;
 
   blankHitList(hlp);
-  
+
   if (hip->status &  HITINFO_REVERSE)
     hlp->status |= HASHHITSTAT_REVERSE;
 
@@ -1296,7 +1296,7 @@ static int initHitList(HashHitList *hlp, const HashHitInfo *hip)
 }
 
 #ifdef hashhit_minimise_coverdeficit
-static int 
+static int
 fillHitListFromSegment
 (
  HashHitList *hlp,
@@ -1331,7 +1331,7 @@ fillHitListFromSegment
     is_trk_overlap = trk_flg & TRACKFLG_KMERHITS_OVERLAP;
   }
 #endif
- 
+
   if ((errcode = initHitList(hlp, hip)))
     return errcode;
 
@@ -1345,7 +1345,7 @@ fillHitListFromSegment
       HASHPACK_t *sqdatp;
       HASHNUM_t i, n, nhits_remaining;
       const HASHNUM_t nhits = hashTableFetchHitPositions(&posp, htp, seedp->posidx);
-      
+
       if (nhits != seedp->nhits)
 	return ERRCODE_ASSERT;
 
@@ -1354,11 +1354,11 @@ fillHitListFromSegment
 	  continue;
 	seedp->cix = 0;
       }
-      
+
       if (seedp->cix > 0 && posp[seedp->cix-1] > segpos_lo)
 	seedp->cix = 0; /* overlapping with last call -> reset helper */
       for (i = seedp->cix; i<nhits && posp[i] < segpos_lo; i++);
-      
+
       posp += i;
       nhits_remaining = nhits - i;
       seedp->cix += i;
@@ -1369,7 +1369,7 @@ fillHitListFromSegment
       if (((int) (hlp->nhits + nhits_remaining)) > hlp->nhits_alloc &&
 	  (errcode = reallocHitList(hlp, hlp->nhits + nhits_remaining)))
 	return errcode;
-   
+
       sqdatp = hlp->sqdat + hlp->nhits;
       n = 0;
 
@@ -1413,7 +1413,7 @@ fillHitListFromSegment
 
 #else //ifdef hashhit_minimise_coverdeficit
 
-static int 
+static int
 fillHitListFromHitInfoSegment
 (
  HashHitList *hlp,
@@ -1442,11 +1442,10 @@ fillHitListFromHitInfoSegment
   int errcode;
   const UCHAR is_reverse = hip->status & HITINFO_REVERSE;
   const UCHAR nskip = hip->nskip;
-  HASHNUM_t nhits, nh, i, k;
-  short j;
+  HASHNUM_t nhits, nh, i, j, k;
   SEQLEN_t n, tuplectr;
-  const SEQLEN_t n_seeds = 
-    (use_short_hitinfo) && hip->seed_rank > 0 ? 
+  const SEQLEN_t n_seeds =
+    (use_short_hitinfo) && hip->seed_rank > 0 ?
     hip->seed_rank: hip->n_seeds;
   SEED *seedp;
   HASHPOS_t *posp;
@@ -1466,10 +1465,10 @@ fillHitListFromHitInfoSegment
 
   if ((errcode = initHitList(hlp, hip)))
     return errcode;
- 
+
   for (n=0; n<n_seeds; n++) {
     seedp = hip->seedp + ((use_short_hitinfo)? hip->sidxp[n]: n);
-    if (maxhit_per_tuple > 0 && 
+    if (maxhit_per_tuple > 0 &&
 #ifdef hashhit_basqual
 	(hip->nhitqual_sortkeyp[n]&KMER_NHIT_MASK) > maxhit_per_tuple
 #else
@@ -1482,46 +1481,46 @@ fillHitListFromHitInfoSegment
     nhits = hashTableFetchHitPositions(&posp, htp, seedp->posidx);
     if (seedp->cix >= nhits) {
       if (posp[nhits-1] < segpos_lo)
-	continue;
+	       continue;
       seedp->cix = 0;
     }
     if (posp[seedp->cix] > segpos_lo)
       seedp->cix = 0; /* reset helper */
     posp += seedp->cix;
-    nh = nhits - seedp->cix;
+    nh = (nhits > seedp->cix)? nhits - seedp->cix: 0;
     for (i=0; i<nh && posp[i] < segpos_lo; i++);
     nh -= i;
     seedp->cix += i;
     posp += i;
 
-    if (hlp->nhits + nh > (HASHNUM_t) hlp->nhits_alloc) {
+    if ((HASHNUM_t) hlp->nhits + nh > (HASHNUM_t) hlp->nhits_alloc) {
       if (maxhit_per_tuple > 0)
-	return ERRCODE_ALLOCBOUNDARY;
+	       return ERRCODE_ALLOCBOUNDARY;
       qmaskp[seedp->qoffs] = HITQUAL_MULTIHIT;
       continue;
     }
-     
+
     tuplectr = seedp->qoffs;
     sqdatp = hlp->sqdat + hlp->nhits;
     k = 0;
 
     if (hhfp) {
       /* filtered */
-      for (i=0, j=0; i<nh && posp[i] < segpos_hi; i++) {
-	ivalp = hhfp->ivp+j;
-	if (posp[i] < ivalp->lower) continue;
-	for(; posp[i] > ivalp->upper && j < hhfp->num; j++)
-	  ivalp = hhfp->ivp+j;
-	if (j>=hhfp->num) break;
-	if (posp[i] >= ivalp->lower) {
+        for (i=j=0; i<nh && posp[i] < segpos_hi; i++) {
+	         ivalp = hhfp->ivp+j;
+	         if (posp[i] < ivalp->lower) continue;
+	         for(; posp[i] > ivalp->upper && j < (HASHNUM_t) hhfp->num; j++)
+	            ivalp = hhfp->ivp+j;
+	            if (j>= (HASHNUM_t) hhfp->num) break;
+	            if (posp[i] >= ivalp->lower) {
 #ifdef RESULTS_TRACKER
-	  if (trkp != NULL && !is_trk_overlap && posp[i] >= trkpos_lo && posp[i] <= trkpos_hi)
-	    is_trk_overlap = 1;
+	            if (trkp != NULL && !is_trk_overlap && posp[i] >= trkpos_lo && posp[i] <= trkpos_hi)
+	              is_trk_overlap = 1;
 #endif
-	  SET_NEXT_SHIFT(is_reverse, sqdatp[k], posp[i], tuplectr, nskip, offbit);
-	  k++;
-	}
-      }
+	            SET_NEXT_SHIFT(is_reverse, sqdatp[k], posp[i], tuplectr, nskip, offbit);
+	            k++;
+	         }
+        }
     } else {
       /* unfiltered */
       for (i=0; i<nh && posp[i] < segpos_hi; i++) {
@@ -1595,7 +1594,7 @@ int hashCollectHitsUsingCutoff(HashHitList *hlp,
 			       FILE *dumpfp,
 			       int *dumpctr,
 #endif
-			       HASHNUM_t max_nhit_per_tup, 
+			       HASHNUM_t max_nhit_per_tup,
 			       const HashTable *htp, const HashHitInfo *hip)
 {
   int errcode;
@@ -1612,7 +1611,7 @@ int hashCollectHitsUsingCutoff(HashHitList *hlp,
   if ((errcode = initHitList(hlp, hip)))
     return errcode;
 
-  do { 
+  do {
     reached_ceiling = 0;
     blankHitList(hlp);
     if (hip->status &  HITINFO_REVERSE)
@@ -1624,10 +1623,10 @@ int hashCollectHitsUsingCutoff(HashHitList *hlp,
 #else
       nh = hip->nhitqual_sortkeyp[i];
 #endif
-      if (nh < 1) 
+      if (nh < 1)
 	continue;
       sp = hip->seedp + hip->sidxp[i];
-      q = sp->qoffs;	
+      q = sp->qoffs;
 
       if (max_nhit_per_tup > 0 && nh > max_nhit_per_tup) {
 	hlp->qmask[q] = HITQUAL_MULTIHIT;
@@ -1642,7 +1641,7 @@ int hashCollectHitsUsingCutoff(HashHitList *hlp,
       }
 
       nhits = hashTableFetchHitPositions(&posp, htp, sp->posidx);
-     
+
       if (nh != nhits)
 	return ERRCODE_ASSERT;
 
@@ -1655,10 +1654,10 @@ int hashCollectHitsUsingCutoff(HashHitList *hlp,
 	printf("hashhit_debug: so = %u\n", posp[j]);
 #endif
       if (hlp->status & HASHHITSTAT_REVERSE) {
-	for (j=0; j<nhits; j++) 
+	for (j=0; j<nhits; j++)
 	  dp[j] = (((HASHPACK_t) posp[j] + qo)<<HASHHIT_HALFBIT) + q;
       } else {
-	for (j=0; j<nhits; j++) 
+	for (j=0; j<nhits; j++)
 	  dp[j] = (((((HASHPACK_t) posp[j])|offbit) - qo)<<HASHHIT_HALFBIT) + q;
       }
 #ifdef hashhit_debug
@@ -1718,29 +1717,29 @@ int hashCollectHitsForSegment(HashHitList *hlp,
     segmoffs_hi = HASHPOS_MAX;
   /* if (nhit_max < 1) nhit_max = DEFAULT_MAXHIT_PER_TUPLE; */
 #ifdef hashhit_minimise_coverdeficit
-  errcode = fillHitListFromSegment(hlp, 
+  errcode = fillHitListFromSegment(hlp,
 #ifdef RESULTS_TRACKER
 				   trkp,
 #endif
-				   (HASHPOS_t) segmoffs_lo, 
+				   (HASHPOS_t) segmoffs_lo,
 				   (HASHPOS_t) segmoffs_hi,
-				   hhip, htp, hhfp);  
+				   hhip, htp, hhfp);
   if (errcode) return errcode;
 #else
   do {
-    errcode = fillHitListFromHitInfoSegment(hlp, 
+    errcode = fillHitListFromHitInfoSegment(hlp,
 #ifdef RESULTS_TRACKER
 					    trkp,
 #endif
 					    (HASHPOS_t) segmoffs_lo, (HASHPOS_t) segmoffs_hi,
 					    nhit_max,
 					    use_short_hitinfo,
-					    hhip, htp, hhfp);  
+					    hhip, htp, hhfp);
     nhit_max /= 2;
-  } while (errcode == ERRCODE_ALLOCBOUNDARY && 
+  } while (errcode == ERRCODE_ALLOCBOUNDARY &&
 	   nhit_max > MINHIT_PER_TUPLE);
-  
-  if ((errcode) && errcode != ERRCODE_ALLOCBOUNDARY) 
+
+  if ((errcode) && errcode != ERRCODE_ALLOCBOUNDARY)
     return errcode;
 #endif
 
@@ -1772,12 +1771,12 @@ void hashPrintHitList(const HashHitList *hlp, FILE *fp)
 {
   int i;
   uint32_t qo,so;
-  fprintf(fp, "=-= List (%s) of %d hits: =-=\n", 
+  fprintf(fp, "=-= List (%s) of %d hits: =-=\n",
 	  (hlp->status & HASHHITSTAT_REVERSE)? "reverse":"forward", hlp->nhits);
   fprintf(fp, " hit_num | qoffs | ktupno offs | shift | \n");
-  for(i=0; i<hlp->nhits; i++) { 
+  for(i=0; i<hlp->nhits; i++) {
     qo = hlp->sqdat[i]&HASHHIT_HALFMASK;
-    if (hlp->status & HASHHITSTAT_REVERSE) 
+    if (hlp->status & HASHHITSTAT_REVERSE)
       so = (hlp->sqdat[i]>>HASHHIT_HALFBIT) - qo/hlp->nskip;
     else
       so = ((hlp->sqdat[i]>>HASHHIT_HALFBIT) + qo/hlp->nskip)&MASK32BIT;
@@ -1787,7 +1786,7 @@ void hashPrintHitList(const HashHitList *hlp, FILE *fp)
   fprintf(fp, "=-= End of list =-=\n\n");
 }
 
-int hashCheckHitList(const HashHitList *hlp, const SeqFastq *seqp, 
+int hashCheckHitList(const HashHitList *hlp, const SeqFastq *seqp,
 		     const HashTable *htp, const SeqSet *ssp,
 		     const SeqCodec *codep)
      /* Check whether all entries in the hit list are correct.
@@ -1807,18 +1806,18 @@ int hashCheckHitList(const HashHitList *hlp, const SeqFastq *seqp,
 
   if (!(ucp = seqFastqCreate(0, SEQTYP_FASTA)))
     return ERRCODE_NOMEM;
- 
+
   ktup = hashTableGetKtupLen(htp, &nskip);
   if (ktup >= hlp->qlen)
     return ERRCODE_ASSERT;
 
   query_datap = seqFastqGetConstSequence(seqp, &querylen, &code);
-  if (querylen != hlp->qlen) 
+  if (querylen != hlp->qlen)
     return ERRCODE_ASSERT;
 
-  if (code != SEQCOD_MANGLED) 
+  if (code != SEQCOD_MANGLED)
     return ERRCODE_SEQCODE;
-  
+
   for (j=0; j<hlp->nhits; j++) {
     sqdat = hlp->sqdat[j];
     qoffs = sqdat&HASHHIT_HALFMASK;
@@ -1843,13 +1842,13 @@ int hashCheckHitList(const HashHitList *hlp, const SeqFastq *seqp,
       sdp = seqFastqGetConstSequence(ucp, NULL, &code);
     }
 
-    if (code != SEQCOD_MANGLED) 
+    if (code != SEQCOD_MANGLED)
       return ERRCODE_SEQCODE;
 
     if (hlp->status & HASHHITSTAT_REVERSE) {
       qdp = query_datap + qoffs + ktup - 1;
       for (k=0; k<ktup; k++)
-	    if (((*qdp--) & 
+	    if (((*qdp--) &
 		 SEQCOD_STDNT_MASK) != (((*sdp++)^SEQCOD_STDNT_MASK)&SEQCOD_STDNT_MASK))
 	      return ERRCODE_FAILURE;
     } else {
@@ -1891,7 +1890,7 @@ uint32_t hashCalcHitListCoverDeficit(const HashHitList *hlp)
   for (s=0;s<nskip;s++) {
     d = 0;
     for (ctr=0, i=s; i<hlp->qlen; i+=nskip) {
-      if (qmaskp[i] == HITQUAL_NORMHIT) 
+      if (qmaskp[i] == HITQUAL_NORMHIT)
 	ctr = k;
       else if (ctr)
 	ctr--;
@@ -1961,7 +1960,7 @@ void hashDeleteHitFilter(HashHitFilter *p)
 {
   if (p) {
     free(p->ivp);
-  } 
+  }
   free(p);
 }
 
@@ -1997,10 +1996,10 @@ void hashPruneHitFilter(HashHitFilter *hhfp)
       if (ivp[j].upper > ivp[i].upper)
 	ivp[i].upper = ivp[j].upper;
     } else {
-      if (++i < j) 
+      if (++i < j)
 	ivp[i] = ivp[j];
-    }   
+    }
   }
   hhfp->num = (i<j)? i+1:j;
-  return; 
+  return;
 }

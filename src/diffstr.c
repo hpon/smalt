@@ -4,7 +4,7 @@
  *****************************************************************************
  *                                                                           *
  *  Copyright (C) 2010 - 2014 Genome Research Ltd.                           *
- *                                                                           * 
+ *                                                                           *
  *  Author: Hannes Ponstingl (hp3@sanger.ac.uk)                              *
  *                                                                           *
  *  This file is part of SMALT.                                              *
@@ -42,14 +42,14 @@ enum {
   NUMBUF_MAXLEN          = 7,   /**< Maximum buffer length for contsal */
   DEFAULT_BLOCKSIZ = 256,       /**< block size for memory allocation */
   DIFFSTR_MARGIN = 5,
-  DIFFBLOCKS_BLKSZ = 64,     /**< Block size for DiffBlocks memory 
+  DIFFBLOCKS_BLKSZ = 64,     /**< Block size for DiffBlocks memory
 				  * allocation */
 /**< maximum number of characters to print contents of one byte of a
  * compressed alignment string in any of the output formats
  * (incl. spaces).  This is used to calculate an upper limit for the length
  * of an output string */
-  NCHAR_MAX_PRINTLEN = 5,  
-  NCHAR_MAX_UNITLEN = 12, /**< Maximum number of characters to print one CIGAR unit 
+  NCHAR_MAX_PRINTLEN = 5,
+  NCHAR_MAX_UNITLEN = 12, /**< Maximum number of characters to print one CIGAR unit
 			   * (i.e. 'I 3', 'M 1028') */
   NCHAR_MAX_CLIPLEN = 13, /**< max string length for clipping (31 bit int)
 			   * ceiling(31*ln2/ln10)+3 */
@@ -136,7 +136,7 @@ static int reallocView(DiffView *dvp, size_t newsiz)
 
   newsiz = (newsiz + dvp->blksz - 1)/dvp->blksz;
   newsiz *= dvp->blksz;
-  
+
   if (newsiz != dvp->n_alloc) {
     void *hp = EREALLOCP(dvp->strp, newsiz);
     if (NULL == hp) {
@@ -158,15 +158,15 @@ typedef int (CIGAR_WRITER) (void *, CIGTYP_t, char, int);
 
 inline static int writeCigarToFile(void *top, CIGTYP_t cigtyp, char typc, int ctr)
 {
-  return (ctr > 0)? (cigtyp & CIGARSTRTYP_EXTENDED)? 
+  return (ctr > 0)? (cigtyp & CIGARSTRTYP_EXTENDED)?
     fprintf((FILE *)top, CIGAR_EXTF, ctr, typc):
-    fprintf((FILE *)top, CIGAR_FORM, typc, ctr): 
+    fprintf((FILE *)top, CIGAR_FORM, typc, ctr):
     fprintf((FILE *)top, "%c", typc);
 }
 
 inline static int writeCigarToStr(void *top, CIGTYP_t cigtyp, char typc, int ctr)
 {
-  return (ctr > 0)? (cigtyp & CIGARSTRTYP_EXTENDED)?  
+  return (ctr > 0)? (cigtyp & CIGARSTRTYP_EXTENDED)?
     sprintf((char *)top, CIGAR_EXTF, ctr, typc):
     sprintf((char *)top, CIGAR_FORM, typc, ctr):
     sprintf((char *)top, "%c", typc);
@@ -182,10 +182,10 @@ static int writeCigarToDiffView(void *top, CIGTYP_t cigtyp, char typc, int ctr)
       !reallocView(dvp, dvp->strlen + NCHAR_MAX_UNITLEN))
     nchar = writeCigarToStr(dvp->strp, cigtyp, typc, ctr);
   if (nchar > 0) dvp->strlen += nchar;
-
   return nchar;
 }
 #endif
+
 /******************************************************************************
  ********************* Private Methods of Type DIFFBUFF ***********************
  ******************************************************************************/
@@ -200,17 +200,17 @@ int fillDIFFBUFF(DIFFBUFF *p, const DIFFSTR_T *dstrp)
   for (i=0; dstrp[i] != 0 && i<INT_MAX; i++) {
     DIFFSTR_GET(dstrp[i], count, typ);
     for (j=0; j<count; j++) {
-      if (p->len >= p->n_alloc) 
+      if (p->len >= p->n_alloc)
 	return ERRCODE_OVERFLOW;
       p->strp[p->len++] = DIFFSTR_SYMBOLS[DIFFCOD_M];
     }
-    if (p->len >= p->n_alloc) 
+    if (p->len >= p->n_alloc)
       return ERRCODE_OVERFLOW;
     p->strp[p->len++] = DIFFSTR_SYMBOLS[typ];
   }
   if (p->len > 0)
     p->len--; /* the last code should be S */
-  if (p->len >= p->n_alloc) 
+  if (p->len >= p->n_alloc)
     return ERRCODE_OVERFLOW;
   p->strp[p->len] = '\0';
   return (typ == DIFFCOD_S)? ERRCODE_SUCCESS: ERRCODE_DIFFSTR;
@@ -298,7 +298,7 @@ static int sprintfDiffStrPlain(char *sp, const DIFFSTR_T *dstrp)
 static int writeDiffStrCIGAR(void * const top, int *nchar,
 			     unsigned char cgt, /* combination of CIGARSTR_TYPES */
 			     const DIFFSTR_T *diffstr,
-			     int clip_start, 
+			     int clip_start,
 			     int clip_end,
 			     CIGAR_WRITER *writerp)
 {
@@ -306,7 +306,7 @@ static int writeDiffStrCIGAR(void * const top, int *nchar,
   unsigned short typ = DIFFCOD_M, prev_typ = DIFFCOD_M;
   int nc = 0;
   const DIFFSTR_T *ucp;
-  const char clipchar = (char) (( 0 != (cgt & CIGARSTRTYP_SOFTCLIPPED) )? 
+  const char clipchar = (char) (( 0 != (cgt & CIGARSTRTYP_SOFTCLIPPED) )?
 				CIGAR_CLIPPED_SOFT: CIGAR_CLIPPED_HARD);
 
 #define WRITE_CIGAR(chr, ctr) nc += (*writerp)(writeCigarToStr == *writerp? ((char *)top)+nc: top, \
@@ -321,17 +321,17 @@ static int writeDiffStrCIGAR(void * const top, int *nchar,
 
   if (clip_start > 0 && (cgt & CIGARSTRTYP_EXTENDED))
     WRITE_CIGAR(clipchar, clip_start);
-    
+
   for (ucp = diffstr; *ucp; ucp++) {
     DIFFSTR_GET(*ucp, count, typ);
-    
+
     if (prev_typ == DIFFCOD_M) {
       prev_count += count;
-      if (typ == DIFFCOD_M || 
+      if (typ == DIFFCOD_M ||
 	  (typ == DIFFCOD_S && (cgt & CIGARSTRTYP_SILENTMISMATCH))) {
 	prev_count++;
 	continue;
-      } 
+      }
     } else if (typ == prev_typ && count < 1) {
       prev_count++;
       continue;
@@ -339,7 +339,7 @@ static int writeDiffStrCIGAR(void * const top, int *nchar,
 
     if (prev_count > 0)
       WRITE_CIGAR(DIFFSTR_SYMBOLS_X[prev_typ], prev_count);
- 
+
     if (typ == DIFFCOD_M || (typ == DIFFCOD_S && (cgt & CIGARSTRTYP_SILENTMISMATCH))) {
       prev_count = count + 1;
       prev_typ = DIFFCOD_M;
@@ -353,10 +353,10 @@ static int writeDiffStrCIGAR(void * const top, int *nchar,
 
   if (typ != DIFFCOD_S)
     return ERRCODE_DIFFSTR;
-  
+
   if (prev_count > 1) /* may end with mismatch */
     WRITE_CIGAR(DIFFSTR_SYMBOLS_X[(cgt & CIGARSTRTYP_SILENTMISMATCH)?
-				  DIFFCOD_M:DIFFCOD_S], 
+				  DIFFCOD_M:DIFFCOD_S],
 		prev_count-1);
 
   if (clip_end > 0 && (cgt & CIGARSTRTYP_EXTENDED))
@@ -379,9 +379,9 @@ static int scrollDiffStr(DIFFSTR_T *dfsp, int pos_uprof_target, UCHAR isEnd,
   ie = 0;
   for (i=0; dfsp[i]; i++) {
     DIFFSTR_GET(dfsp[i], count, typ);
- 
+
     if (typ == DIFFCOD_M || typ == DIFFCOD_S) {
-      count_prof += count+1;  
+      count_prof += count+1;
       count_uprof += count+1;
     } else if (typ == DIFFCOD_I) {
       count_prof += count + 1;
@@ -407,12 +407,12 @@ static int scrollDiffStr(DIFFSTR_T *dfsp, int pos_uprof_target, UCHAR isEnd,
   if (dfs_offs) *dfs_offs = ie;
   if (pos_prof) *pos_prof = count_prof_lastmatch;
   if (pos_uprof) *pos_uprof = count_uprof_lastmatch;
-  return (count_uprof < pos_uprof_target)? ERRCODE_DIFFSTR: ERRCODE_SUCCESS;   
+  return (count_uprof < pos_uprof_target)? ERRCODE_DIFFSTR: ERRCODE_SUCCESS;
 }
 
-static int scrollDIFFSTRStartEnd 
-(			  
- int *start_unprof, 
+static int scrollDIFFSTRStartEnd
+(
+ int *start_unprof,
  int *end_unprof,
  int *start_prof,
  int *end_prof,
@@ -433,7 +433,7 @@ static int scrollDIFFSTRStartEnd
       * unprofiled sequence. If this position is in a deletion or a
       * mismatch, scroll back to the last position that was a perfect
       * match.
-      * 
+      *
       * \return ERRCODE_NOMATCH if segment selected does not contain a match.
       *
       * \param start_unprof Returns actual start position in the unprofiled seuqence after the scrolling.
@@ -441,11 +441,11 @@ static int scrollDIFFSTRStartEnd
       * \param start_prof Returns position in profiled sequence corresponding to start_unprof.
       * \param end_prof Returns position in profiled sequence corresponding to end_unprof.
       * \param count_start Returns the number of matches following position (start_unprof, start_prof) up
-      *        to the state typ_end. I.e. the starting character of the resulting segment of the 
+      *        to the state typ_end. I.e. the starting character of the resulting segment of the
       *        compressed alignment string is (*typ_end:*count_end) for *typ_end != DIFFCOD_M and
       *        (DIFFCOD_M:*count_end-1) for *typ_end == DIFFCOD_M.
-      * \param count_end Returns the number of matches preceding (and including) position 
-      *       (pos_unprof, pos_prof) up to the state typ_end. I.e. the last character of the resulting 
+      * \param count_end Returns the number of matches preceding (and including) position
+      *       (pos_unprof, pos_prof) up to the state typ_end. I.e. the last character of the resulting
       *        segment of the compressed alignment string is (DIFFCOD_S:*count_end).
       * \param typ_start Returns the DIFF_CODE of the compressed diffstr at (start_unprof, start_prof).
       * \param idx_start Returns the index in the alignment string corresponding to (start_unprof, start_prof).
@@ -462,7 +462,7 @@ static int scrollDIFFSTRStartEnd
   fprintfDiffStrRaw(stdout, diffstrp);
   printf("diffstr.c::scrollDIFFSTRStartEnd: start_unprof_target = %i\n", start_unprof_target);
 #endif
-  
+
   /* shift = *start_prof - *start_unprof */
   /* scroll to start */
   for (i=0; diffstrp[i] != 0 && i<INT_MAX; i++) {
@@ -474,7 +474,7 @@ static int scrollDIFFSTRStartEnd
     } else if (typ == DIFFCOD_S) {
       count_add = 1;
     } else if (typ == DIFFCOD_I) {
-      shift++; 
+      shift++;
       count_add = 0;
     } else { /* typ == DIFFCOD_D */
       count_add = 1;
@@ -485,21 +485,21 @@ static int scrollDIFFSTRStartEnd
      * shift: pos_profiled - pos_unprofiled
      */
     pos += count;
-    if (pos > start_unprof_target && count > 0) 
+    if (pos > start_unprof_target && count > 0)
       break;
     pos += count_add;
   }
   if (i >= INT_MAX)
     return ERRCODE_DIFFSTR;
-  
+
   if (diffstrp[i] == 0)
     return ERRCODE_FAILURE;
-  /* pos: position on unprofiled sequence - count_add, 
+  /* pos: position on unprofiled sequence - count_add,
    * i.e. excluding last mismatch or deletion */
   idx_last = i;
   *count_start = (DIFFSTR_T) (pos - start_unprof_target);
   if (*count_start > count)
-    *count_start = count;  
+    *count_start = count;
   *start_unprof = pos - *count_start;
   *start_prof = *start_unprof + shift_last;
 
@@ -509,11 +509,11 @@ static int scrollDIFFSTRStartEnd
   *typ_start = typ;
 
 #ifdef diffstr_debug
-  printf("diffstr.c::scrollDIFFSTRStartEnd: start_unprof = %i, start_prof = %i\n", 
+  printf("diffstr.c::scrollDIFFSTRStartEnd: start_unprof = %i, start_prof = %i\n",
 	 *start_unprof, *start_prof);
-  printf("diffstr.c::scrollDIFFSTRStartEnd: count_start = %i, pos_last = %i\n", 
+  printf("diffstr.c::scrollDIFFSTRStartEnd: count_start = %i, pos_last = %i\n",
 	 *count_start, pos_last);
-  printf("diffstr.c::scrollDIFFSTRStartEnd: idx_start = %i, typ_start = %c\n", 
+  printf("diffstr.c::scrollDIFFSTRStartEnd: idx_start = %i, typ_start = %c\n",
 	 *idx_start, DIFFSTR_SYMBOLS[*typ_start]);
   printf("diffstr.c::scrollDIFFSTRStartEnd: end_unprof_target = %i\n", end_unprof_target);
   printf("diffstr.c::scrollDIFFSTRStartEnd:");
@@ -522,7 +522,7 @@ static int scrollDIFFSTRStartEnd
 
   if (*start_unprof > end_unprof_target) {
     /* no match in sequence */
-    return ERRCODE_NOMATCH; 
+    return ERRCODE_NOMATCH;
   }
   if (pos <= end_unprof_target) {
     /* scroll to end */
@@ -531,7 +531,7 @@ static int scrollDIFFSTRStartEnd
       DIFFSTR_GET(diffstrp[i], count, typ);
       if (count > 0)
 	shift_last = shift;
-      
+
       if (typ == DIFFCOD_M) {
 	count++;
 	count_add = 0;
@@ -544,7 +544,7 @@ static int scrollDIFFSTRStartEnd
 	count_add = 1;
 	shift--;
       }
-      
+
       pos += count;
       /* count is the number of exact matches */
 
@@ -560,7 +560,7 @@ static int scrollDIFFSTRStartEnd
     }
     if (diffstrp[i] == 0)
       i--;
-    else if (i >= INT_MAX) 
+    else if (i >= INT_MAX)
       return ERRCODE_OVERFLOW;
   }  /* pos <= end_unprof_target */
   if (pos_last > end_unprof_target) {
@@ -581,9 +581,9 @@ static int scrollDIFFSTRStartEnd
 
   *end_prof = *end_unprof + shift_last;
 #ifdef diffstr_debug
-  printf("diffstr.c::scrollDIFFSTRStartEnd: end_unprof = %i, end_prof = %i\n", 
+  printf("diffstr.c::scrollDIFFSTRStartEnd: end_unprof = %i, end_prof = %i\n",
 	 *end_unprof, *end_prof);
-  printf("diffstr.c::scrollDIFFSTRStartEnd: count_end = %i, idx_end = %i\n", 
+  printf("diffstr.c::scrollDIFFSTRStartEnd: count_end = %i, idx_end = %i\n",
 	 *count_end, *idx_end);
 #endif
 
@@ -679,7 +679,7 @@ int diffStrFindBlocks(DiffBlocks *dbp, const DIFFSTR_T *diffstrp)
     (p) += (l);							\
     (l) = 0;							\
 }
-    
+
   dbp->nblk = 0;
   if (NULL == diffstrp)
     return ERRCODE_SUCCESS;
@@ -774,7 +774,7 @@ int diffStrRealloc(DiffStr *dfsp, int n_new)
   if (!n_new) nsiz = dfsp->n_alloc + dfsp->blksz;
   else nsiz = ((size_t) ((n_new + dfsp->blksz - 1)/dfsp->blksz))*dfsp->blksz;
 
-  if (nsiz > INT_MAX) 
+  if (nsiz > INT_MAX)
     return ERRCODE_OVERFLOW;
 
 #ifdef diffstr_debug
@@ -794,24 +794,24 @@ int diffStrRealloc(DiffStr *dfsp, int n_new)
 
 int diffStrCopy(DiffStr *dfsp, const DIFFSTR_T *diffstrp)
 {
-  int errcode; 
+  int errcode;
   short l;
   const  DIFFSTR_T *dstrp = diffstrp;
   DIFFSTR_T *ucp;
 
   for (l=0; (diffstrp[l]); l++)
-    if (l >= SHRT_MAX) 
+    if (l >= SHRT_MAX)
       return ERRCODE_OVERFLOW;
-  
+
   if (l>=dfsp->n_alloc &&
       (errcode = diffStrRealloc(dfsp, l)))
     return errcode;
-  
+
   dfsp->len = l+1; /* length included termination */
-  
+
   for (ucp = dfsp->dstrp; l>=0; l--)
     *ucp++ = *dstrp++;
-  
+
   return ERRCODE_SUCCESS;
 }
 
@@ -832,18 +832,18 @@ int diffStrAdd(DiffStr *top, const DIFFSTR_T *fcp, int len)
     return errcode;
 
   tcp = top->dstrp + top->len;
-  for (l=0; l<len; l++) 
+  for (l=0; l<len; l++)
     *tcp++ = *fcp++;
 
   top->len = (int) newlen;
   if (newlen > 0 && top->dstrp[newlen-1] != 0)
     errcode = ERRCODE_ASSERT;
 
-  return errcode; 
+  return errcode;
 }
 
 int diffStrAppend(DiffStr *top, const DiffStr *fromp)
-{ 
+{
   return diffStrAdd(top, fromp->dstrp, fromp->len);
 }
 
@@ -856,15 +856,15 @@ int diffStrReverse(DiffStr *dfsp, const DIFFSTR_T *diffstrp)
 #ifdef results_debug
   printf("results_debug::reverseDIFFSTR(): string before ");
   fprintfDiffStrRaw(stdout, diffstrp);
-#endif  
+#endif
   for (l=0; diffstrp[l]; l++)
-    if (l >= SHRT_MAX) 
+    if (l >= SHRT_MAX)
       return ERRCODE_OVERFLOW;
-  
+
   if (l>=dfsp->n_alloc &&
       (errcode = diffStrRealloc(dfsp, l+1)))
     return errcode;
-  
+
   l--;
   DIFFSTR_GET(diffstrp[l], count_prev, typ);
   if (typ != DIFFCOD_S)
@@ -881,8 +881,8 @@ int diffStrReverse(DiffStr *dfsp, const DIFFSTR_T *diffstrp)
       }
     } else {
       ucp[u++] = SETDIFF(count_prev, typ);
-      count_prev = count; 
-    }   
+      count_prev = count;
+    }
   }
   ucp[u++] = SETDIFF(count_prev, DIFFCOD_S);
   ucp[u++] = SETDIFF(0, DIFFCOD_M);
@@ -890,7 +890,7 @@ int diffStrReverse(DiffStr *dfsp, const DIFFSTR_T *diffstrp)
 #ifdef results_debug
   printf("results_debug::reverseDIFFSTR(): string after ");
   fprintfDiffStrRaw(stdout, dfsp->dstrp);
-#endif  
+#endif
 
   return ERRCODE_SUCCESS;
 }
@@ -941,7 +941,7 @@ int diffStrCalcAliLen(int *matchnum, const DIFFSTR_T *diffstrp)
     DIFFSTR_GET(diffstrp[0], count, typ);
     if (typ == DIFFCOD_M)
       m += count + 1;
-    else 
+    else
       m += count;
     l += count+1;
   }
@@ -951,7 +951,7 @@ int diffStrCalcAliLen(int *matchnum, const DIFFSTR_T *diffstrp)
   return ((*diffstrp))? 0: l;
 }
 
-int diffStrGetDiffStats(int *n_sub, int *n_ins, int *n_del, 
+int diffStrGetDiffStats(int *n_sub, int *n_ins, int *n_del,
 			const DIFFSTR_T * diffstrp)
 {
   int ni = 0, nd = 0, ns = 0;
@@ -988,13 +988,13 @@ int diffStrGetDiffStats(int *n_sub, int *n_ins, int *n_del,
   if (n_sub) *n_sub = ns;
   if (n_ins) *n_ins = ni;
   if (n_del) *n_del = nd;
- 
+
   return errcode;
 }
 
-int diffStrGenerateFromMismatches(int *dlen, DIFFSTR_T *diffstrp, 
+int diffStrGenerateFromMismatches(int *dlen, DIFFSTR_T *diffstrp,
 				  const int mmpos[], int mmnum, int qlen)
-     
+
 {
   int i, j, n, ntot;
   int supos;
@@ -1018,7 +1018,7 @@ int diffStrGenerateFromMismatches(int *dlen, DIFFSTR_T *diffstrp,
   ntot = n+1;
   if (mmnum>0) {
     for (i=1; i<mmnum; i++) {
-      if (mmpos[i] <= mmpos[i-1]) 
+      if (mmpos[i] <= mmpos[i-1])
 	return ERRCODE_ASSERT;
       n = (int) (mmpos[i]-mmpos[i-1]-1)/DIFFSTR_MAXMISMATCH;
       if (dcp) {
@@ -1038,14 +1038,14 @@ int diffStrGenerateFromMismatches(int *dlen, DIFFSTR_T *diffstrp,
       ntot += n+1;
     }
   }
-  if ((dcp)) 
+  if ((dcp))
     *dcp++ = SETDIFF(0, DIFFCOD_M); /* termination */
   if (dlen) *dlen = ntot+1;
 
   return ERRCODE_SUCCESS;
 }
 
-int diffStrPrintf(FILE *fp, const DIFFSTR_T *diffstrp, char outform, 
+int diffStrPrintf(FILE *fp, const DIFFSTR_T *diffstrp, char outform,
 		  int clip_start, int clip_end, char is_softclipped)
 {
   int errcode = ERRCODE_SUCCESS;
@@ -1059,18 +1059,18 @@ int diffStrPrintf(FILE *fp, const DIFFSTR_T *diffstrp, char outform,
     fprintfDiffStrPlain(fp, diffstrp);
     break;
   case DIFFSTRFORM_CIGNORM:
-    errcode = writeDiffStrCIGAR(fp, &nchar, 
-				CIGARSTRTYP_SILENTMISMATCH, 
+    errcode = writeDiffStrCIGAR(fp, &nchar,
+				CIGARSTRTYP_SILENTMISMATCH,
 				diffstrp, 0, 0, writeCigarToFile);
     break;
   case DIFFSTRFORM_CIGEXT:
-    errcode = writeDiffStrCIGAR(fp, &nchar, 
-				(CIGTYP_t)(cgt|CIGARSTRTYP_EXTENDED|CIGARSTRTYP_SILENTMISMATCH), 
+    errcode = writeDiffStrCIGAR(fp, &nchar,
+				(CIGTYP_t)(cgt|CIGARSTRTYP_EXTENDED|CIGARSTRTYP_SILENTMISMATCH),
 				diffstrp, clip_start, clip_end, writeCigarToFile);
     break;
   case DIFFSTRFORM_CIGEXT_XMISMATCH:
-    errcode = writeDiffStrCIGAR(fp, &nchar, 
-				(CIGTYP_t)(cgt|CIGARSTRTYP_EXTENDED), 
+    errcode = writeDiffStrCIGAR(fp, &nchar,
+				(CIGTYP_t)(cgt|CIGARSTRTYP_EXTENDED),
 				diffstrp, clip_start, clip_end, writeCigarToFile);
    break;
   default:
@@ -1081,7 +1081,7 @@ int diffStrPrintf(FILE *fp, const DIFFSTR_T *diffstrp, char outform,
   return errcode;
 }
 
-int diffStrPrintfStr(char *sp, int *nchar, const DIFFSTR_T *diffstrp, char outform, 
+int diffStrPrintfStr(char *sp, int *nchar, const DIFFSTR_T *diffstrp, char outform,
 		     int clip_start, int clip_end, char is_softclipped)
 {
   int errcode = ERRCODE_SUCCESS;
@@ -1096,20 +1096,20 @@ int diffStrPrintfStr(char *sp, int *nchar, const DIFFSTR_T *diffstrp, char outfo
     *nchar = sprintfDiffStrPlain(sp, diffstrp);
     break;
   case DIFFSTRFORM_CIGNORM:
-    errcode = writeDiffStrCIGAR(sp, nchar, 
-				0, 
+    errcode = writeDiffStrCIGAR(sp, nchar,
+				0,
 				diffstrp, 0, 0, writeCigarToStr);
-    break;  
+    break;
   case DIFFSTRFORM_CIGEXT:
-    errcode = writeDiffStrCIGAR(sp, nchar, 
-				(CIGTYP_t) (cgt|CIGARSTRTYP_EXTENDED|CIGARSTRTYP_SILENTMISMATCH), 
-				diffstrp, clip_start, clip_end, 
+    errcode = writeDiffStrCIGAR(sp, nchar,
+				(CIGTYP_t) (cgt|CIGARSTRTYP_EXTENDED|CIGARSTRTYP_SILENTMISMATCH),
+				diffstrp, clip_start, clip_end,
 				writeCigarToStr);
     break;
   case DIFFSTRFORM_CIGEXT_XMISMATCH:
-    errcode = writeDiffStrCIGAR(sp, nchar, 
-				(CIGTYP_t)(cgt|CIGARSTRTYP_EXTENDED), 
-				diffstrp, clip_start, clip_end, 
+    errcode = writeDiffStrCIGAR(sp, nchar,
+				(CIGTYP_t)(cgt|CIGARSTRTYP_EXTENDED),
+				diffstrp, clip_start, clip_end,
 				writeCigarToStr);
     break;
   default:
@@ -1140,7 +1140,7 @@ int diffStrParsePlain(DiffStr *dfsp, const char *rawstrp)
       numbuf[i] = cp[i];
     if (i >= NUMBUF_MAXLEN-1)
       return ERRCODE_DIFFSTR;
-    
+
     numbuf[i] = '\0';
     count = atoi(numbuf);
     while (count > DIFFSTR_MAXMISMATCH) {
@@ -1148,7 +1148,7 @@ int diffStrParsePlain(DiffStr *dfsp, const char *rawstrp)
       dfsp->dstrp[dfsp->len++] = (DIFFCOD_M<<DIFFSTR_TYPSHIFT) + (DIFFSTR_T) (DIFFSTR_MAXMISMATCH & DIFFSTR_COUNTMASK);
       count -= DIFFSTR_MAXMISMATCH;
     }
-    
+
     c = toupper(cp[i]);
     for (code=0; (DIFFSTR_SYMBOLS[code]) && c !=  toupper(DIFFSTR_SYMBOLS[code]); code++);
     if (!DIFFSTR_SYMBOLS[code])
@@ -1157,17 +1157,17 @@ int diffStrParsePlain(DiffStr *dfsp, const char *rawstrp)
     DIFFSTR_CHECKMEM();
 
     dfsp->dstrp[dfsp->len++] = (DIFFSTR_T) ((code<<DIFFSTR_TYPSHIFT) + (DIFFSTR_T) (count & DIFFSTR_COUNTMASK));
-    
+
     cp += i+1;
   }
   DIFFSTR_CHECKMEM();
   dfsp->dstrp[dfsp->len++] = 0;
-  
+
   return ERRCODE_SUCCESS;
 }
 
-int diffStrParseSimul(DiffStr *dfsp, 
-		      int *clip_start, int *clip_end, 
+int diffStrParseSimul(DiffStr *dfsp,
+		      int *clip_start, int *clip_end,
 		      unsigned char isSAMCIGAR, const char *rawstrp)
 {
   int errcode = ERRCODE_SUCCESS;
@@ -1181,7 +1181,7 @@ int diffStrParseSimul(DiffStr *dfsp,
 
   /* skip white space at beginning */
   for (cp = rawstrp; (*cp) && isspace(*cp); cp++);
-  
+
   dfsp->len = 0;
 
   while (*cp && ERRCODE_SUCCESS == errcode) {
@@ -1193,7 +1193,7 @@ int diffStrParseSimul(DiffStr *dfsp,
       return ERRCODE_DIFFSTR;
     numbuf[i] = '\0';
     count = atoi(numbuf);
-    
+
     cp += i;
     if (!(*cp))
       return ERRCODE_DIFFSTR;
@@ -1223,7 +1223,7 @@ int diffStrParseSimul(DiffStr *dfsp,
 
     if (errcode)
       break;
-    
+
     if ((isClip)) {
       if(*clip_end > 0 && (*(cp+1)))
 	errcode = ERRCODE_DIFFSTR;
@@ -1248,25 +1248,25 @@ int diffStrParseSimul(DiffStr *dfsp,
   if (curr_count > 0) {
     DIFFSTR_CHECKMEM();
     dfsp->dstrp[dfsp->len++] = (DIFFSTR_T)
-      ((((DIFFSTR_T) DIFFCOD_S)<<DIFFSTR_TYPSHIFT) + 
+      ((((DIFFSTR_T) DIFFCOD_S)<<DIFFSTR_TYPSHIFT) +
        (curr_count & DIFFSTR_COUNTMASK));
   }
   DIFFSTR_CHECKMEM();
   dfsp->dstrp[dfsp->len++] = 0;
-  
+
   return errcode;
 }
- 
+
 int diffStrCrop(DIFFSTR_T *diffstrp, int *dstrlen,
 		int start_unprof_target, int end_unprof_target,
-		int *start_unprof, int *end_unprof, 
+		int *start_unprof, int *end_unprof,
 		int *start_prof, int *end_prof)
 {
   int errcode;
   UCHAR count, typ;
   UCHAR count_over;
   int j, is, ie, dd;
-  
+
   *dstrlen = 0;
   *start_unprof = *end_unprof = 0;
   *start_prof = *end_prof = 0;
@@ -1275,19 +1275,19 @@ int diffStrCrop(DIFFSTR_T *diffstrp, int *dstrlen,
   fprintfDiffStrRaw(stdout, diffstrp);
 #endif
 
-  if ((errcode = scrollDiffStr(diffstrp, start_unprof_target, 
+  if ((errcode = scrollDiffStr(diffstrp, start_unprof_target,
 			       0, start_unprof, start_prof, &is)))
     return errcode;
-  
-  if ((errcode = scrollDiffStr(diffstrp, end_unprof_target, 
+
+  if ((errcode = scrollDiffStr(diffstrp, end_unprof_target,
 			       1, end_unprof, end_prof, &ie)))
     return errcode;
-  
+
   DIFFSTR_GET(diffstrp[is], count, typ);
   if (typ == DIFFCOD_M) count++;
   if (*start_unprof < start_unprof_target)
     return ERRCODE_ASSERT;
-  
+
   if (*start_unprof < start_unprof_target + count) {
     count = (UCHAR) (*start_unprof - start_unprof_target);
   }
@@ -1295,14 +1295,14 @@ int diffStrCrop(DIFFSTR_T *diffstrp, int *dstrlen,
   *start_unprof -= count;
   *start_prof -= count;
 
-  j = 0;  
+  j = 0;
   if (is < ie) {
     if (count < 1 || (typ == DIFFCOD_M && count < 2)) {
       count_over = count;
     } else {
-      if (typ == DIFFCOD_M) 
+      if (typ == DIFFCOD_M)
 	count--;
-      diffstrp[j++] = SETDIFF(count, typ); 
+      diffstrp[j++] = SETDIFF(count, typ);
       count_over = 0;
     }
     for (is++; is<ie && diffstrp[is]; is++) {
@@ -1319,7 +1319,7 @@ int diffStrCrop(DIFFSTR_T *diffstrp, int *dstrlen,
 	diffstrp[j++] = SETDIFF(count, typ);
       }
     }
-  
+
     DIFFSTR_GET(diffstrp[ie], count, typ);
     count = (UCHAR) (count + count_over);
     if (typ == DIFFCOD_M) count++;
@@ -1332,7 +1332,7 @@ int diffStrCrop(DIFFSTR_T *diffstrp, int *dstrlen,
   } else {
     if (*end_unprof > end_unprof_target + count + 1)
       return ERRCODE_DIFFSTR;
-    dd = (int) (*end_unprof - end_unprof_target);  
+    dd = (int) (*end_unprof - end_unprof_target);
     count = (UCHAR) (count + 1 - dd);
     *end_unprof -= dd;
     *end_prof -= dd;
@@ -1343,15 +1343,15 @@ int diffStrCrop(DIFFSTR_T *diffstrp, int *dstrlen,
 #ifdef diffstr_debug
   printf("diffStrCrop: after split");
   fprintfDiffStrRaw(stdout, diffstrp);
-#endif  
-  
-  *dstrlen = j+1; 
+#endif
+
+  *dstrlen = j+1;
   return ERRCODE_SUCCESS;
-} 
+}
 
 int diffStrFetchSegment(DiffStr *dfsp, const DIFFSTR_T *diffstrp,
 			int start_unprof_target, int end_unprof_target,
-			int *start_unprof, int *end_unprof, 
+			int *start_unprof, int *end_unprof,
 			int *start_prof, int *end_prof)
 {
   int errcode;
@@ -1369,7 +1369,7 @@ int diffStrFetchSegment(DiffStr *dfsp, const DIFFSTR_T *diffstrp,
 
 int diffStrSegment(DiffStr *dfsp, const DIFFSTR_T *diffstrp,
 		   int start_unprof_target, int end_unprof_target,
-		   int *start_unprof, int *end_unprof, 
+		   int *start_unprof, int *end_unprof,
 		   int *start_prof, int *end_prof)
 {
   int errcode;
@@ -1385,24 +1385,24 @@ int diffStrSegment(DiffStr *dfsp, const DIFFSTR_T *diffstrp,
 #endif
 
   dfsp->len = 0;
-  nmatch = nmatch_start = nmatch_end = 0;				    
+  nmatch = nmatch_start = nmatch_end = 0;
   errcode = scrollDIFFSTRStartEnd(start_unprof, end_unprof,
 				  start_prof, end_prof,
 				  &nmatch_start, &nmatch_end,
-				  &typ_start, 
+				  &typ_start,
 				  &idx_start, &idx_end,
-				  start_unprof_target, 
+				  start_unprof_target,
 				  end_unprof_target,
 				  diffstrp);
   if (errcode)
     return errcode; /* hands down ERRCODE_NOMATCH if requested segment does
 		     * not contain a match */
-  
+
   maxsiz = idx_end - idx_start + DIFFSTR_MARGIN;
   if (maxsiz > dfsp->n_alloc &&
       (errcode = diffStrRealloc(dfsp, maxsiz)))
     return errcode;
-  
+
   nmatch = 0;
   if (idx_start == idx_end) {
     DIFFSTR_GET(diffstrp[idx_start], count, typ);
@@ -1447,8 +1447,8 @@ int diffStrSegment(DiffStr *dfsp, const DIFFSTR_T *diffstrp,
     return ERRCODE_ALLOCBOUNDARY;
   dfsp->dstrp[dfsp->len++] = SETDIFF(nmatch, DIFFCOD_S);
   dfsp->dstrp[dfsp->len++] = SETDIFF(0, DIFFCOD_M);
- 
-#ifdef diffstr_debug 
+
+#ifdef diffstr_debug
   deleteDIFFBUFF(dstrbfp);
 #endif
 
@@ -1456,7 +1456,7 @@ int diffStrSegment(DiffStr *dfsp, const DIFFSTR_T *diffstrp,
 }
 
 
-int diffStrScore(const DIFFSTR_T *diffstrp, int *swscor, SWSCOR match, SWSCOR mismatch, 
+int diffStrScore(const DIFFSTR_T *diffstrp, int *swscor, SWSCOR match, SWSCOR mismatch,
 		 SWSCOR gapopen, SWSCOR gapextend)
 {
   int errcode = ERRCODE_SUCCESS;
@@ -1464,7 +1464,7 @@ int diffStrScore(const DIFFSTR_T *diffstrp, int *swscor, SWSCOR match, SWSCOR mi
   UCHAR is_gap_open = 0;
   int i, maxi;
 
-  if (match < 1 || mismatch > 0 || gapopen > gapextend || gapopen > 0) 
+  if (match < 1 || mismatch > 0 || gapopen > gapextend || gapopen > 0)
     return ERRCODE_ASSERT;
 
   maxi = INT_MAX - (DIFFSTR_MAXMISMATCH+1)*match;
@@ -1473,7 +1473,7 @@ int diffStrScore(const DIFFSTR_T *diffstrp, int *swscor, SWSCOR match, SWSCOR mi
   for(i=0; (diffstrp[i]) && i < maxi; i++) {
     DIFFSTR_GET(diffstrp[i], count, typ);
     if (typ == DIFFCOD_S) {
-      *swscor += match*count + mismatch; 
+      *swscor += match*count + mismatch;
       is_gap_open = 0;
     } else if (typ == DIFFCOD_M) {
       *swscor += match*(count+1);
@@ -1487,7 +1487,7 @@ int diffStrScore(const DIFFSTR_T *diffstrp, int *swscor, SWSCOR match, SWSCOR mi
   }
   if ((diffstrp[i]) || typ != DIFFCOD_S)
     errcode = ERRCODE_DIFFSTR;
-  else 
+  else
     *swscor -= mismatch;
 
   return errcode;
@@ -1537,7 +1537,7 @@ DiffView *diffStrCreateView(int blksz)
 
 void diffStrDeleteView(DiffView *p)
 {
-  if (p != NULL) 
+  if (p != NULL)
     free(p->strp);
   free(p);
 }
@@ -1557,18 +1557,18 @@ int diffStrAsView(DiffView *dvp, const DIFFSTR_T *dstrp,
   for (i=0; i < INT_MAX && (dstrp[i]); i++);
   if (i >= INT_MAX)
     return ERRCODE_OVERFLOW;
-  
-  maxlen = ((size_t) i)*NCHAR_MAX_PRINTLEN + 2*NCHAR_MAX_CLIPLEN; 
+
+  maxlen = ((size_t) i)*NCHAR_MAX_PRINTLEN + 2*NCHAR_MAX_CLIPLEN;
 
   if (maxlen >= dvp->n_alloc &&
       (errcode = reallocView(dvp, maxlen+1)))
     return errcode;
 
-  errcode = diffStrPrintfStr(dvp->strp, &len, dstrp, 
+  errcode = diffStrPrintfStr(dvp->strp, &len, dstrp,
 			     outform, clip_start, clip_end, is_softclipped);
 
   if (!(errcode) && ((size_t) len) > maxlen)
     errcode = ERRCODE_ASSERT;
 
-  return errcode; 
+  return errcode;
 }

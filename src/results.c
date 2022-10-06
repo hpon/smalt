@@ -55,7 +55,7 @@ enum RESULT_CONST {
   MAPSCOR_MAX = 60,         /**< Maximum mapping score */
   MAPSCOR_DUMMY_COUNT = 3, /**< Dummy count for fraction in log arg */
   MAPSCOR_MAX_RANDOM = 3,  /**< minimum Smith-Waterman score for a unique mapping */
-  MAPSCOR_MIN_UNIQ = MAPSCOR_MAX_RANDOM + 1, /**< minimum Smith-Waterman score for a unique mapping */ 
+  MAPSCOR_MIN_UNIQ = MAPSCOR_MAX_RANDOM + 1, /**< minimum Smith-Waterman score for a unique mapping */
 #ifdef results_mapscor_exp
   /* MAPSCOR_MAX_EQUALSW = 30, /\**< Maximum mapping score if Smith-Waterman scores are equal *\/ */
   //MAPSCOR_SCALFAC = 60,    /**< Mapping score scaling factor */
@@ -126,9 +126,9 @@ struct _RESULT { /**< Alignmment results */
   char is_alidir;    /**< added from direct alignment without gaps */
 #endif
   RSLTFLG_t status;   /**< combination of RESULT_STATUS_FLAGS */
-  int swatscor;      /**< Smith-Waterman alignment score */ 
+  int swatscor;      /**< Smith-Waterman alignment score */
   int mapscor;       /**< 'Mapping' score */
-  double prob;       /**< Mapping score as likelihood of being correct 
+  double prob;       /**< Mapping score as likelihood of being correct
 		      * (related to mapscor) */
 #ifdef results_mscor_calib
   UCHAR mode;        /**< mode by which mapping score was calculated */
@@ -138,14 +138,14 @@ struct _RESULT { /**< Alignmment results */
   SEQLEN_t q_end;     /**< End in original query sequence, counting from 1 (q_start <= q_end) */
   SETSIZ_t s_start;  /**< if sidx>= 0: Start in subject sequence
 		      *   else: Start in concatenated set of subject sequences (counting from 1) */
-  SETSIZ_t s_end;    /**< if sidx >= 0: End in subject sequence, counting from 1 ( s_start <= s_end) 
+  SETSIZ_t s_end;    /**< if sidx >= 0: End in subject sequence, counting from 1 ( s_start <= s_end)
 		      *   else: End in concatenated set of subject sequences (counting from 1) */
   SEQNUM_t sidx;        /**< sequence index to which reference segment belongs, if <0 sequence
 		      * index is unknown and s_start, s_end represent offset (counting from 0)
 		      * in concatenated set of sequences */
   int stroffs;       /**< offset of alignment string. the aligment string is along the reference strand */
   int strlen;        /**< length of the alignment string (excl. termination) */
-  short rsltx;       /**< Initialised to RSLTX_INITVAL<0: result is primary alignment. 
+  short rsltx;       /**< Initialised to RSLTX_INITVAL<0: result is primary alignment.
 		      * >= 0: index of the secondary alignment in the array _ResultSet.resr */
   short qsegx;      /**< Index number of the segment in the set of complementary segments of
 		     * the query this result belongs to (used for mapping quality and secondary
@@ -175,11 +175,11 @@ struct _ResultSet { /**< Set of alignment results */
 			 * alignment output, alignment strings are along the reference strand */
   int n_ali_done;       /**< number of Smith-Waterman alignments executed */
   int n_ali_tot;        /**< total number of Smith-Waterman alignments that would
-			 * have to be considered */ 
+			 * have to be considered */
   short n_ali_max;      /**< Cut-off in the number of Smith-Waterman alignments */
   uint32_t n_hits_used;   /**< Number of seed hits used */
   uint32_t n_hits_tot;    /**< Total number of seed hits for read */
-  short qsegno;           /**< number of complementary segments of the read max_i(rsr[i].qsegx) 
+  short qsegno;           /**< number of complementary segments of the read max_i(rsr[i].qsegx)
 			   *  <0: not yet assigned */
 #ifdef RESULTS_BASQUAL
   BASQ *basqp;            /**< Statistics on base qualities */
@@ -229,10 +229,10 @@ static int assignPhredScaledMappingScoreToRandomDraw(int samplesiz)
   return mapq;
 }
 
-static int sumQualOverMisMatch(int *qualsum_ali, BOOL with_nonali, 
-			       const char *qualstrp, const SEQLEN_t slen, 
+static int sumQualOverMisMatch(int *qualsum_ali, BOOL with_nonali,
+			       const char *qualstrp, const SEQLEN_t slen,
 			       SEQLEN_t pos_start, SEQLEN_t pos_end, const DIFFSTR_T *dstrp)
-     /**< \param spos Start position in sequence (starting fom 1) 
+     /**< \param spos Start position in sequence (starting fom 1)
       */
 {
   UCHAR q;
@@ -267,16 +267,16 @@ static int sumQualOverMisMatch(int *qualsum_ali, BOOL with_nonali,
 	return ERRCODE_ASSERT;
       ADD_QVAL_CHECKED();
     }
-    spos++;     
+    spos++;
   }
 
-  if (spos != pos_end) 
+  if (spos != pos_end)
     return ERRCODE_ASSERT;
-  
+
   if (with_nonali) {
-    for (spos=0; spos < pos_start-1; spos++) 
+    for (spos=0; spos < pos_start-1; spos++)
       ADD_QVAL_CHECKED();
-    for (spos=pos_end; spos < slen; spos++) 
+    for (spos=pos_end; spos < slen; spos++)
       ADD_QVAL_CHECKED();
   }
 
@@ -335,8 +335,8 @@ static BASQ *createBASQ(void)
   }
   return p;
 }
-static int sampleQualOverMisMatch(BASQ *basqp, 
-				  const char *qualstrp, SEQLEN_t slen, 
+static int sampleQualOverMisMatch(BASQ *basqp,
+				  const char *qualstrp, SEQLEN_t slen,
 				  SEQLEN_t pos_start, SEQLEN_t pos_end,
 				  const DIFFSTR_T *dstrp)
 {
@@ -347,7 +347,7 @@ static int sampleQualOverMisMatch(BASQ *basqp,
 
   if (pos_end < pos_start)
     return ERRCODE_ASSERT;
-  
+
   spos = (pos_start > 0)? pos_start - 1: 0;
   for (dp = dstrp; (*dp); dp++) {
     DIFFSTR_GET((*dp), gap, typ);
@@ -374,7 +374,7 @@ static int sampleQualOverMisMatch(BASQ *basqp,
       if (q < SEQCOD_QVAL_OFFS)
 	return ERRCODE_ASSERT;
       q -= SEQCOD_QVAL_OFFS;
- 
+
       basqp->error[q]++;
     }
     spos++;
@@ -389,7 +389,7 @@ static int fprintBASQ(FILE *fp, const BASQ *basqA, const BASQ *basqB)
   int q;
   uint64_t ntot, nerr;
 
-  if (basqA->siz > UCHAR_MAX || 
+  if (basqA->siz > UCHAR_MAX ||
       ((basqB) && basqA->siz != basqB->siz))
     return ERRCODE_ASSERT;
 
@@ -409,7 +409,7 @@ static int fprintBASQ(FILE *fp, const BASQ *basqA, const BASQ *basqB)
     } else {
       q = -QUALSCOR_SCAL*log(((double) nerr)/ntot)/QUALSCOR_LOGBASE;
     }
-    
+
     fprintf(fp, "# BASQ [%u] %i\n", (unsigned int) u, q);
   }
   return ERRCODE_SUCCESS;
@@ -457,7 +457,7 @@ static int cmpRes(const void *p1, const void *p2)
   /* compare subject sequence index */
   if (ap->sidx < bp->sidx) return -1;
   if (ap->sidx > bp->sidx) return 1;
-  
+
   /* compare sense on subject sequence */
   if (((ap->status)&RSLTFLAG_REVERSE) < ((bp->status)&RSLTFLAG_REVERSE)) return -1;
   if (((ap->status)&RSLTFLAG_REVERSE) > ((bp->status)&RSLTFLAG_REVERSE)) return 1;
@@ -465,7 +465,7 @@ static int cmpRes(const void *p1, const void *p2)
   /* compare match starts on subject sequence */
   if (ap->s_start < bp->s_start) return -1;
   if (ap->s_start > bp->s_start) return 1;
-    
+
   /* compare segment lengths on query sequence */
   da = ap->q_end - ap->q_start;
   db = bp->s_end - bp->s_start;
@@ -484,7 +484,7 @@ static int cmpResOutput(const void *p1, const void *p2)
   /* by decreasing Smith-Waterman score */
   if (ap->swatscor > bp->swatscor) return -1;
   if (ap->swatscor < bp->swatscor) return 1;
-  
+
   /* by strand of the reference sequence: forward 1st */
   if (((ap->status)&RSLTFLAG_REVERSE) < ((bp->status)&RSLTFLAG_REVERSE)) return -1;
   if (((ap->status)&RSLTFLAG_REVERSE) > ((bp->status)&RSLTFLAG_REVERSE)) return 1;
@@ -496,7 +496,7 @@ static int cmpResOutput(const void *p1, const void *p2)
   /* by increasing alignment start points on reference sequence */
   if (ap->s_start < bp->s_start) return -1;
   if (ap->s_start > bp->s_start) return 1;
-  
+
   /* by decreasing segment length */
   da = ap->q_end - ap->q_start;
   db = bp->q_end - bp->q_start;
@@ -518,7 +518,7 @@ static int cmpResSegSW(const void *p1, const void *p2)
   /* by decreasing Smith-Waterman score */
   if (ap->swatscor > bp->swatscor) return -1;
   if (ap->swatscor < bp->swatscor) return 1;
- 
+
   return 0;
 }
 
@@ -549,7 +549,7 @@ static int cmpResSegLen (const void *p1, const void *p2)
   /* compare match starts on subject sequence */
   if (ap->s_start < bp->s_start) return -1;
   if (ap->s_start > bp->s_start) return 1;
-  
+
   return 0;
 }
 
@@ -560,7 +560,7 @@ static int isIdenticalResult(const Result*ap, const Result*bp)
 	  ap->q_start != bp->q_start ||
 	  ap->q_end != bp->q_end ||
 	  ap->swatscor != bp->swatscor ||
-	  ap->sidx != bp->sidx)? 
+	  ap->sidx != bp->sidx)?
     0: 1;
 }
 
@@ -584,7 +584,7 @@ static void fprintResultDebugInfo(FILE *fp, const Result*rp, const DiffStr *dfsp
   fprintf(fp, "\n");
 }
 
-static int checkRESULT(SeqFastq *sqbufp, const Result*rp, const DiffStr *dfsp, 
+static int checkRESULT(SeqFastq *sqbufp, const Result*rp, const DiffStr *dfsp,
 		       const char *qstr, SEQLEN_t qlen,
 		       const SeqSet *ssp, const SeqCodec *codecp)
 {
@@ -605,8 +605,8 @@ static int checkRESULT(SeqFastq *sqbufp, const Result*rp, const DiffStr *dfsp,
     return ERRCODE_OVERFLOW;
 
   if (rp->sidx >= 0) {
-    errcode = seqSetFetchSegmentBySequence(sqbufp, rp->sidx, 
-					   rp->s_start - 1, 
+    errcode = seqSetFetchSegmentBySequence(sqbufp, rp->sidx,
+					   rp->s_start - 1,
 					   rp->s_end - rp->s_start + 1,
 					   ssp, codecp);
   } else {
@@ -669,10 +669,10 @@ static int checkRESULT(SeqFastq *sqbufp, const Result*rp, const DiffStr *dfsp,
 static int sortBySegmentAndSWscor(ResultSet *rsp)
 {
   short i, j, nres = (short) ARRLEN(rsp->sortr);
-  
+
   if (nres < 1)
     return ERRCODE_SUCCESS;
-    
+
   /** Allocate 2nd sort array */
   if (((size_t) nres) > ARRNALLOC(rsp->segsrtr)) {
     void *hp = ARREALLOC(rsp->segsrtr, nres);
@@ -704,7 +704,7 @@ static int sortBySegmentAndSWscor(ResultSet *rsp)
   return (j == rsp->qsegno + 1)? ERRCODE_SUCCESS: ERRCODE_ASSERT;
 }
 
-static int labelComplementarySegments(ResultSet *rsp, 
+static int labelComplementarySegments(ResultSet *rsp,
 				      short const min_overlap_percent)
 /**< find complementary (on query sequence) segments, link overlapping ones */
 {
@@ -712,7 +712,7 @@ static int labelComplementarySegments(ResultSet *rsp,
   RESULTPTRARR rspp = rsp->sortr;
   short i, i_start, n = (short) ARRLEN(rspp);
   double const min_overlap_frac = ((double) min_overlap_percent)/N100PERCENT;
-  
+
   if (n < 1)
     return ERRCODE_SUCCESS;
   else if (n > 1 && !(rsp->status & RSLTSETFLG_SWSORT))
@@ -757,7 +757,7 @@ static int labelComplementarySegments(ResultSet *rsp,
 }
 
 static int sortAndPrune(ResultSet *rsp)
-     /**< sort results and remove duplicates. 
+     /**< sort results and remove duplicates.
       * If ssp != Null, assign ref. sequence index and update reference offsets */
 {
   short i, nres = (short) ARRLEN(rsp->resr);
@@ -795,7 +795,7 @@ static int sortAndPrune(ResultSet *rsp)
   for (dpp=rsp->sortr+1; dpp<endpp; dpp++) {
     if ((*dpp)->s_end > (*prevpp)->s_end ||
 	(*dpp)->swatscor > (*prevpp)->swatscor ||
-	(*dpp)->q_start < (*prevpp)->q_start || 
+	(*dpp)->q_start < (*prevpp)->q_start ||
 	(*dpp)->q_end > (*prevpp)->q_end ||
 	(*dpp)->sidx != (*prevpp)->sidx ||
 	(((*dpp)->status)&RSLTFLAG_REVERSE) != (((*prevpp)->status)&RSLTFLAG_REVERSE)) {
@@ -806,7 +806,7 @@ static int sortAndPrune(ResultSet *rsp)
     } else {
       (*dpp)->status &= ~RSLTFLAG_SELECT;
 #ifdef result_debug
-      skipctr++;  
+      skipctr++;
 #endif
     }
   }
@@ -853,8 +853,8 @@ static BOOL getNumberOfTopSwatRESULTs(short *n_best, RESULTPTRARR rspp)
   } else {
     rv = 0;
   }
- 
-  if (n > 2) {  
+
+  if (n > 2) {
     int scorthresh = rspp[1]->swatscor;
     short i;
     for (i=2; i<n; i++)
@@ -883,14 +883,14 @@ int resultGetData(SEQLEN_t *qs, SEQLEN_t *qe,
     if (qs) *qs = 0;
     if (qe) *qe = 0;
     if (rs) *rs = 0;
-    if (re) *re = 0;       
+    if (re) *re = 0;
     if (rx) *rx = 0;
     if (swscor) *swscor = 0;
     if (flag) flag = 0;
     errcode = ERRCODE_NULLPTR;
   } else {
     if (qs) *qs = rp->q_start;
-    if (qe) *qe = rp->q_end;  
+    if (qe) *qe = rp->q_end;
     if (rs) *rs = (SEQLEN_t) rp->s_start;
     if (re) *re = (SEQLEN_t) rp->s_end;
     if (rx) *rx = rp->sidx;
@@ -935,7 +935,7 @@ int resultGetMapQualScore(double *prob, RSLTFLG_t *flag, const Result * const rp
   return mapq;
 }
 
-RSLTPAIRMAPFLG_t resultCalcInsertSize(int *isiz, 
+RSLTPAIRMAPFLG_t resultCalcInsertSize(int *isiz,
 				      unsigned char samspec,
 				      const Result *ap,
 				      const Result *bp)
@@ -956,7 +956,7 @@ RSLTPAIRMAPFLG_t resultCalcInsertSize(int *isiz,
 
   if (isiz) {
     SETSIZ_t rA, rB;
-    if (RSLTSAMSPEC_V1P4 == samspec) { 
+    if (RSLTSAMSPEC_V1P4 == samspec) {
       rA = (ap->s_start < bp->s_start)? ap->s_start: bp->s_start;
       rB = (ap->s_end < bp->s_end)? bp->s_end: ap->s_end;
       *isiz = (rA + INT_MAX > rB || rA < rB + INT_MAX)? rB - rA + 1: 0;
@@ -968,7 +968,7 @@ RSLTPAIRMAPFLG_t resultCalcInsertSize(int *isiz,
       } else {
 	rA = ap->s_start - ap->q_start + 1;
       }
-      if (bp->status&RSLTFLAG_REVERSE) {    
+      if (bp->status&RSLTFLAG_REVERSE) {
 	rB = bp->s_end + bp->q_start;
       } else {
 	rB = bp->s_start - bp->q_start + 1;
@@ -1025,7 +1025,7 @@ static int calcMappingScore(RESULTARR const *rspp)
   short i, n = ARRLEN(rspp);
   int swatscor_1st = rspp[0]->swatscor;
   int mapscor, swatscor_2nd = 0;
-  
+
   if (swatscor_1st < 1)
     return 0;
 
@@ -1044,13 +1044,13 @@ static int calcMappingScore(RESULTARR const *rspp)
 /*   if (mapscor < 0)  */
 /*     mapscor = 0; */
   mapscor = (swatscor_1st - swatscor_2nd)*MAPSCOR_MAX/swatscor_1st;
-  if (mapscor > MAPSCOR_MAX_TAG) 
+  if (mapscor > MAPSCOR_MAX_TAG)
     mapscor = MAPSCOR_MAX_TAG;
-  
+
   rspp[0]->mapscor = mapscor;
   for(i=1;i<n;i++)
     rspp[i]->mapscor = 0;
-  
+
   return mapscor;
 }
 
@@ -1092,7 +1092,7 @@ static int calcMappingQuality(const ResultSet *rsetp, const SeqFastq *sqp)
     if (!qualstrp)
       return ERRCODE_ASSERT;
 
-    if ((errcode = sumQualOverMisMatch(qvalsum, 1, qualstrp, slen, 
+    if ((errcode = sumQualOverMisMatch(qvalsum, 1, qualstrp, slen,
 				       rspp[0]->q_start, rspp[0]->q_end, dstrp+rspp[0]->stroffs)))
       return errcode;
     if ((errcode = sumQualOverMisMatch(qvalsum+1, 1, qualstrp, slen,
@@ -1108,22 +1108,22 @@ static int calcMappingQuality(const ResultSet *rsetp, const SeqFastq *sqp)
     mapscor = qvalsum[1] - qvalsum[0] - qn;
     if (mapscor > MAPSCOR_MAX)
       mapscor = MAPSCOR_MAX;
-    else if (mapscor < 0) 
+    else if (mapscor < 0)
       mapscor = 0;
 
 #ifdef results_mscor_calib
     namp = seqFastqGetSeqName(sqp);
-    printf("CALDAT_RESULTS %s %i %i %i %hi %i %i %i %i %u %u\n", 
-	   namp, mapscor, 
+    printf("CALDAT_RESULTS %s %i %i %i %hi %i %i %i %i %u %u\n",
+	   namp, mapscor,
 	   qvalsum[1], qvalsum[0],
 	   i-1, swatscor_1st, swatscor_2nd,
 	   rsetp->n_ali_done, rsetp->n_ali_tot,
 	   rsetp->n_hits_used, rsetp->n_hits_tot);
 #endif
-    
+
   }
   if (rsetp->n_ali_tot > rsetp->n_ali_done && rsetp->n_ali_tot > 1) {
-    
+
     //const int qfracscor = - QUALSCOR_SCAL * log(1.0 - ((double)rsetp->n_ali_done)/rsetp->n_ali_tot) / QUALSCOR_LOGBASE;
 /*     qfracscor = MAPSCOR_MAX * rsetp->n_ali_done / rsetp->n_ali_tot; */
 /*     if (mapscor > qfracscor) */
@@ -1131,20 +1131,20 @@ static int calcMappingQuality(const ResultSet *rsetp, const SeqFastq *sqp)
     const double qfrac = ((double)rsetp->n_ali_done)/rsetp->n_ali_tot;
     mapscor *= qfrac;
   }
-  
+
   rspp[0]->mapscor = (mapscor < MAPSCOR_MAX)? mapscor: MAPSCOR_MAX;
   for(i=1;i<n;i++)
     rspp[i]->mapscor = 0;
-  
+
   return ERRCODE_SUCCESS;
 }
 #endif
 
-static int calcPhredScaledMappingQuality(short qsegx, 
-					 const ResultSet *rsetp, 
+static int calcPhredScaledMappingQuality(short qsegx,
+					 const ResultSet *rsetp,
 					 const SeqFastq *sqp)
      /**< Assigns PHRED scaled mapping score.
-      * Degenerate (multiple best) mappings with 
+      * Degenerate (multiple best) mappings with
       */
 {
   int errcode;
@@ -1167,7 +1167,7 @@ static int calcPhredScaledMappingQuality(short qsegx,
 
   if (!(rsetp->status & RSLTSETFLG_SEGIDX) || qsegx < 0 || qsegx >= rsetp->qsegno)
     return ERRCODE_ASSERT;
-  
+
   rspp = rsetp->segsrtr + rsetp->segnor[qsegx];
   n = (short) (rsetp->segnor[qsegx + 1] - rsetp->segnor[qsegx]);
   if (n < 1)
@@ -1180,12 +1180,12 @@ static int calcPhredScaledMappingQuality(short qsegx,
     return ERRCODE_SUCCESS;
   }
 
-  
+
   /*   seedfractlg = (rsetp->n_hits_tot>0 && rsetp->n_hits_used > 0)?  */
   /*     log(((double) rsetp->n_hits_used)/rsetp->n_hits_tot): 0.0; */
   /*   alifractlg = (rsetp->n_ali_done > 0 && rsetp->n_ali_tot > 0)? */
   /*     log(((double) rsetp->n_ali_done)/rsetp->n_ali_tot): 0.0; */
- 
+
   /*   mapscor_deficit = -QUALSCOR_SCAL*(seedfractlg + alifractlg)/QUALSCOR_LOGBASE; */
   /*   if (mapscor_deficit < 0) */
   /*     return ERRCODE_ASSERT; */
@@ -1199,7 +1199,7 @@ static int calcPhredScaledMappingQuality(short qsegx,
   /*   fs = (rsetp->n_hits_used > 0)?  */
   /*     -QUALSCOR_SCAL * log(((double)rsetp->n_hits_used)/(rsetp->n_hits_tot)/QUALSCOR_LOGBASE: */
   /*     MAPSCOR_MAX; */
-  
+
   /*   fa = (rsetp->n_ali_done > 0)?  */
   /*     -QUALSCOR_SCAL * log(((double)rsetp->n_ali_done)/rsetp->n_ali_tot)/QUALSCOR_LOGBASE: */
   /*     MAPSCOR_MAX; */
@@ -1217,7 +1217,7 @@ static int calcPhredScaledMappingQuality(short qsegx,
   /*   } */
   if (n>1) {
       swatscor_2nd = rspp[1]->swatscor;
-      for (i=2; i<n && rspp[i]->swatscor == swatscor_2nd; i++); 
+      for (i=2; i<n && rspp[i]->swatscor == swatscor_2nd; i++);
       n_swatscor_2nd = (short) (i-1); /* number of results with 2nd largest score = i-1 */
       qn = (int) (QUALSCOR_SCAL*log((double) (n_swatscor_2nd)) / QUALSCOR_LOGBASE);
     } else {
@@ -1239,14 +1239,14 @@ static int calcPhredScaledMappingQuality(short qsegx,
     if (seglen_1st == seglen) {
       qualstrp = seqFastqGetConstQualityFactors(sqp, &slen, NULL);
       if ((qualstrp)) {
-	if ((errcode = sumQualOverMisMatch(&qvalsum_1st, 0, qualstrp, slen, 
+	if ((errcode = sumQualOverMisMatch(&qvalsum_1st, 0, qualstrp, slen,
 					   rspp[0]->q_start, rspp[0]->q_end, dstrp+rspp[0]->stroffs)))
 	  return errcode;
 
-	if ((errcode = sumQualOverMisMatch(&qvalsum_2nd, 0, qualstrp, slen, 
+	if ((errcode = sumQualOverMisMatch(&qvalsum_2nd, 0, qualstrp, slen,
 					   rspp[1]->q_start, rspp[1]->q_end, dstrp+rspp[1]->stroffs)))
 	  return errcode;
-      
+
 	i_min = 1;
 	for (i=2; i<n && rspp[i]->swatscor == swatscor_1st; i++) {
 	  seglen = rspp[i]->q_end - rspp[i]->q_start;
@@ -1279,7 +1279,7 @@ static int calcPhredScaledMappingQuality(short qsegx,
 	mapscor = 0;
 #ifdef results_mscor_calib
 	mode = 2;
-#endif	
+#endif
       }
     } else { /* if (seglen_1st == seglen) */
       /* mapscor = (int) QUALSCOR_SCAL * (log(n_swatscor_2nd + 1) - log(n_swatscor_2nd))/ QUALSCOR_LOGBASE; */
@@ -1303,7 +1303,7 @@ static int calcPhredScaledMappingQuality(short qsegx,
 					MAPSCOR_EXPFAC/qlen)) - qn);
     //mapscor = maxmapscor*(1-exp(((double)(swatscor_2nd - swatscor_1st))*MAPSCOR_EXPFAC/qlen)) - qn;
     //mapscor = MAPSCOR_SCALFAC*(1-exp((swatscor_2nd - swatscor_1st)*MAPSCOR_EXPFAC/swatscor_1st));
-    //mapscor -= mapscor_deficit/MAPSCOR_DEFICIT_SCALFAC; 
+    //mapscor -= mapscor_deficit/MAPSCOR_DEFICIT_SCALFAC;
 #else
     SEQLEN_t qlen;
     seqFastqGetConstSequence(sqp, &qlen, NULL);
@@ -1323,20 +1323,20 @@ static int calcPhredScaledMappingQuality(short qsegx,
 /*     else if (mapscor < MAPSCOR_MIN_UNIQ) */
 /*       mapscor = MAPSCOR_MIN_UNIQ; */
 #endif
-    
+
 #ifdef results_mscor_calib
     mode = 4;
 #endif
   }
   if (mapscor > MAPSCOR_MAX)
     mapscor = MAPSCOR_MAX;
-  else if (mapscor < 0) 
+  else if (mapscor < 0)
     mapscor = 0;
-    
+
 #ifdef results_mscor_calib
   rspp[0]->mode = mode;
   namp = seqFastqGetSeqName(sqp);
-  printf("CALDAT_RESULTS %s %i %i %i %i %hi %i %i %i %i %i %u %u\n", 
+  printf("CALDAT_RESULTS %s %i %i %i %i %hi %i %i %i %i %i %u %u\n",
 	 namp, mapscor, (int) mode,
 	 qvalsum_1st, qvalsum_2nd,
 	 n_swatscor_2nd, qn, swatscor_1st, swatscor_2nd,
@@ -1347,11 +1347,11 @@ static int calcPhredScaledMappingQuality(short qsegx,
   rspp[0]->mapscor = mapscor;
   for(i=1;i<n;i++)
     rspp[i]->mapscor = 0;
-  
+
   return ERRCODE_SUCCESS;
 }
 
-static int 
+static int
 propagateMapQualAsProb
 (short qsegx, const ResultSet *rsetp)
 /* calcPhredScaledMappingQuality() must have been called beforehand! */
@@ -1362,12 +1362,12 @@ propagateMapQualAsProb
 
   if (!(rsetp->status & RSLTSETFLG_SEGIDX) || qsegx < 0 || qsegx >= rsetp->qsegno)
     return ERRCODE_ASSERT;
-  
+
   rspp = rsetp->segsrtr + rsetp->segnor[qsegx];
   nn = (short) (rsetp->segnor[qsegx + 1] - rsetp->segnor[qsegx]);
   if (nn < 1)
     return ERRCODE_SUCCESS;
-  
+
   for (i=1; i<nn && rspp[i]->swatscor == rspp[0]->swatscor; i++);
   n1 = i;
   if (i < nn) {
@@ -1411,7 +1411,7 @@ propagateMapQualAsProb
   return ERRCODE_SUCCESS;
 }
 
-static int 
+static int
 calcPhredScaledMappingQualityPerQuerySegment
 (ResultSet *rsetp, const SeqFastq *sqp)
 {
@@ -1434,9 +1434,9 @@ calcPhredScaledMappingQualityPerQuerySegment
 }
 
 static int findSplitReads(RESULTARR const *rspp)
-     /**< Array of pointers into array of results, sorted by 
+     /**< Array of pointers into array of results, sorted by
       * Smith-Waterman core,
-      * rspp[i]->rsltidx must have been initialised to 0 
+      * rspp[i]->rsltidx must have been initialised to 0
       * This variable is set to the index of the primary alignment
       * in the (sorted) pointer array into results
       */
@@ -1445,7 +1445,7 @@ static int findSplitReads(RESULTARR const *rspp)
   int swatscor_1st = rspp[0]->swatscor;
   short n_split = 0;
   Result*ap, *bp;
- 
+
   for (i=0; i<n; i++) {
     /* only top->scoring hits can be primary alignments */
     ap = rspp[i];
@@ -1456,7 +1456,7 @@ static int findSplitReads(RESULTARR const *rspp)
       if (bp->rsltx >= 0)
 	continue;
       /* check that there is no overlap between the alignments */
-      if (ap->q_end < bp->q_start || 
+      if (ap->q_end < bp->q_start ||
 	  ap->q_start > bp->q_end) {
 	bp->rsltx = i;
 	ap->status |= RSLTFLAG_HASSECOND;
@@ -1470,22 +1470,22 @@ static int findSplitReads(RESULTARR const *rspp)
 }
 
 static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
-			  DiffStr *diffstrbufp, DiffStr *diffstrp, 
-			  SeqFastq *sqbufp, 
-			  SEQNUM_t so, SEQNUM_t eo, 
+			  DiffStr *diffstrbufp, DiffStr *diffstrp,
+			  SeqFastq *sqbufp,
+			  SEQNUM_t so, SEQNUM_t eo,
 #ifdef results_debug
 			  const char *profiled_seqp,
 			  const char *profiled_seqRCp,
 #endif
 			  const ScoreProfile *scpp,
 			  const ScoreProfile *scpRCp,
-			  const SeqSet *ssp, 
+			  const SeqSet *ssp,
 			  const SeqCodec *codecp)
 /**< Split alignment results that span multiple refrence sequences and add them
- * to the array. 
+ * to the array.
  * \param resr Array of alignment results.
  * \param residx Index of the element in the array that is going to be split.
- * \param so Index (serial no, 0 based) of the first reference sequence in ssp that is part 
+ * \param so Index (serial no, 0 based) of the first reference sequence in ssp that is part
  *        of the alignment with the query.
  * \param eo Index (serial no, 0 based) of the first reference sequence after sequence so in ssp
  *        that is not part of the alignment with the query (eo == no sequences in ssp is allowed).
@@ -1517,11 +1517,11 @@ static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
       so < 0 || eo <= so || eo > nseq ||
       (*resr)[residx].s_start <= ofp[so])
     return ERRCODE_ASSERT;
-  
+
   rp = (*resr) + residx;
   isReverseComplement = (BOOL) ((rp->status & RSLTFLAG_REVERSE) != 0);
   if (isReverseComplement) {
-      scprofp = scpRCp; 
+      scprofp = scpRCp;
 #ifdef results_debug
     profdseqp = profiled_seqRCp;
 #endif
@@ -1529,8 +1529,8 @@ static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
     scprofp = scpp;
 #ifdef results_debug
     profdseqp = profiled_seqp;
-    if ((errcode = checkRESULT(sqbufp, rp, 
-			       diffstrp, 
+    if ((errcode = checkRESULT(sqbufp, rp,
+			       diffstrp,
 			       profdseqp, profiled_seqlen,
 			       ssp, codecp)))
       return errcode;
@@ -1538,7 +1538,7 @@ static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
   }
 
   n = eo - so; /* number of reference squences spanned by the alignment */
-  for (i=0; i<n; i++) { 
+  for (i=0; i<n; i++) {
     Result*hp;
     SEQLEN_t q_start_0based_inprofil;
     /* rp->s_start, rp->s_end start from 1,
@@ -1550,8 +1550,8 @@ static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
       curr_start = ofp[idx] - rp->s_start + 1;
     }
     curr_end = ((rp->s_end <= ofp[idx+1])? rp->s_end: ofp[idx+1]) - rp->s_start;
- 
-    errcode = diffStrSegment(diffstrbufp, 
+
+    errcode = diffStrSegment(diffstrbufp,
 			     diffstrp->dstrp + rp->stroffs,
 			     curr_start, curr_end,
 			     &s_start, &s_end,
@@ -1563,13 +1563,13 @@ static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
 	return errcode;
     }
 #ifdef results_debug
-    printf("results.c:splitMultiSpan(): curr_start = %i, curr_end = %i\n", 
+    printf("results.c:splitMultiSpan(): curr_start = %i, curr_end = %i\n",
 	   curr_start, curr_end);
     diffStrPrintf(stdout, diffstrp->dstrp + rp->stroffs, DIFFSTRFORM_RAW,
 		  0, 0, 0);
-    printf("results.c:splitMultiSpan(): s_start = %i, s_end = %i\n", 
-	   s_start, s_end);  
-    printf("results.c:splitMultiSpan(): q_start = %i, q_end = %i\n", 
+    printf("results.c:splitMultiSpan(): s_start = %i, s_end = %i\n",
+	   s_start, s_end);
+    printf("results.c:splitMultiSpan(): q_start = %i, q_end = %i\n",
 	   q_start, q_end);
     printf("results.c:splitMultiSpan(): new diffstr: ");
     diffStrPrintf(stdout, diffstrbufp->dstrp, DIFFSTRFORM_RAW,
@@ -1577,7 +1577,7 @@ static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
 
 #endif
     ARRNEXTP(hp, *resr);
-    if (!hp) 
+    if (!hp)
       return ERRCODE_NOMEM;
     rp = (*resr) + residx;
     *hp = *rp;
@@ -1605,7 +1605,7 @@ static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
       return ERRCODE_ASSERT;
 
     hp->s_start = rp->s_start + s_start - ofp[idx];
-    hp->s_end = rp->s_start + s_end - ofp[idx]; 
+    hp->s_end = rp->s_start + s_end - ofp[idx];
     if (hp->s_end < hp->s_start || hp->s_end - hp->s_start >= INT_MAX)
       return ERRCODE_OVERFLOW;
 
@@ -1614,19 +1614,19 @@ static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
     hp->status |= RSLTFLAG_SELECT;
 
 #ifdef results_debug
-    if ((errcode = checkRESULT(sqbufp, hp, diffstrp, 
+    if ((errcode = checkRESULT(sqbufp, hp, diffstrp,
 			       profdseqp, profiled_seqlen,
 			       ssp, codecp)))
       return errcode;
 #endif
 
     /* update Smith-Waterman score */
-    if ((errcode = seqSetFetchSegmentBySequence(sqbufp, hp->sidx, 
-						(SEQLEN_t) (hp->s_start - 1), 
+    if ((errcode = seqSetFetchSegmentBySequence(sqbufp, hp->sidx,
+						(SEQLEN_t) (hp->s_start - 1),
 						(SEQLEN_t) hp->s_end - hp->s_start + 1,
 						ssp, codecp)))
       return errcode;
-  
+
     seqstr = seqFastqGetSequence(sqbufp, &seqlen, &code);
     if (code != SEQCOD_MANGLED &&
 	(errcode = seqFastqEncode(sqbufp, codecp)))
@@ -1635,7 +1635,7 @@ static int splitMultiSpan(RESULTARR *resr, const uint32_t residx,
     if (seqlen > INT_MAX)
       return ERRCODE_OVERFLOW;
 
-    if ((errcode = aliScoreDiffStr(&hp->swatscor, seqstr, (int) seqlen, 
+    if ((errcode = aliScoreDiffStr(&hp->swatscor, seqstr, (int) seqlen,
 				   q_start_0based_inprofil,
 				   diffstrp->dstrp + hp->stroffs, hp->strlen,
 				   scprofp)))
@@ -1662,7 +1662,7 @@ static int sampleBasQStats(ResultSet *rsetp, const SeqFastq *sqp)
     return ERRCODE_SEQCODE;
 
   rp = rspp[0];
-  
+
   return sampleQualOverMisMatch(rsetp->basqp, basqstr, slen, rp->q_start, rp->q_end,
 				rsetp->diffstrp->dstrp + rp->stroffs);
 }
@@ -1687,7 +1687,7 @@ static double getMinProb(const RESULTPTRARR rsr, BOOL is_restricted)
       minprob = 1.0/nr;
     }
   }
-  
+
   return minprob;
 }
 #endif
@@ -1723,14 +1723,14 @@ static int assignSequenceIndex(ResultSet *rsp,
 	return ERRCODE_NOMEM;
     }
   }
-  
+
   ctr = (short) ARRLEN(rsp->sortidxr);
   if (ctr > 1) {
     /* qsort(rsp->sortr, ctr, sizeof(Result*), cmpOffsRESULTp); */
     if ((errcode = sortUINT64andUINT32ArraysByQuickSort(ctr, rsp->sortkeyr, rsp->sortidxr)))
       return errcode;
   }
-  
+
   /* assign sequence index */
   for (s=0,i=0; i<ctr && s<nseq; i++) {
     Result *rp = rsp->resr + rsp->sortidxr[i];
@@ -1746,7 +1746,7 @@ static int assignSequenceIndex(ResultSet *rsp,
 #endif
 
 	errcode = splitMultiSpan(&rsp->resr, rsp->sortidxr[i],
-				 rsp->diffstrbufp, rsp->diffstrp, 
+				 rsp->diffstrbufp, rsp->diffstrp,
 				 sbufp, s, e,
 #ifdef results_debug
 				 profiled_seqp,
@@ -1799,8 +1799,8 @@ ResultSet *resultSetCreate(int blocksiz, int blocksiz_diffstr)
 #ifdef RESULTS_BASQUAL
   rsp->basqp = createBASQ();
 #endif
-  if (!((rsp->resr) && (rsp->sortr) && 
-	(rsp->segsrtr) && (rsp->segnor) && 
+  if (!((rsp->resr) && (rsp->sortr) &&
+	(rsp->segsrtr) && (rsp->segnor) &&
 	(rsp->sortidxr) && (rsp->sortidxr) &&
 	(rsp->diffstrp) && (rsp->diffstrbufp)
 #ifdef RESULTS_BASQUAL
@@ -1849,10 +1849,10 @@ unsigned char resultSetAlignmentWasCurtailed(const ResultSet *rsp)
   return (unsigned char) (rsp->n_ali_tot > rsp->n_ali_max && rsp->n_ali_done >= rsp->n_ali_max);
 }
 
-int resultSetAddFromAli(ResultSet *rsp, const AliRsltSet *arsp, 
-			SEQLEN_t soffs, 
+int resultSetAddFromAli(ResultSet *rsp, const AliRsltSet *arsp,
+			SEQLEN_t soffs,
 			SEQLEN_t qoffs, SEQLEN_t qlen,
-			SEQNUM_t seqidx, 
+			SEQNUM_t seqidx,
 #ifdef results_debug
 			SEGIDX sgx,
 			SeqFastq *sqbufp,
@@ -1888,20 +1888,20 @@ int resultSetAddFromAli(ResultSet *rsp, const AliRsltSet *arsp,
       is_new = 0;
       rp->status = 0;
     }
-    
+
     errcode = aliRsltSetFetchData(arsp, i, &rp->swatscor,
 				  &qs, &qe, &rs, &re,
 				  &dfsp);
     if (errcode)
       break;
 
-    if (is_reverse) {  
+    if (is_reverse) {
       rp->q_start = qoffs + qlen - qe; /* counting from 1 */
       rp->q_end = qoffs + qlen - qs;   /* counting from 1 */
     } else {
       rp->q_start = qs + qoffs + 1; /* counting from 1 */
       rp->q_end   = qe + qoffs + 1; /* counting from 1 */
-    } 
+    }
 
     rp->s_start = soffs + rs + 1;
     rp->s_end   = soffs + re + 1;
@@ -1929,7 +1929,7 @@ int resultSetAddFromAli(ResultSet *rsp, const AliRsltSet *arsp,
 #ifdef results_debug
       rp->sgx = sgx;
       rp->is_alidir = 0;
-      if ((errcode = checkRESULT(sqbufp, rp, rsp->diffstrp, 
+      if ((errcode = checkRESULT(sqbufp, rp, rsp->diffstrp,
 				 profiled_seqp, qlen, ssp, codecp)))
 	return errcode;
 #endif
@@ -1941,7 +1941,7 @@ int resultSetAddFromAli(ResultSet *rsp, const AliRsltSet *arsp,
   return errcode;
 }
 
-int resultSetAddMisMatch(ResultSet *rsp, const int mmoffs[], int mmnum, 
+int resultSetAddMisMatch(ResultSet *rsp, const int mmoffs[], int mmnum,
 			 SEQLEN_t qoffs, int len, SEQLEN_t soffs, SEQNUM_t sidx, char is_rcpl,
 			 int swatscor)
 {
@@ -1977,7 +1977,7 @@ int resultSetAddMisMatch(ResultSet *rsp, const int mmoffs[], int mmnum,
   rp->s_end = soffs + len;
   rp->sidx = sidx;
   rp->swrank = 0;
-  if (sidx == RESULTSET_UNKNOWN_SEQIDX) 
+  if (sidx == RESULTSET_UNKNOWN_SEQIDX)
     rp->status |= RSLTFLAG_NOSEQID;
   rp->swatscor = swatscor;
   UPDATE_SWATSCORMAX(rsp, rp->swatscor);
@@ -1987,7 +1987,7 @@ int resultSetAddMisMatch(ResultSet *rsp, const int mmoffs[], int mmnum,
   rp->stroffs = rsp->diffstrp->len;
   rp->strlen = diffstrlen;
 
-  if ((errcode = diffStrGenerateFromMismatches(&diffstrlen, rsp->diffstrp->dstrp+rp->stroffs, 
+  if ((errcode = diffStrGenerateFromMismatches(&diffstrlen, rsp->diffstrp->dstrp+rp->stroffs,
 					       mmoffs, mmnum, len)))
     return errcode;
 #ifdef results_debug
@@ -1998,7 +1998,7 @@ int resultSetAddMisMatch(ResultSet *rsp, const int mmoffs[], int mmnum,
   rsp->status = 0;
 
   return ERRCODE_SUCCESS;
-} 
+}
 
 void resultSetUpdateFromSegment(ResultSet *rsp, short start_idx, short end_idx,
 				SEQLEN_t soffs, SEQLEN_t qoffs, char is_reverse)
@@ -2031,7 +2031,7 @@ int resultSetSortAndAssignSequence(ResultSet *rsp,
 				   const SeqSet *ssp,
 				   const SeqCodec *codecp)
 {
-  int errcode = assignSequenceIndex(rsp, sbufp, 
+  int errcode = assignSequenceIndex(rsp, sbufp,
 #ifdef results_debug
 				    sqp,
 				    sqRCp,
@@ -2045,15 +2045,15 @@ int resultSetSortAndAssignSequence(ResultSet *rsp,
     return errcode;
 
   rsp->qsegno = 0;
-  
+
   if (ARRLEN(rsp->sortr) > 0) {
     if ((errcode = labelComplementarySegments(rsp, MIN_QSEGOVERLAP_PERCENT)))
       return errcode;
-   
+
     if ((errcode = calcPhredScaledMappingQualityPerQuerySegment(rsp, sqp)))
       return errcode;
 
-#ifdef RESULTS_BASQUAL    
+#ifdef RESULTS_BASQUAL
     if ((errcode = sampleBasQStats(rsp, sqp)))
       return errcode;
 #endif
@@ -2083,7 +2083,7 @@ int resultSetGetNumberOfSegments(short *nres, short *nseg, const ResultSet *rsp)
   int errcode = ERRCODE_SUCCESS;
   if (rsp == NULL) {
     errcode = ERRCODE_NULLPTR;
-  } else if (ARRLEN(rsp->sortr) > SHRT_MAX || 
+  } else if (ARRLEN(rsp->sortr) > SHRT_MAX ||
 	     ARRLEN(rsp->segnor) > SHRT_MAX) {
     errcode = ERRCODE_OVERFLOW;
   } else if (ARRLEN(rsp->sortr) < 1) {
@@ -2098,20 +2098,20 @@ int resultSetGetNumberOfSegments(short *nres, short *nseg, const ResultSet *rsp)
       if (*nseg < 0) *nseg = 0;
     }
   }
-  
+
   return errcode;
 }
 
 int resultSetGetNumberOfResultsInSegment(int segx, const ResultSet *rsp)
 {
   int nres = 0;
-  
+
   if (rsp != NULL && segx >= 0 && ((size_t) segx + 1) < ARRLEN(rsp->segnor)) {
     nres = rsp->segnor[segx+1] - rsp->segnor[segx];
     if (nres < 0)
       nres = 0;
   }
-  
+
   return nres;
 }
 
@@ -2176,7 +2176,7 @@ Result *resultSetGetResultBySWrank(const ResultSet *rsp, short rank)
   return rp;
 }
 
-int resultSetDo(void *argp, ResultSetCallBackf *cbf, 
+int resultSetDo(void *argp, ResultSetCallBackf *cbf,
 		const ResultSet *rsp)
 {
   int errcode;
@@ -2188,11 +2188,11 @@ int resultSetDo(void *argp, ResultSetCallBackf *cbf,
 
   if (nres < 1)
     return ERRCODE_SUCCESS;
-  
+
   if (!((rsp->status & RSLTSETFLG_SWSORT) && (rsp->status & RSLTSETFLG_SEGIDX)))
-    return ERRCODE_ASSERT; 
+    return ERRCODE_ASSERT;
   /* must have been sorted by segment number and sw-score */
-  
+
   for (s=0; s<nseg && errc != RSLTSCBRTN_STOP; s++) {
     short r = rsp->segnor[s];
     for (; r<rsp->segnor[s+1]; r++) {
@@ -2220,10 +2220,10 @@ int resultSetAddResultToReport(Report *rep,
   if (rp == NULL || (rp->status & RSLTFLAG_NOOUTPUT)) {
     errcode = reportAddMap(rep,
 			   pairid,
-			   0, 0, 
 			   0, 0,
-			   0, 0, 0, 
-			   NULL, 0, 
+			   0, 0,
+			   0, 0, 0,
+			   NULL, 0,
 			   0,
 			   mateflg, pairflg);
   } else {
@@ -2235,8 +2235,8 @@ int resultSetAddResultToReport(Report *rep,
 
     errcode = reportAddMap(rep,
 			   pairid,
-			   rp->swatscor, 
-			   (short) ((pairid<0)? rp->mapscor: mapscor), 
+			   rp->swatscor,
+			   (short) ((pairid<0)? rp->mapscor: mapscor),
 			   rp->q_start, rp->q_end,
 			   rp->s_start, rp->s_end, rp->sidx,
 			   dstrp, rp->strlen,
@@ -2246,7 +2246,7 @@ int resultSetAddResultToReport(Report *rep,
   return errcode;
 }
 
-int resultSetAdd2ndaryResultsToReport(Report *rep, 
+int resultSetAdd2ndaryResultsToReport(Report *rep,
 				      REPMATEFLG_t mateflg,
 				      RESULTOUTFLG_t rsltflg,
 				      const ResultSet *rsp)
@@ -2264,8 +2264,8 @@ int resultSetAdd2ndaryResultsToReport(Report *rep,
 	if ((rp->status & (RSLTFLAG_NOOUTPUT)))
 	  continue;
 	if ((rp->status & RSLTFLAG_REPORTED) ||
-	    (rp->swatscor < swscor && 
-	     ((rsltflg & RESULTFLG_BEST) || 
+	    (rp->swatscor < swscor &&
+	     ((rsltflg & RESULTFLG_BEST) ||
 	      (rp->status & RSLTFLAG_BELOWRELSW))))
 	  break;
 	if ((errcode = resultSetAddResultToReport(rep, -1, 0, mateflg, 0, 0, rp, rsp)))
@@ -2275,7 +2275,7 @@ int resultSetAdd2ndaryResultsToReport(Report *rep,
       }
     }
   }
-  
+
   return errcode;
 }
 
@@ -2287,11 +2287,11 @@ int resultSetAddToReport(Report *rep,
   short i, nsort = (short) ARRLEN(rsp->sortr);
   Result*rp = (nsort < 1)? NULL: rsp->sortr[0];
   REPMATEFLG_t mateflg = 0;
-  
+
   if (rp != NULL) {
     short ns = 0;
     BOOL is_single = getNumberOfTopSwatRESULTs(&ns, rsp->sortr);
-    if (rp->mapscor == 0 && !(is_single) && ns > 1 && 
+    if (rp->mapscor == 0 && !(is_single) && ns > 1 &&
 	(rsltflg&RESULTFLG_BEST) && !(rsltflg&RESULTFLG_SPLIT)) {
       mateflg |= REPMATEFLG_MULTI;
       if ((rsltflg&RESULTFLG_RANDSEL)) {
@@ -2301,19 +2301,19 @@ int resultSetAddToReport(Report *rep,
 	  rp->mapscor = assignPhredScaledMappingScoreToRandomDraw(ns);
       } else if ((rsltflg & RESULTFLG_SINGLE)) {
 	rp = NULL;
-      }     
+      }
     }
   }
-  if ((errcode = resultSetAddResultToReport(rep, -1, 
-					    0, 
-					    (REPMATEFLG_t) (mateflg | 
-							    REPMATEFLG_PRIMARY), 
+  if ((errcode = resultSetAddResultToReport(rep, -1,
+					    0,
+					    (REPMATEFLG_t) (mateflg |
+							    REPMATEFLG_PRIMARY),
 					    0, 0, rp, rsp)))
     return errcode;
-  if (rp != NULL) 
+  if (rp != NULL)
     rp->status |= RSLTFLAG_REPORTED;
 
-  
+
   if ((rsltflg & RESULTFLG_SINGLE) && !(rsltflg&RESULTFLG_SPLIT))
     return ERRCODE_SUCCESS;
 
@@ -2327,24 +2327,24 @@ int resultSetAddToReport(Report *rep,
 	return errcode;
       rp->status |= RSLTFLAG_REPORTED;
 #ifdef results_debug
-      fprintf(stdout, "results_debug: segment index sgx = %u, is_alidir = %i\n", 
+      fprintf(stdout, "results_debug: segment index sgx = %u, is_alidir = %i\n",
 	      rp->sgx, (int) rp->is_alidir);
 #endif
     }
   }
-  
+
   /* 2ndary results */
   if ((rsltflg&RESULTFLG_BEST) && (rsltflg&RESULTFLG_SPLIT)) {
-    errcode = resultSetAdd2ndaryResultsToReport(rep, 
-						(REPMATEFLG_t) (mateflg | 
-								REPMATEFLG_PARTIAL), 
+    errcode = resultSetAdd2ndaryResultsToReport(rep,
+						(REPMATEFLG_t) (mateflg |
+								REPMATEFLG_PARTIAL),
 						rsltflg,
 						rsp);
   }
 
   return errcode;
 }
-   
+
 void resultSetPrintDebugInfo(FILE *fp, const ResultSet *rsp)
 {
   short i, nres = (short) ARRLEN(rsp->resr);
@@ -2356,8 +2356,8 @@ void resultSetPrintDebugInfo(FILE *fp, const ResultSet *rsp)
     rp = rsp->resr + i;
     fprintf(fp, "PAIR_START %d\n", i+1);
     fprintf(fp, "PAIR_SEGMENT_A %u %u\n", rp->q_start-1, rp->q_end-1);
-    fprintf(fp, "PAIR_SEGMENT_B %llu %llu\n", 
-	    (long long unsigned int) rp->s_start-1, 
+    fprintf(fp, "PAIR_SEGMENT_B %llu %llu\n",
+	    (long long unsigned int) rp->s_start-1,
 	    (long long unsigned int) rp->s_end-1);
     fprintf(fp, "PAIR_DIFFS");
     for (ucp = rsp->diffstrp->dstrp + rp->stroffs; *ucp; ucp++)
@@ -2371,8 +2371,8 @@ void resultSetPrintDebugInfo(FILE *fp, const ResultSet *rsp)
   fprintf(fp, "PAIR_END\n");
 }
 
-int resultSetGetScorStats(const ResultSet *rsp, 
-			    int *scor_max, short *num_max, 
+int resultSetGetScorStats(const ResultSet *rsp,
+			    int *scor_max, short *num_max,
 			    int *scor_2ndmax, short *num_2ndmax)
 {
   short i, j;
@@ -2399,9 +2399,9 @@ int resultSetGetScorStats(const ResultSet *rsp,
 BOOL resultSetGetRankDepth(const ResultSet *rsp, short *depth, short *rank)
 {
   short n_max, n_2ndmax;
-  
+
   resultSetGetScorStats(rsp, NULL, &n_max, NULL, &n_2ndmax);
-  
+
   if (n_max < 2) {
     if (depth) *depth = (short) (n_max + n_2ndmax);
     if (rank) *rank = 1;
@@ -2409,7 +2409,7 @@ BOOL resultSetGetRankDepth(const ResultSet *rsp, short *depth, short *rank)
     if (depth) *depth = n_max;
     if (rank) *rank = 0;
   }
-  
+
   return (BOOL) (n_max == 1);
 }
 
@@ -2425,7 +2425,7 @@ int resultSetGetMappingScore(const ResultSet *rsp, int *swscor)
 }
 
 double resultSetGetMapQualAsProb(double *pp2, short *nn1, short *nn2, const ResultSet *rsp)
-/**< 
+/**<
  * \return Probability for mapping with best score.
  * \param p2 Returns probability for mapping with 2nd best score.
  * \param n1 Returns Number of alignments with best score.
@@ -2449,7 +2449,7 @@ double resultSetGetMapQualAsProb(double *pp2, short *nn1, short *nn2, const Resu
     p1 = 1.0/(n1);
     p2 = p1;
   }
- 
+
   if (pp2) *pp2 = p2;
   if (nn1) *nn1 = n1;
   if (nn2) *nn2 = n2;
@@ -2460,25 +2460,25 @@ double resultSetGetMapQualAsProb(double *pp2, short *nn1, short *nn2, const Resu
 int resultSetInferInsertSize(int *isiz, unsigned char samspec, const ResultSet *rsrp, const ResultSet *rsmp)
 {
   int errcode = ERRCODE_FAILURE;
-  
+
   *isiz = 0;
   if (ARRLEN(rsrp->sortr) > 0 && ARRLEN(rsmp->sortr) > 0) {
     const Result*rp = rsrp->sortr[0];
     const Result*mp = rsmp->sortr[0];
     if (rp->mapscor >= MAPSCOR_THRESH_CONFIDENT &&
-	mp->mapscor >= MAPSCOR_THRESH_CONFIDENT &&
-	rp->sidx == rp->sidx) {
+      	mp->mapscor >= MAPSCOR_THRESH_CONFIDENT &&
+      	rp->sidx == mp->sidx) {
       if (rp->sidx < 0) {
 	errcode = ERRCODE_ASSERT;
       } else {
 	RSLTPAIRMAPFLG_t flg = resultCalcInsertSize(isiz, samspec, rp, mp);
-	if (flg == RSLTPAIRMAPFLG_REVERSE_1st)
-	  *isiz *= -1;
-	errcode = ERRCODE_SUCCESS;
+      	if (flg == RSLTPAIRMAPFLG_REVERSE_1st)
+      	  *isiz *= -1;
+      	errcode = ERRCODE_SUCCESS;
       }
     }
   }
-  
+
   return errcode;
 }
 
@@ -2491,13 +2491,13 @@ BOOL resultSetTestOverlap(const ResultSet *rs1p, int overlap_percent, const Resu
   SEQLEN_t minlen, seg2len, overlaplen;
   const Result *r1p, *r2p;
 
-  if (rl1 < 1 || rl2 < 1) 
+  if (rl1 < 1 || rl2 < 1)
     return 0;
 
   r1p = rs1p->sortr[0];
   minlen = r1p->q_end - r1p->q_start + 1;
 
-  
+
   for (i=0; i<rl2 && (!isOverlap); i++) {
     r2p = rs2p->sortr[i];
     if (r2p->swatscor < rs2p->swatscor_2ndmax)
@@ -2505,7 +2505,7 @@ BOOL resultSetTestOverlap(const ResultSet *rs1p, int overlap_percent, const Resu
     seg2len = r2p->q_end - r2p->q_start + 1;
     overlaplen = (seg2len < minlen)? seg2len: minlen;
     overlaplen =  (overlaplen * overlap_percent)/N100PERCENT;
-    
+
     if (TEST_RESULT_OVERLAP(r1p, r2p, overlaplen))
       isOverlap = 1;
   }
@@ -2519,7 +2519,7 @@ Result *resultSetGetTopResult(BOOL *is_multi, const BOOL is_randsel, const Resul
   BOOL is_single = getNumberOfTopSwatRESULTs(&ntop, rsp->sortr);
   Result *toprp = NULL;
   *is_multi = 0;
-  
+
   if (ntop > 0) {
     if ((is_single)) {
      toprp = rsp->sortr[0];
@@ -2560,7 +2560,7 @@ static SEQLEN_t getFilterIdForRead(const ResultFilter *rfp, const SeqFastq *sqp)
     } else {
       id = (SEQLEN_t) rfp->min_identity;
     }
-  } 
+  }
   return id;
 }
 
@@ -2590,7 +2590,7 @@ void resultSetFilterData(ResultFilter *p, int sw_abs, int sw_rel, double id_abs)
 }
 
 int resultSetFilterResults(const ResultSet *rsp,
-			   const ResultFilter *rsfp, 
+			   const ResultFilter *rsfp,
 			   const SeqFastq *sqp)
 {
   short i, n = (short) ARRLEN(rsp->sortr);
@@ -2599,7 +2599,7 @@ int resultSetFilterResults(const ResultSet *rsp,
   SEQLEN_t idthresh = getFilterIdForRead(rsfp, sqp);
   int minid = 0;
 
-  if (n < 1) 
+  if (n < 1)
     return ERRCODE_SUCCESS;
 
   if (idthresh > INT_MAX)
@@ -2621,6 +2621,6 @@ int resultSetFilterResults(const ResultSet *rsp,
     } else if (rp->swatscor < minrelswscor)
       rp->status |= RSLTFLAG_BELOWRELSW;
   }
-    
+
   return ERRCODE_SUCCESS;
 }

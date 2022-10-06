@@ -45,11 +45,11 @@ class Cigar:
             self.parse(lin)
             okflg = self.ok
             if Cigar.DEBUG:
-                print "DEBUG:Cigar.next %s" % (okflg)
+                print("DEBUG:Cigar.next {:s}".format(okflg))
         if Cigar.DEBUG:
-            print "DEBUG:Cigar.next returns %s" % (isEOF)
+            print("DEBUG:Cigar.next returns {:s}".format(isEOF))
         return isEOF
-    
+
     def parse(self, lin):
         m = Cigar.CIGARSTR.match(lin)
         if m:
@@ -66,11 +66,11 @@ class Cigar:
             self.cigar.strip()
             self.ok = True
             if Cigar.DEBUG:
-                print "DEBUG:Cigar.parse('%s')::'%s'" % (self.lin, self.cigar)
+                print ("DEBUG:Cigar.parse('{:s}')::'{:s}'".format(self.lin, self.cigar))
         else:
             lin.strip()
             if lin[0] != '#':
-                print "not parsed: %s" % (lin)
+                print ("not parsed: {:s}".format(lin))
             self._blank()
 
     def getMateNo(self):
@@ -80,7 +80,7 @@ class Cigar:
         elif  self.qnam[-2:] == "/2":
             mateno = 2
         return mateno
-    
+
     def _blank(self):
         self.mapcls = ""
         self.mapq = 0
@@ -96,12 +96,12 @@ class Cigar:
     def __cmp__(self, other):
         rv = cmp(self.snam, other.snam)
         if rv: return rv
-        
+
         rv = cmp(self.sseg[0], other.sseg[0])
         if rv: return rv
 
         return cmp(other.sseg[1], self.sseg[1])
-                
+
 def getNextCigarPair(infil, cigA, cigB, mateno_check = True):
     isOk = False
     isEOF = cigA.next(infil)
@@ -109,21 +109,21 @@ def getNextCigarPair(infil, cigA, cigB, mateno_check = True):
     if not isEOF:
         if cigB.next(infil):
             exit("ERROR EOF when reading 2nd mate ...")
-    
+
         if not cigA.ok:
             exit("ERROR when parsing 1st mate")
-            
+
         if not cigB.ok:
             exit("ERROR: when parsing 2nd mate")
         isOk = True
     if not isEOF and mateno_check:
         if cigA.qnam[-2] != cigB.qnam[-2]:
-            print "ERROR: read names don't match %s, %s" % (cigA.qnam, cigB.qnam)
+            print ("ERROR: read names don't match {:s}, {:s}".format(cigA.qnam, cigB.qnam))
             isOk = False
         elif cigA.getMateNo() != 1 or cigB.getMateNo() != 2:
-            print "ERROR in mate number %s [1] and %s [2]" % (cigA.qnam, cigB.qnam)
+            print ("ERROR in mate number {:s} [1] and {:s} [2]".format(cigA.qnam, cigB.qnam))
             isOk = False
-    
+
     return (isOk, isEOF)
 
 def openFile(filnam, mode = 'r'):
@@ -136,7 +136,7 @@ def openFile(filnam, mode = 'r'):
         else:
             fil = open(filnam, mode)
     except:
-        exit("ERROR when opening file '%s'" % filnam)
+        exit("ERROR when opening file '{:s}'".format(filnam))
 
     return fil
 
@@ -144,13 +144,13 @@ if __name__ == "__main__":
     from sys import argv, exit
 
     if len(argv) < 2:
-        exit("usage: %s <cigar file>" % argv[0])
+        exit("usage: {:s} <cigar file>".format(argv[0]))
 
     cig = Cigar()
-    
+
     infil = openFile(argv[1])
 
     while not cig.next(infil):
-        print cig.qnam
-    
+        print(cig.qnam)
+
     infil.close()

@@ -4,7 +4,7 @@
 /****************************************************************************
  ****************************************************************************
  *                                                                          *
- *  Copyright (C) 2010-2014 Genome Research Ltd.                            * 
+ *  Copyright (C) 2010-2014 Genome Research Ltd.                            *
  *                                                                          *
  *  Author: Hannes Ponstingl (hp3@sanger.ac.uk)                             *
  *                                                                          *
@@ -48,13 +48,13 @@
  * (([dims])(\d+))+   if simread_alistrtyp_explicit is defined
  * or
  * ((\d+)([dims]))+   else
- * 
+ *
  * The number (\d+) represents the number of exact matches
  * d is a 1-base deletion in the read with respect to the reference
  * i is a 1-base insertion in the read with respect to the reference
  * m indicates exact matches up to the end of the alignment
  * s is a 1-base substitution.
- * 
+ *
  */
 
 enum {
@@ -63,7 +63,7 @@ enum {
   BLOCKSIZ_READ = 256,
   INDEL_BLKSZ = 512*1024,
   DEFAULT_PERCINDEL = 20, /**< Percentage of indels among total variations */
-  //  RANDOM_SEED = 0,  /**< Seed for random number generation, 0 -> derived from calendar time. */ 
+  //  RANDOM_SEED = 0,  /**< Seed for random number generation, 0 -> derived from calendar time. */
   MAXLEN_HISTO = 10,/**< Maximum indel length for histogram */
   MAXLEN_INDEL = 16, /**< maximum indel size */
   MAX_QVAL = 99,     /**< maximum base quality value */
@@ -134,7 +134,7 @@ static int cmpVARIAT(const void *ap, const void *bp)
 {
   uint64_t a = ((const VARIAT *) ap)->bas;
   uint64_t b = ((const VARIAT *) bp)->bas;
-  
+
   if (a > b)
     return 1;
   if (a < b)
@@ -142,7 +142,7 @@ static int cmpVARIAT(const void *ap, const void *bp)
   return 0;
 }
 
-static void fprintfVARIAT(FILE *fp, const VARIAT *varp, 
+static void fprintfVARIAT(FILE *fp, const VARIAT *varp,
 			  const uint32_t varnum_start, const uint32_t varnum_end)
 {
   uint32_t v;
@@ -170,7 +170,7 @@ static int fprintfVariationStats(FILE *fp, const VARIAT *vp, const uint32_t varn
   }
 
   for (v=0; v<varnum; v++) {
-    
+
     l = vp[v].len;
     typ = vp[v].typ;
 
@@ -197,7 +197,7 @@ static int fprintfVariationStats(FILE *fp, const VARIAT *vp, const uint32_t varn
   fprintf(fp, "%u deletions\n", n_del);
   fprintf(fp, "histogram of insertions | deletions :\n");
   for (h=0; h<= MAXLEN_HISTO; h++)
-    fprintf(fp, "[%2i] %4u | %4u\n", h, 
+    fprintf(fp, "[%2i] %4u | %4u\n", h,
 	    ins_len_histo[h], del_len_histo[h]);
   fprintf(fp, "maximum insertion length: %hu\n", (unsigned short) max_ins);
   fprintf(fp, "maximum deletion length: %hu\n", (unsigned short) max_del);
@@ -206,11 +206,11 @@ static int fprintfVariationStats(FILE *fp, const VARIAT *vp, const uint32_t varn
   return ERRCODE_SUCCESS;
 }
 
-static int drawRandomVariations(VARIAT *vp, const uint32_t varnum,  
+static int drawRandomVariations(VARIAT *vp, const uint32_t varnum,
 				const uint64_t basnum,
 				const int nindel_percent,
 				const double indelsz_pgeom)
-     /**< Generate random positions for single-base variations and for 
+     /**< Generate random positions for single-base variations and for
       * indels.
       * \param vp Array of varnum variations
       * \param varnum number of variations (size of array vp)
@@ -236,7 +236,7 @@ static int drawRandomVariations(VARIAT *vp, const uint32_t varnum,
 
   /* determine the number of indels amongst the varnum variations */
   indelnum = (varnum*nindel_percent)/100;
-  if (indelnum > varnum) 
+  if (indelnum > varnum)
     return ERRCODE_ASSERT;
 
   if (indelnum < 1)
@@ -276,7 +276,7 @@ static int drawRandomVariations(VARIAT *vp, const uint32_t varnum,
 
     ctr++;
   }
-  
+
   free(indelszr);
   return ERRCODE_SUCCESS;
 }
@@ -298,28 +298,28 @@ static int parseIndelSizes(UCHAR **isizr, const char *filnam)
 
   if (!fp)
     return ERRCODE_NOFILE;
-  
+
   while (fgets(linbuf, LINBUFSIZ, fp)) {
     il = atoi(linbuf);
     if (il < 1 || il > MAXLEN_INDEL)
-      il = 1;
+          il = 1;
     ARRCURR(*isizr) = (UCHAR) il;
     ARRNEXTP(hp, *isizr);
     if (hp == NULL)
       return ERRCODE_NOMEM;
-  }
+    }
 
   return EFCLOSE(fp);
 }
 #endif
 
-static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp, 
+static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
 			      char *targetp, char *target_qualp,
 			      const char *readnamprefix,
 			      int readnum, UCHAR is_reverse, int mateno,
 			      const VARIAT *varp, const uint32_t varnum,
-			      const int readlen, const uint64_t basctr, 
-			      uint32_t pos, 
+			      const int readlen, const uint64_t basctr,
+			      uint32_t pos,
 			      const SeqSet *ssp, const SeqCodec *codecp)
      /** mateno 0 for single read, 1 for first, 2 for 2nd mate of pair */
 {
@@ -361,15 +361,15 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
   }
   if (exact_len > INT_MAX)
     return ERRCODE_OVERFLOW;
-  if (fetch_len < (int) exact_len) 
+  if (fetch_len < (int) exact_len)
     fetch_len = (int) exact_len;
 
   if ((so + fetch_len) > reflen)
     return ERRCODE_SOURCE_LEN;
 
-  if ((errcode = seqSetFetchSegmentBySequence(sbufp, sidx, 
+  if ((errcode = seqSetFetchSegmentBySequence(sbufp, sidx,
 					      so, (uint32_t) fetch_len,
-					      ssp, 
+					      ssp,
 					      codecp)))
     return errcode;
   sp = seqFastqGetSequence(sbufp, &slen, NULL);
@@ -406,32 +406,32 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
       continue;
 
     exact_len = varp[v].bas - ctr + 1;
-    if (exact_len < 1 && 
-	((last_typ == VARTYP_DELETION && varp[v].typ == VARTYP_INSERTION) || 
+    if (exact_len < 1 &&
+	((last_typ == VARTYP_DELETION && varp[v].typ == VARTYP_INSERTION) ||
 	 (last_typ == VARTYP_INSERTION && varp[v].typ == VARTYP_DELETION)))
       continue;
     n = (int) exact_len; /* number of nucleotides including position of the variation */
     ctr = varp[v].bas+1;
     typ = varp[v].typ;
- 
-    
+
+
     for (d=0; t<readlen && s<slen && exact_len > 0; t++, s++, exact_len--, d++) {
       c = sp[s];
       targetp[t] = c;
     }
     /* d > 0 is the number of exact matches up to variation or end of alignment.
      * If the end of the alignment is reached, d includes the last
-     * match. 
-     * 
+     * match.
+     *
      * t is the current position */
 
     if (t>=readlen && (exact_len > 0 || typ != VARTYP_SUBSTITUTION)) {
       if (d > 0) {
-	sprintf(alistr+a, 
+	sprintf(alistr+a,
 #ifdef simread_alistrtyp_explicit
-		"m%hi]", 
+		"m%i]",
 #else
-		"%him",
+		"%im",
 #endif
 		d);
 	a = strlen(alistr);
@@ -441,7 +441,7 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
     if (typ == VARTYP_SUBSTITUTION) {
       sprintf(alistr+a,
 #ifdef simread_alistrtyp_explicit
-	      "s%i:", 
+	      "s%i:",
 #else
 	      "%is",
 #endif
@@ -452,17 +452,17 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
       cod %= (SEQCOD_STDNT_MASK+1);
       targetp[t-1] = alphabetp[cod];
 #ifdef SIMREAD_DEBUG
-      fprintf(stderr, "DEBUG::simulateSingleRead: VAR[%u] substitute %llu + %i, pos = %llu\n", 
-	     v, (unsigned long long) basctr, t, 
+      fprintf(stderr, "DEBUG::simulateSingleRead: VAR[%u] substitute %llu + %i, pos = %llu\n",
+	     v, (unsigned long long) basctr, t,
 	     (unsigned long long) varp[v].bas);
 #endif
     } else if (typ == VARTYP_INSERTION) {
-      sprintf(alistr+a, 
+      sprintf(alistr+a,
 #ifdef simread_alistrtyp_explicit
 	      "i%i:",
 #else
 	      "%ii",
-#endif 
+#endif
 	      n);
       n += varp[v].len;
       for (l=0; l<varp[v].len && t<readlen; l++, t++) {
@@ -471,7 +471,7 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
 	targetp[t] = alphabetp[cod];
 	if (l>0) {
 	  a = strlen(alistr);
-	  sprintf(alistr+a, 
+	  sprintf(alistr+a,
 #ifdef simread_alistrtyp_explicit
 		  "i0:"
 #else
@@ -482,8 +482,8 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
       }
     } else if (typ == VARTYP_DELETION) {
       sprintf(alistr+a,
-#ifdef simread_alistrtyp_explicit 
-	      "d%i:", 
+#ifdef simread_alistrtyp_explicit
+	      "d%i:",
 #else
 	      "%id",
 #endif
@@ -492,8 +492,8 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
       s++;
       for (l=1; l<varp[v].len && s<slen; l++, s++) {
 	a = strlen(alistr);
-	sprintf(alistr+a, 
-#ifdef simread_alistrtyp_explicit 
+	sprintf(alistr+a,
+#ifdef simread_alistrtyp_explicit
 		  "d0:"
 #else
 		  "0d"
@@ -507,17 +507,17 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
   n = readlen - t;
   if (n>0) {
     sprintf(alistr+a,
-#ifdef simread_alistrtyp_explicit 
-	    "m%hi]", 
+#ifdef simread_alistrtyp_explicit
+	    "m%i]",
 #else
-	    "%him",
+	    "%im",
 #endif
 	    n);
     for (; t<readlen && s<slen && n > 0; t++, s++, n--) {
       targetp[t] = sp[s];
     }
   } else {
-#ifdef simread_alistrtyp_explicit 
+#ifdef simread_alistrtyp_explicit
     alistr[a++] = ']';
 #else
     alistr[a] = '\0';
@@ -527,11 +527,11 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
     return ERRCODE_READLEN;
   targetp[t] = '\0';
 
-#ifdef simread_alistrtyp_explicit 
-  sprintf(read_name, "%s_%9.9i_%s_%9.9u_%c_%s", readnamprefix, readnum, 
+#ifdef simread_alistrtyp_explicit
+  sprintf(read_name, "%s_%9.9i_%s_%9.9u_%c_%s", readnamprefix, readnum,
 	  refnamp, so+1, (is_reverse)? 'R':'F', alistr);
-#else 
-  sprintf(read_name, "%s_%9.9i_%s_%9.9u_%lli_%c_%s", readnamprefix, readnum, 
+#else
+  sprintf(read_name, "%s_%9.9i_%s_%9.9u_%lli_%c_%s", readnamprefix, readnum,
 	  refnamp, so+1, (long long signed) sidx, (is_reverse)? 'R':'F', alistr);
 #endif
   if (mateno > 0)
@@ -542,17 +542,17 @@ static int simulateSingleRead(SeqFastq *readp, SeqFastq *sbufp,
   return errcode;
 }
 
-static int simulatePairedRead(SeqFastq *readp, SeqFastq *matep, 
-			      SeqFastq *sbufp, 
+static int simulatePairedRead(SeqFastq *readp, SeqFastq *matep,
+			      SeqFastq *sbufp,
 			      char *target_seqp, char *target_qualp,
 			      const char *readnamprefix,
 			      int readnum, UCHAR is_reverse,
 			      const VARIAT *varp, uint32_t *voffs, const uint32_t varnum,
 			      const int readlen, int insertsiz,
-			      SETSIZ_t *basctr, uint32_t pos, 
+			      SETSIZ_t *basctr, uint32_t pos,
 			      const SeqSet *ssp, const SeqCodec *codecp)
 /*
- * \param insertsiz length of insert (measured from 5'-ends). 
+ * \param insertsiz length of insert (measured from 5'-ends).
  * 0 signals single reads.
  */
 {
@@ -574,11 +574,11 @@ static int simulatePairedRead(SeqFastq *readp, SeqFastq *matep,
 			       target_seqp, target_qualp,
 			       readnamprefix,
 			       readnum, is_reverse, (is_paired)? 1:0,
-			       varp+vs, ve-vs, readlen, 
+			       varp+vs, ve-vs, readlen,
 			       bctr, pos, ssp, codecp);
   if (is_paired && insertsiz > 0 && !errcode) {
     if ((is_reverse)) {
-      if (d_insert >= 0 && pos < ((uint32_t) d_insert)) 
+      if (d_insert >= 0 && pos < ((uint32_t) d_insert))
 	return ERRCODE_MATEPOS;
       mpos = pos - d_insert;
     } else {
@@ -594,7 +594,7 @@ static int simulatePairedRead(SeqFastq *readp, SeqFastq *matep,
 				 target_seqp, target_qualp,
 				 readnamprefix,
 				 readnum, (UCHAR) !is_reverse, 2,
-				 varp+vs, ve-vs, readlen, 
+				 varp+vs, ve-vs, readlen,
 				 bctr, mpos, ssp, codecp);
   }
   if (!errcode) {
@@ -605,15 +605,15 @@ static int simulatePairedRead(SeqFastq *readp, SeqFastq *matep,
   return errcode;
 }
 
-static int generateReads(SeqFastq *readp, SeqFastq *matep, 
+static int generateReads(SeqFastq *readp, SeqFastq *matep,
 			 SeqFastq *sbufp, SeqIO *sfpA, SeqIO *sfpB,
 			 char *target_seqp, char *target_qualp,
-			 const VARIAT *varp, const uint32_t varnum, 
+			 const VARIAT *varp, const uint32_t varnum,
 			 const char *readnamprefix,
-			 int readlen, int readnum, 
+			 int readlen, int readnum,
 			 int insertsiz, const double *ins1p,
 			 const SeqSet *ssp, const SeqCodec *codecp)
-/* 
+/*
  * \param readnum Number of reads or read pairs.
  * \param insertsiz mean of the insert size distribution (can be 0 for single reads
  * or -1 for randomly paired reads)
@@ -658,14 +658,14 @@ static int generateReads(SeqFastq *readp, SeqFastq *matep,
 				 target_seqp, target_qualp,
 				 readnamprefix,
 				 rn, is_reverse,
-				 varp, &vs, varnum, 
+				 varp, &vs, varnum,
 				 readlen, isiz,
 				 &basctr, pos, ssp, codecp);
     if ((errcode)) {
       if (errcode == ERRCODE_TOOMANY_N || errcode == ERRCODE_MATEPOS) {
 	n_skipped++;
 	if (!(n_skipped % 100))
-	  fprintf(stderr, "skipped %i of %i (n_var = %u, error rate = %g) ...\n", 
+	  fprintf(stderr, "skipped %i of %i (n_var = %u, error rate = %g) ...\n",
 		  n_skipped, i, vs, ((double) vs)/basctr);
 	continue;
       }
@@ -682,7 +682,7 @@ static int generateReads(SeqFastq *readp, SeqFastq *matep,
     if (insertsiz >= 0) {
       if ((errcode = seqFastqWrite(sfpA, readp, 0)))
 	return errcode;
-      
+
       if ((matep) && insertsiz > 0) {
 	if ((errcode = seqFastqWrite(sfpB, matep, 0)))
 	  return errcode;
@@ -722,7 +722,7 @@ int main(int argc, char *argv[])
   SeqFastq *readp, *sbufp, *matep = 0;
   SeqSet *ssp;
   ErrMsg *errmsgp=0;
-  
+
   ERRMSG_CREATE(errmsgp);
 
   if (argc < 11) {
@@ -743,7 +743,7 @@ int main(int argc, char *argv[])
     nindel_percent = 0;
 
   insertsiz = atoi(argv[6]);
-  /* insertsiz == 0: produce single reads, 
+  /* insertsiz == 0: produce single reads,
    * insertsiz == -1: produce random pairings (no fixed inserts size, different chromosomes)
    */
   insertstd1 = atof(argv[7]);
@@ -774,7 +774,7 @@ int main(int argc, char *argv[])
 
   if (percerr > SMALL_QVAL*100) {
     double qv = -10*log10(percerr/100);
-    if (qv > (double) MAX_QVAL) 
+    if (qv > (double) MAX_QVAL)
       qv = MAX_QVAL;
     else if (qv < 0)
       qv = 0.0;
@@ -794,14 +794,14 @@ int main(int argc, char *argv[])
 
   if (!(readp = seqFastqCreate(BLOCKSIZ_READ, SEQTYP_FASTQ)))
     ERRMSGNO(errmsgp, ERRCODE_NOMEM);
-  
+
   if (insertsiz > 0) {
     if (!(matep = seqFastqCreate(BLOCKSIZ_READ, SEQTYP_FASTQ)))
       ERRMSGNO(errmsgp, ERRCODE_NOMEM);
   } else {
     matep = NULL;
   }
-  
+
   if (insertsiz != 0) {
     ESTRCAT(oufilnamA, oufilnam, "_1.fq");
     ESTRCAT(oufilnamB, oufilnam, "_2.fq");
@@ -811,16 +811,16 @@ int main(int argc, char *argv[])
     ESTRCAT(oufilnamA, oufilnam, ".fq");
     oufilnamB = 0;
   }
-  if (!(oufilnamA)) 
+  if (!(oufilnamA))
     ERRMSGNO(errmsgp, ERRCODE_NOMEM);
 
   sfpA = seqIOopen(&errcode, oufilnamA, SEQIO_WRITE_FASTQ, 0);
-  if (errcode) 
+  if (errcode)
     ERRMSGNO(errmsgp, errcode);
 
   if (insertsiz != 0) {
     sfpB = seqIOopen(&errcode, oufilnamB, SEQIO_WRITE_FASTQ, 0);
-    if (errcode) 
+    if (errcode)
       ERRMSGNO(errmsgp, errcode);
   } else {
     sfpB = 0;
@@ -830,7 +830,7 @@ int main(int argc, char *argv[])
   //RANSEED(RANDOM_SEED);
   RANSEED(randseed);
 
-  printf("Simulate %i read%s a %ibp...\n", 
+  printf("Simulate %i read%s a %ibp...\n",
 	 readnum, (insertsiz > 0)? "pairs":"s", readlen);
 
   basnum = ((uint64_t) readlen)*readnum;
@@ -850,7 +850,7 @@ int main(int argc, char *argv[])
 
   fprintfVariationStats(stdout, varp, varnum);
 
-  printf("Sorting variations by base number ...\n"); 
+  printf("Sorting variations by base number ...\n");
   qsort(varp, varnum, sizeof(VARIAT), cmpVARIAT);
 
   printf("Variations after sort ...\n");
@@ -866,9 +866,9 @@ int main(int argc, char *argv[])
     ECALLOCP(readnum, ins1p);
     if (!ins1p)
       ERRMSGNO(errmsgp, ERRCODE_NOMEM);
-    
-    if ((errcode = rsampleNormal(ins1p, readnum, 
-				 (double) insertsiz, 
+
+    if ((errcode = rsampleNormal(ins1p, readnum,
+				 (double) insertsiz,
 				 stdisiz*stdisiz)))
       ERRMSGNO(errmsgp, errcode);
   } else {
@@ -887,9 +887,9 @@ int main(int argc, char *argv[])
 
   if ((errcode = generateReads(readp, matep, sbufp, sfpA, sfpB,
 			       target_seqp, target_qualp,
-			       varp, varnum, 
+			       varp, varnum,
 			       readnamprefix,
-			       readlen, readnum, 
+			       readlen, readnum,
 			       insertsiz, ins1p,
 			       ssp, codecp)))
     ERRMSGNO(errmsgp, errcode);
@@ -911,4 +911,3 @@ int main(int argc, char *argv[])
 
   return EXIT_SUCCESS;
 }
-

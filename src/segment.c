@@ -34,11 +34,11 @@
  * between its SEEDS (or indels if insertions and deletions cancel
  * out). SEGMENTs may overlap.  HITREGIONs are defined by maximum
  * shift differences between successive k-tuple hits.
- * 
+ *
  * Candidate segments for alignment (SegCand) are defined by segment
  * boundaries in the query and reference sequences and by a shift
  * band, specified as an start shift and a shift range.
- * 
+ *
  * HITREGIONs, constant-shift SEGMENTs and SEEDs are not necessary for
  * the simplest algorithm defining candidates for alignment. Depending
  * on sequencing platform and read length they may incur quite a bit
@@ -63,9 +63,9 @@
  * example, in order to avoid Smith-Waterman, one might try to
  * directly match a SEGMENT first where the coverage by SEED is so
  * high that max 2 mismatches are possible.
- * 
+ *
  * Strategies for defining candidate segments for alignment:
- * 
+ *
  * (i) The simplest algorithm would scan along the k-tuple hits (which
  * had been sorted first by shift, 'diagonal search', and then by
  * offset in query read) until the shift difference btween 2
@@ -118,24 +118,24 @@
 
 enum {
   DEFAULT_BLKSZ = 16*4096,
-  DEFAULT_QBLKSZ = 1024,   
+  DEFAULT_QBLKSZ = 1024,
   /**< Default block size for query mask */
-  SEGMENTING_DIFFSHIFT = 3, 
+  SEGMENTING_DIFFSHIFT = 3,
   /**< Maximum shift difference between successive hits
    * in a segment specified in units of ktuple lengths */
   SEEDLEN_FLAGGED = -1,
   /**< value for (struct seed).len that flags out the seed */
   NUMBER_OF_STRANDS = 2,
   /**< For looping over forwared [0] and reverse [1] strands */
-  MAXIMUM_DEPTH = 8000, 
+  MAXIMUM_DEPTH = 8000,
   /**< Maximum number of candidate segments allowed for alignment */
-  DEFAULT_TARGET_DEPTH = 200, 
+  DEFAULT_TARGET_DEPTH = 200,
   /**< Target depth if none specified */
-  EDGE_BAND_FACTOR = 4, 
+  EDGE_BAND_FACTOR = 4,
   /**< divide the length of the largest stretch of query sequence
-   * not coverered by seeds by EDGE_BAND_FACTOR to obtain an added 
+   * not coverered by seeds by EDGE_BAND_FACTOR to obtain an added
    * band_width */
-  MAX_BANDEDGE_2POW = 4, 
+  MAX_BANDEDGE_2POW = 4,
   /**< devide read length by 2^MAX_BANDEDGE_2POW to obtain a maximum
    * added band width */
 };
@@ -159,13 +159,13 @@ typedef int32_t SEGMLEN;
 typedef uint32_t SEQPOS;
 typedef uint8_t BOOL;
 
-typedef struct _SEED { 
-  /**< Defines an exactly matching segment 
+typedef struct _SEED {
+  /**< Defines an exactly matching segment
    * (covered by a run of overlapping tuples)
-   * query offset (as the number of bases) 
+   * query offset (as the number of bases)
    *   qo = SEED.sqo&HASHHIT_HALFMASK
    * reference offset (as the number of k-ktuples)
-   *   on forward strand: 
+   *   on forward strand:
    *  <code> rs_F = (SEED.sqo + qo/NSKIP)&HASHHIT_SOFFSMASK </code>;
    *   on reverse strand: <code> rs_R = SEED.sqo - qo/NSKIP </code>;
    *   rs_R is the number of the last matching k-tuple (k-tuple numbers begin
@@ -184,38 +184,38 @@ typedef struct _SEED {
    */
   /*   int64_t shift; */
   /*   SEQOFFS q_offs; */
-  uint64_t sqo;  
+  uint64_t sqo;
   /**< shift (upper 33 bits) and query offset (lower 31 bits) */
-  SEEDLEN len; 
+  SEEDLEN len;
   /**< Length  of the exactly matching segment as the number of bases covered.
    * The number of ktuples is (SEED.len-KTUP)/nskip + 1 */
 } SEED;
 typedef struct _SEED *SEEDARR;
 
-typedef struct _HITREGION { 
+typedef struct _HITREGION {
   /**< Points to seeds in the same region of the reference
    * sequences. This is used mainly to avoid multiple fetches of
    * overlapping regions on the reference sequence during alignment */
-  SEEDIDX idx; 
+  SEEDIDX idx;
   /**< start index, points into hit, seed or segment array */
   SEEDLEN num;
   /**< number of hits or seeds */
 } HITREGION;
 typedef struct _HITREGION *HITREGARR;
 
-typedef struct _SEGMENT { 
+typedef struct _SEGMENT {
   /**< Segment of seeds with identical shift */
-  SEEDIDX ix; 
+  SEEDIDX ix;
   /**< index of the first seed in the segment */
-  SEGMLEN nseed; 
+  SEGMLEN nseed;
   /**< number of seeds in the segment. Can be < 0, in which case the
    * segment is flagged out and the number of seeds is -nseed */
-  SEGCOV_t cover; 
+  SEGCOV_t cover;
   /**< number of bases covered by seeds */
 } SEGMENT;
 typedef struct _SEGMENT *SEGMARR;
 
-struct _SegQMask { 
+struct _SegQMask {
   /**< Essentially just a string of flags for coverage calculations */
   UCHAR *maskp;    /**< String of flags */
   size_t n_alloc;  /**< Allocated memory for coverage calculations */
@@ -225,14 +225,14 @@ struct _SegQMask {
 struct _SegLst {
   HITREGARR hregr; /**< Array of regions of k-tuple hits */
   SEEDARR seedr;   /**< Array of exactly matching segments (seeds) */
-  SEGMARR segmr;   
+  SEGMARR segmr;
   /**< Array of segments that are covered by seeds of constant shift */
   USHORT dshift_cutoff; /**< segmenting max difference in shift */
   UCHAR nskip;
   UCHAR ktup;
   BITFLG flags;
   SEQPOS qlen;
-  SEGCOV_t maxcover; 
+  SEGCOV_t maxcover;
   /**< maximum coverage for segments of constant shift in segmr */
 };
 
@@ -240,19 +240,19 @@ typedef struct _SEGCAND { /**< candidate for dynamic programming step */
   uint32_t qs;         /**< query segment start */
   uint32_t qe;         /**< query segment end, points to last base of last k-tuple */
   uint32_t rs;         /**< reference segment start as kmer word number */
-  uint32_t re;         /**< reference segment end as k-tuple serial number 
+  uint32_t re;         /**< reference segment end as k-tuple serial number
 			    * points to first base of last k-mer word */
   short shiftoffs;         /**< minimum shift for start of pair s = (rs - qs/nskip) for forward
 			    * or reverse strand relative to the situation where both segments
 			    * are aligned at the beginning of the reference segment */
   short shift2mm;          /**< shift for Smith-Waterman free alignment with max. 2 mismatches.
 			    * Value set if flag&SEGCANDFLG_MMALI is set */
-  short srange;            /**< shift range as multiples of the skip step size 
+  short srange;            /**< shift range as multiples of the skip step size
 			    * this is == 0 for candiates without indels */
   SEGCOV_t cover;          /**< the number of bases in the query segment
 			    * that are covered by seeds, cover */
   SEGBITFLG_t flag;        /**< Combination of SEGCAND_FLAG bits */
-  uint32_t segix;      /**< Index of the segment of constant shift (in SegLst) 
+  uint32_t segix;      /**< Index of the segment of constant shift (in SegLst)
 			    * this candidate segment corresponds to */
   int32_t nseg;        /**< Number of constant-shift segments (in SegList) that
 			    * are part of this segment. 0 indicates that this is a candidate
@@ -274,7 +274,7 @@ struct _SegAliCands { /** Segments as candidates for dynamic programming */
   SEGNUM_t n_sort;      /**< Number of elements in sort arrays */
   SEGCOV_t max_cover;   /**< current maximum coverage */
   SEGCOV_t max2nd_cover;/**< 2nd highest coverage */
-  SEGCOV_t cover_deficit[NUMBER_OF_STRANDS]; 
+  SEGCOV_t cover_deficit[NUMBER_OF_STRANDS];
   /**< cover_deficit is the maximum number of bases that might not be
    * covered by k-tuples because those k-tuples were not sampled (for
    * forward [0] and reverse [1] strands). */
@@ -287,8 +287,8 @@ struct _SegAliCands { /** Segments as candidates for dynamic programming */
  *********************************** Macros ***********************************
  ******************************************************************************/
 
-#define MIN(a,b) ((a)<(b))? (a):(b)
-#define MAX(a,b) ((a)>(b))? (a):(b)
+#define MIN(a,b) (((a)<(b))? (a):(b))
+#define MAX(a,b) (((a)>(b))? (a):(b))
 
 #define INIT_COVERAGE_CALC(segmp, seedr, maskp, qlen)\
 {\
@@ -302,7 +302,7 @@ struct _SegAliCands { /** Segments as candidates for dynamic programming */
     for(q=0; q<sep->len; q++) ucp[q] = 1;\
   }\
 }\
- 
+
 #ifdef RESULTS_TRACKER
 #define TRACK_SEED(trkpos_hi, trkpos_lo, trk_flg, cover_flag, ktup, nskip, seedp, nseed) \
 {\
@@ -342,23 +342,23 @@ struct _SegAliCands { /** Segments as candidates for dynamic programming */
  ******************************************************************************/
 
 #ifdef segment_debug
-static void fprintfHitRegion(FILE *fp, const HITREGION * const hrgp, 
-			     const SEGMARR segmr) 
+static void fprintfHitRegion(FILE *fp, const HITREGION * const hrgp,
+			     const SEGMARR segmr)
 {
   SEEDLEN i;
   fprintf(fp, "++++ hit region ++++\n");
   fprintf(fp, "number of segments: %u\n", hrgp->num);
   for (i=0; i<hrgp->num; i++) {
     const SEGMENT *sgp = segmr + hrgp->idx + i;
-    fprintf(fp, "segment [%u] seeds %u - %u (%i), cover = %u\n", 
+    fprintf(fp, "segment [%u] seeds %u - %u (%i), cover = %u\n",
 	    i, sgp->ix, sgp->ix + sgp->nseed - 1,
 	    sgp->nseed, sgp->cover);
   }
 }
 #endif
- 
+
 static SEGCOV_t calcIndelFreeMincover(SEQOFFS slen, UCHAR ktup, UCHAR nskip)
-     /**< Return the minimum coverage required for a mapping to be indel free 
+     /**< Return the minimum coverage required for a mapping to be indel free
       */
 {
   USHORT diffcover_1mm = ktup + nskip - 1; /* max coverage knocked out by 1 mismatch */
@@ -388,7 +388,7 @@ static void printSeed(FILE *fp, const SEED *sp, char is_reverse, UCHAR nskip, UC
     so *= nskip;
   }
   /* reference offset is given as k-mer word number */
-  fprintf(fp, "SEED shift = %llu, s = %llu, q = %u, l = %i, strand = %i\n", 
+  fprintf(fp, "SEED shift = %llu, s = %llu, q = %u, l = %i, strand = %i\n",
 	  (long long unsigned int) shift, (long long unsigned int) so, qo, sp->len, (int) is_reverse);
 
 }
@@ -408,7 +408,7 @@ static int defineHitRegions(HITREGARR *idxr, int *n_added, USHORT *max_dshift,
   SEQPOS qlen;
   size_t n0;
   HITREGION *sp;
-  
+
   const uint64_t *shdat = hashGetHitListData(&nhits, NULL,
 					   &qlen, &ktup, &nskip, NULL, hhlp);
   if ((n_added)) {
@@ -421,7 +421,7 @@ static int defineHitRegions(HITREGARR *idxr, int *n_added, USHORT *max_dshift,
 
   if (nhits < 1)
     return ERRCODE_SUCCESS;
-     
+
   /* calculate the segmenting shift difference */
   *max_dshift = ktup*SEGMENTING_DIFFSHIFT/nskip;
   ds = (qlen - ktup)/nskip + 1;
@@ -452,7 +452,7 @@ static int defineHitRegions(HITREGARR *idxr, int *n_added, USHORT *max_dshift,
   return ERRCODE_SUCCESS;
 }
 
-static int makeSeedsFromHits(SEEDARR *seedr, 
+static int makeSeedsFromHits(SEEDARR *seedr,
 #ifdef RESULTS_TRACKER
 			     Track *trkp,
 #endif
@@ -502,7 +502,7 @@ static int makeSeedsFromHits(SEEDARR *seedr,
 	if ((shdat[j]&~((uint64_t) HASHHIT_HALFMASK)) != shift)
 	  break;
 	qo = shdat[j]&HASHHIT_HALFMASK;
-	if (qo > lastq || 
+	if (qo > lastq ||
 	    ((qo - qoffs)%nskip) /* out of register */
 	    )
 	  break;
@@ -571,7 +571,7 @@ static int makeSegmentsFromSeeds(SEGMARR *segmr, SEGCOV_t *maxcover,
 	sgp->cover += seedr[j].len;
       }
       d = j-i;
-      if (d > INT_MAX) 
+      if (d > INT_MAX)
 	return ERRCODE_OVERFLOW;
       sgp->nseed = (SEGMLEN) d;
       if (sgp->cover > *maxcover)
@@ -584,7 +584,7 @@ static int makeSegmentsFromSeeds(SEGMARR *segmr, SEGCOV_t *maxcover,
 }
 
 
-static int calcSegmentOverlap(const SEGMENT *sgAp, const SEGMENT *sgBp, 
+static int calcSegmentOverlap(const SEGMENT *sgAp, const SEGMENT *sgBp,
 			      const SEEDARR seedr)
      /**< Calculate the overlap between two segments of constant shift on the
       * query sequence */
@@ -592,7 +592,7 @@ static int calcSegmentOverlap(const SEGMENT *sgAp, const SEGMENT *sgBp,
   SEQPOS qa_start, qb_start, qa_end, qb_end;
   SEGMLEN a, b;
   SEGCOV_t overlap = 0;
- 
+
   qb_start = seedr[0].sqo&HASHHIT_HALFMASK;
   a=b=0;
   while (a<sgAp->nseed && b<sgBp->nseed) {
@@ -633,16 +633,16 @@ static int calcSegmentOverlap(const SEGMENT *sgAp, const SEGMENT *sgBp,
 }
 
 static void calcSegmentBoundaries(SEQOFFS *qs, SEQOFFS *qe, SEQOFFS *rs, SEQOFFS *re,
-				  const SEGMENT *sgp, const SEEDARR seedr, 
-				  UCHAR ktup, UCHAR nskip, 
+				  const SEGMENT *sgp, const SEEDARR seedr,
+				  UCHAR ktup, UCHAR nskip,
 				  BOOL is_reverse)
      /**< Derrive the outer boundaries of an identical-shift-segment
-      * 
+      *
       * \param qs Returns the offset of the first base of the segment in the query sequence (counting from 0)
       * \param qe Returns the offset of the last base of the segment in the query sequence (counting from 0)
-      * \param rs Returns the offset of the first base of the segment in the set of concatenated 
+      * \param rs Returns the offset of the first base of the segment in the set of concatenated
       *        reference sequences (counting from 0)
-      * \param re Returns the offset of the last base of the segment in the set of concatenated 
+      * \param re Returns the offset of the last base of the segment in the set of concatenated
       *        reference sequences (counting from 0)
       * \param sgp Segment consisting of seeds of identical shift.
       * \param seedr Array of seeds
@@ -676,7 +676,7 @@ static int reallocQMask(SegQMask *p, SEQPOS newsiz)
   size_t nsz = ((newsiz-1)/p->blksiz+1)*p->blksiz;
   UCHAR *hp;
   hp = EREALLOCP(p->maskp, nsz);
-  if (!hp) 
+  if (!hp)
     return ERRCODE_NOMEM;
   p->maskp = hp;
   p->n_alloc = nsz;
@@ -725,12 +725,12 @@ SegLst *segLstCreate(int blocksiz)
   EMALLOCP0(sp);
   if (!sp) return 0;
 
-  if (blocksiz < DEFAULT_BLKSZ) 
+  if (blocksiz < DEFAULT_BLKSZ)
     blocksiz = DEFAULT_BLKSZ;
   ARRCREATE(sp->seedr, blocksiz);
   ARRCREATE(sp->segmr, blocksiz);
   ARRCREATE(sp->hregr, blocksiz/2);
-  if (!((sp->hregr) && (sp->seedr) && 
+  if (!((sp->hregr) && (sp->seedr) &&
       (sp->segmr))) {
     segLstDelete(sp);
     sp = 0;
@@ -760,7 +760,7 @@ void segLstBlank(SegLst *sp)
   sp->maxcover = 0;
 }
 
-int segLstFillHits(SegLst *sglp, 
+int segLstFillHits(SegLst *sglp,
 #ifdef RESULTS_TRACKER
 		   Track *trkp,
 #endif
@@ -780,9 +780,9 @@ int segLstFillHits(SegLst *sglp,
 
   /* reduce the minimum number of k-tuples by the number of missing k-tuples */
   for (;(*qmask);qmask++) {
-    if (*qmask == HITQUAL_NORMHIT) 
+    if (*qmask == HITQUAL_NORMHIT)
       continue;
-    if (min_ktup < 2) 
+    if (min_ktup < 2)
       break;
     min_ktup--;
   }
@@ -791,7 +791,7 @@ int segLstFillHits(SegLst *sglp,
     return errcode;
   sglp->flags |= SEGLSTFLG_HITREGIONS;
 
-  if ((errcode = makeSeedsFromHits(&(sglp->seedr), 
+  if ((errcode = makeSeedsFromHits(&(sglp->seedr),
 #ifdef RESULTS_TRACKER
 				   trkp,
 #endif
@@ -803,13 +803,13 @@ int segLstFillHits(SegLst *sglp,
   segLstPrintSeeds(stdout, sglp);
 #endif
 
-  errcode = makeSegmentsFromSeeds(&(sglp->segmr), &sglp->maxcover, 
+  errcode = makeSegmentsFromSeeds(&(sglp->segmr), &sglp->maxcover,
 				  sglp->hregr, 0, 0,  sglp->seedr, sglp->nskip);
   if (!errcode) sglp->flags |= SEGLSTFLG_SEGMENTS;
   return errcode;
-} 
+}
 
-int segLstAddHits(SegLst *sglp, 
+int segLstAddHits(SegLst *sglp,
 #ifdef RESULTS_TRACKER
 		  Track *trkp,
 #endif
@@ -830,16 +830,16 @@ int segLstAddHits(SegLst *sglp,
 
   /* reduce the minimum number of k-tuples by the number of missing k-tuples */
   for (;(*qmask);qmask++) {
-    if (*qmask == HITQUAL_NORMHIT) 
+    if (*qmask == HITQUAL_NORMHIT)
       continue;
-    if (min_ktup < 2) 
+    if (min_ktup < 2)
       break;
     min_ktup--;
   }
   reg_start = ARRLEN(sglp->hregr);
   if (reg_start > INT_MAX)
     return ERRCODE_OVERFLOW;
-  
+
   if ((errcode = defineHitRegions(&(sglp->hregr), &nreg, &sglp->dshift_cutoff, min_ktup, hhlp)))
     return errcode;
   sglp->flags |= SEGLSTFLG_HITREGIONS;
@@ -847,7 +847,7 @@ int segLstAddHits(SegLst *sglp,
   if ((errcode = makeSeedsFromHits(&(sglp->seedr),
 #ifdef RESULTS_TRACKER
 				   trkp,
-#endif 
+#endif
 				   sglp->hregr, (int) reg_start, nreg, hhlp)))
     return errcode;
   sglp->flags |= SEGLSTFLG_SEEDS;
@@ -856,12 +856,12 @@ int segLstAddHits(SegLst *sglp,
   segLstPrintSeeds(stdout, sglp);
 #endif
 
-  errcode = makeSegmentsFromSeeds(&(sglp->segmr), &sglp->maxcover, 
-				  sglp->hregr, (int) reg_start, nreg,  
+  errcode = makeSegmentsFromSeeds(&(sglp->segmr), &sglp->maxcover,
+				  sglp->hregr, (int) reg_start, nreg,
 				  sglp->seedr, sglp->nskip);
   if (!errcode) sglp->flags |= SEGLSTFLG_SEGMENTS;
   return errcode;
-} 
+}
 
 BOOL segLstGetStats(const SegLst *sp, SEEDIDX *nhreg, SEEDIDX *nseed, SEEDIDX *nseg)
 {
@@ -901,13 +901,13 @@ void segLstPrintSeeds(FILE *fp, const SegLst *sglp)
   n_seeds = ARRLEN(sglp->seedr);
   fprintf(fp, "=-=-=-=-= Seed List =-=-=-=-=\n");
   fprintf(fp, "%u Seeds\n", n_seeds);
-  
+
   for (i=0; i<n_seeds; i++) {
     sp = sglp->seedr + i;
     fprintf(fp, "[%i] ", i);
     printSeed(fp, sp, sglp->flags&SEGLSTFLG_REVERSE, sglp->nskip, sglp->ktup);
   }
-  
+
   fprintf(fp, "=-=-= End of Seed List =-=-=\n");
 }
 
@@ -920,14 +920,14 @@ static int printSEGCAND(FILE *fp, const SEGCAND *scp)
   int nchar = fprintf(fp, "SEGCAND qs = %u, qe = %u, rs = %u, re = %u, shiftoffs = %hi, "\
 	  "seqidx = %i, "\
 	  "srange = %hi, cover = %u, strand = %c, shift2mm = %hi, mmali = %hi\n",
-	  scp->qs, scp->qe, scp->rs, scp->re, scp->shiftoffs, scp->seqidx, scp->srange, 
-	  scp->cover, (scp->flag&SEGCANDFLG_REVERSE)? 'R':'F', 
+	  scp->qs, scp->qe, scp->rs, scp->re, scp->shiftoffs, scp->seqidx, scp->srange,
+	  scp->cover, (scp->flag&SEGCANDFLG_REVERSE)? 'R':'F',
 	  scp->shift2mm, (short) (scp->flag & SEGCANDFLG_MMALI));
   return (nchar > 0)? ERRCODE_SUCCESS: ERRCODE_FAILURE;
 }
 
 static int derriveSEGCAND(SEGCAND *candp, SEEDLEN segix_start, SEEDLEN nseg,
-			  SEGMENT *segmbasp, const SEEDARR seedr, UCHAR ktup, UCHAR nskip, 
+			  SEGMENT *segmbasp, const SEEDARR seedr, UCHAR ktup, UCHAR nskip,
 			  SEGCOV_t cover, SEGCOV_t mincover_noindel,
 			  uint32_t hregix, BOOL is_reverse)
      /**< Derrive a pair of segments as candidates for pairwise alignment.
@@ -956,14 +956,14 @@ static int derriveSEGCAND(SEGCAND *candp, SEEDLEN segix_start, SEEDLEN nseg,
   uint64_t offbit = ((uint64_t) 1)<<(HASHHIT_HALFBIT+1);
   /* don't declare this as const, too large for 32-bit systems */
 
-  if (segmentp->nseed <0) 
+  if (segmentp->nseed <0)
     return ERRCODE_ASSERT;
   /* return boundaries of the first identical-shift-segment */
-  calcSegmentBoundaries(&candp->qs, &candp->qe, &candp->rs, &candp->re, 
+  calcSegmentBoundaries(&candp->qs, &candp->qe, &candp->rs, &candp->re,
 			segmentp, seedr, ktup, nskip, is_reverse);
   segmentp->nseed *= -1; /* seed flagged out */
   shift_2mm = shift_min = (int64_t) (seedr[segmentp->ix].sqo>>HASHHIT_HALFBIT);
-  /* shift_min is smallest shift 
+  /* shift_min is smallest shift
    * shift_2mm eventually will contain the shift of the constant-shift-segment
    * that hast the most bases covered by k-mers fromt the hash-index */
   maxcover = segmentp->cover;
@@ -974,14 +974,14 @@ static int derriveSEGCAND(SEGCAND *candp, SEEDLEN segix_start, SEEDLEN nseg,
 	  segix_start, nseg);
   fprintf(stderr, "#derriveSEGCAND: [0] q = (%u, %u) r = (%u, %u) RC = %i, "\
 	  "shift_min = %lli\n",
-	  candp->qs, candp->qe, candp->rs, candp->re, 
+	  candp->qs, candp->qe, candp->rs, candp->re,
 	  (int) (is_reverse != 0),
-	  (signed long long) shift_min);  
+	  (signed long long) shift_min);
 #endif
 
   /* update boundaries */
   for (n=1; n<nseg; n++, segmp++) {
-    if (segmp->nseed <0) 
+    if (segmp->nseed <0)
       return ERRCODE_ASSERT;
     calcSegmentBoundaries(&qs, &qe, &rs, &re, segmp, seedr, ktup, nskip, is_reverse);
     if (segmp->cover > maxcover) {
@@ -991,42 +991,42 @@ static int derriveSEGCAND(SEGCAND *candp, SEEDLEN segix_start, SEEDLEN nseg,
     }
 
     segmp->nseed *= -1;
-    if (qs < candp->qs) 
+    if (qs < candp->qs)
       candp->qs = qs;
-    if (qe > candp->qe) 
+    if (qe > candp->qe)
       candp->qe = qe;
-    if (rs < candp->rs) 
+    if (rs < candp->rs)
       candp->rs = rs;
     if (re > candp->re)
       candp->re = re;
   }
   segmp--;
-  
+
   /* calculate the reference shift at the beginning (relative to read)
    * of the resulting candidate segment */
   if (is_reverse) {
     flag |= SEGCANDFLG_REVERSE;
-    /* calculate the reference shift at the beginning of 
+    /* calculate the reference shift at the beginning of
      * the reference segment */
     shift_start = ((int64_t) candp->rs) + (candp->qe-ktup+1)/nskip;
     /* substitute the following if shift_start refers to shift at
-     * beginning of read: 
+     * beginning of read:
      * shift_start = ((int64_t) candp->re) + candp->qs/nskip; */
   } else {
     shift_start = (((int64_t) candp->rs)|offbit) - candp->qs/nskip;
   }
- 
+
   shift_range = ((int64_t)(seedr[segmp->ix].sqo>>HASHHIT_HALFBIT)) - shift_min;
   diff_shift = shift_min - shift_start;
 
 #ifdef segment_debug
   fprintf(stderr, "#derriveSEGCAND: [0] q = (%u, %u) r = (%u, %u) RC = %i, "\
 	  "sr = %lli, so = %lli\n",
-	  candp->qs, candp->qe, candp->rs, candp->re, 
+	  candp->qs, candp->qe, candp->rs, candp->re,
 	  (int) (is_reverse != 0),
-	  shift_range, diff_shift);  
+	  shift_range, diff_shift);
 #endif
-  
+
   /* diff_shift is the smallest shift between the reference segment and the query segment
    * relative to segments aligned at the reference segment start (i.e. shift_start == 0) */
   if (shift_range > SHRT_MAX)
@@ -1054,11 +1054,11 @@ static int derriveSEGCAND(SEGCAND *candp, SEEDLEN segix_start, SEEDLEN nseg,
   candp->nseg = nseg;
   candp->hregix = hregix;
   candp->seqidx = SEGCAND_UNKNOWN_SEQIDX;
-  
+
   return ERRCODE_SUCCESS;
 }
 
-static int updateCandBoundaries(SEGCAND *sgcp, const SEGMENT *segmp, 
+static int updateCandBoundaries(SEGCAND *sgcp, const SEGMENT *segmp,
 				const SEEDARR seedr,
 				UCHAR ktup, UCHAR nskip)
 {
@@ -1070,7 +1070,7 @@ static int updateCandBoundaries(SEGCAND *sgcp, const SEGMENT *segmp,
   shift = ((int64_t) rs) - qs/nskip;
   d_shift = shift - shift0;
   if (d_shift < 0) {
-    if (d_shift < SHRT_MIN) 
+    if (d_shift < SHRT_MIN)
       return ERRCODE_OVERFLOW;
     sgcp->shiftoffs += d_shift;
     sgcp->srange -= d_shift;
@@ -1081,11 +1081,11 @@ static int updateCandBoundaries(SEGCAND *sgcp, const SEGMENT *segmp,
     sgcp->srange = d_shift;
   }
   /* update boundaries */
-  if (qs < sgcp->qs) 
+  if (qs < sgcp->qs)
     sgcp->qs = qs;
-  if (qe > sgcp->qe) 
+  if (qe > sgcp->qe)
     sgcp->qe = qe;
-  if (rs < sgcp->rs) 
+  if (rs < sgcp->rs)
     sgcp->rs = rs;
   if (re > sgcp->re)
     sgcp->re = re;
@@ -1103,7 +1103,7 @@ static int extendCand(SEGCAND *sgcp, SEGMARR segmr, const HITREGARR hregr, const
   SEGMIDX i, endix;
   SEGMENT *sip, *sap = segmr + sgcp->segix;
   HITREGION *hregp = hregr + sgcp->hregix;
-  
+
   endix = hregp->idx + hregp->num;
   if (sap->ix < hregp->idx || sap->ix >= endix)
     return ERRCODE_ASSERT;
@@ -1111,23 +1111,23 @@ static int extendCand(SEGCAND *sgcp, SEGMARR segmr, const HITREGARR hregr, const
   /* first look to the left ... */
   for (i=sgcp->segix-1; i>=hregp->idx; i--) {
     sip = segmr+i;
-    if (sip->nseed < 0) 
+    if (sip->nseed < 0)
       break;
     ovl = calcSegmentOverlap(sip, sap, seedr);
-    if (ovl > MIN(sip->cover, sap->cover)/2)
+    if (ovl > 0 && (SEGCOV_t) ovl > MIN(sip->cover, sap->cover)/2)
       break;
     if ((errcode = updateCandBoundaries(sgcp, sip, seedr, ktup, nskip)))
       return errcode;
     sip->nseed *= -1; /* flag segment out */
   }
-  
+
   /* ... then to the right */
   for (i=sgcp->segix+1; i<endix; i--) {
     sip = segmr+i;
-    if (sip->nseed < 0) 
+    if (sip->nseed < 0)
       break;
     ovl = calcSegmentOverlap(sip, sap, seedr);
-    if (ovl > MIN(sip->cover, sap->cover)/2)
+    if (ovl > 0 && (SEGCOV_t) ovl > MIN(sip->cover, sap->cover)/2)
       break;
     if ((errcode = updateCandBoundaries(sgcp, sip, seedr, ktup, nskip)))
       return errcode;
@@ -1174,7 +1174,7 @@ static int addCandsFast(CANDARR *candr, SEGCOV_t *maxcover, SEGCOV_t *max2ndcove
 #endif
    for(i=0;i<hitregp->num;) {
       sgp = segmentp+i;
-      INIT_COVERAGE_CALC(sgp, seedr, maskp, qlen);      
+      INIT_COVERAGE_CALC(sgp, seedr, maskp, qlen);
       cover = sgp->cover;
 #ifdef RESULTS_TRACKER
       TRACK_SEED(trkpos_hi, trkpos_lo, trk_flg, trk_is_covering, ktup, nskip, seedr+sgp->ix, sgp->nseed);
@@ -1182,7 +1182,7 @@ static int addCandsFast(CANDARR *candr, SEGCOV_t *maxcover, SEGCOV_t *max2ndcove
       /* look ahead */
       sgp++;
       for(j=i+1; j<hitregp->num; j++,sgp++) {
-	if (sgp->nseed < 0) 
+	if (sgp->nseed < 0)
 	  break; /* up to already flagged out segment */
 	/* calculate coverage overlap and complement */
 #ifdef RESULTS_TRACKER
@@ -1198,7 +1198,7 @@ static int addCandsFast(CANDARR *candr, SEGCOV_t *maxcover, SEGCOV_t *max2ndcove
 	ARRNEXTP(cdp, *candr);
 	if (!cdp)
 	  return ERRCODE_NOMEM;
-	if ((errcode = derriveSEGCAND(cdp, i, j-i, segmentp, seedr, ktup, nskip, 
+	if ((errcode = derriveSEGCAND(cdp, i, j-i, segmentp, seedr, ktup, nskip,
 				      cover, mincover_noindel, r, is_reverse)))
 	  return errcode;
 	cdp->seqidx = seqidx;
@@ -1211,7 +1211,7 @@ static int addCandsFast(CANDARR *candr, SEGCOV_t *maxcover, SEGCOV_t *max2ndcove
 	    *max2ndcover = cover;
 	  }
 	}
-      }			      
+      }
       i = j;
     }
   }
@@ -1222,7 +1222,7 @@ static int addCandsFast(CANDARR *candr, SEGCOV_t *maxcover, SEGCOV_t *max2ndcove
   return ERRCODE_SUCCESS;
 }
 
-static int addCandsFromSortedSegments(CANDARR *candr, SEGMARR segmr, 
+static int addCandsFromSortedSegments(CANDARR *candr, SEGMARR segmr,
 				      SEGNUM_t nseg, const SEEDIDX *segmidx,
 				      const SEEDARR seedr,
 				      const HITREGARR hregr, SEEDIDX hridx,
@@ -1256,7 +1256,7 @@ static int addCandsFromSortedSegments(CANDARR *candr, SEGMARR segmr,
   for (i=nseg; i>0; i--) {
     sgx = segmidx[i-1];
     sgp = segmr + sgx;
-    if (sgp->nseed <= 0) 
+    if (sgp->nseed <= 0)
       continue;
     ARRNEXTP(cdp, *candr);
     if (!cdp)
@@ -1281,7 +1281,7 @@ static int addCandsFromSortedSegments(CANDARR *candr, SEGMARR segmr,
   return errcode;
 }
 
-static int addNoIndelCandsFromSegmentSeeds(CANDARR *candr, SEGCOV_t *max_cover, 
+static int addNoIndelCandsFromSegmentSeeds(CANDARR *candr, SEGCOV_t *max_cover,
 					   SEGMARR segmr, const SEEDARR seedr,
 					   const HITREGARR hregr, SEGCOV_t mincover,
 					   UCHAR ktup, UCHAR nskip, char is_reverse)
@@ -1300,10 +1300,10 @@ static int addNoIndelCandsFromSegmentSeeds(CANDARR *candr, SEGCOV_t *max_cover,
     end_i = i + hregr[s].num;
     for (;i<end_i;i++) {
       cover = segmr[i].cover;
-      if (cover < mincover || segmr[i].nseed < 0) 
+      if (cover < mincover || segmr[i].nseed < 0)
 	/* coverage not above threshold or segment flagged out */
 	continue;
-      if (cover > *max_cover) 
+      if (cover > *max_cover)
 	*max_cover = cover;
       ARRNEXTP(cdp, *candr);
       if (!cdp)
@@ -1327,8 +1327,8 @@ static int addNoIndelCandsFromSegmentSeeds(CANDARR *candr, SEGCOV_t *max_cover,
   return ERRCODE_SUCCESS;
 }
 
-static void labelSEGCANDWithinInsertRange (SEGCAND *candAp, SEGNUM_t nsegA, 
-					   SEGCAND *candBp, SEGNUM_t nsegB, 
+static void labelSEGCANDWithinInsertRange (SEGCAND *candAp, SEGNUM_t nsegA,
+					   SEGCAND *candBp, SEGNUM_t nsegB,
 					   SEQLEN_t dmax, SEQLEN_t dmin)
 /**< Compare two sets of Candidate segments and label those segments
  * SEGCANDFLG_MATEDIST that are placed on the reference within the
@@ -1339,7 +1339,7 @@ static void labelSEGCANDWithinInsertRange (SEGCAND *candAp, SEGNUM_t nsegA,
   SEGNUM_t na, nb;
   SEGCAND *scAp, *scBp;
   BOOL is_swapped = nsegA > nsegB;
-     
+
   if (nsegA == 0 || nsegB == 0)
     return;
 
@@ -1353,7 +1353,7 @@ static void labelSEGCANDWithinInsertRange (SEGCAND *candAp, SEGNUM_t nsegA,
     scAp = candAp;
     scBp = candBp;
   }
-  
+
   for (na=nb=0; na < nsegA && nb < nsegB;) {
     if (scAp[na].seqidx < scBp[nb].seqidx) {
       na++;
@@ -1423,7 +1423,7 @@ static int checkCANDARRsequential(const CANDARR candr, SEGNUM_t *rvc_offs)
 
 /*   if ((errcode = checkCANDARRsequential(candAr, &na_rvc))) */
 /*     return errcode; */
-  
+
 /*   if ((errcode = checkCANDARRsequential(candBr, &nb_rvc))) */
 /*     return errcode; */
 
@@ -1439,14 +1439,14 @@ static int reallocSortArrays(SegAliCands *sacp, SEEDIDX num)
   size_t newsiz = ((num-1)/sacp->alloc_blksz + 1)*sacp->alloc_blksz;
   void *hp;
 
-  if (newsiz > UINT_MAX) 
+  if (newsiz > UINT_MAX)
     return ERRCODE_OVERFLOW;
   hp = EREALLOCP(sacp->sort_keys, newsiz);
-  if (!hp) 
+  if (!hp)
     return ERRCODE_NOMEM;
   sacp->sort_keys = hp;
   hp = EREALLOCP(sacp->sort_idx, newsiz);
-  if (!hp) 
+  if (!hp)
     return ERRCODE_NOMEM;
   sacp->sort_idx = hp;
   sacp->n_alloc = (SEGNUM_t) newsiz;
@@ -1474,7 +1474,7 @@ static int transferParamFromSegLst(SegAliCands *sacp, const SegLst *sglp)
 SegAliCands *segAliCandsCreate(int blocksiz)
 {
   SegAliCands *sacp;
-  
+
   EMALLOCP0(sacp);
   if (!sacp) return 0;
 
@@ -1484,7 +1484,7 @@ SegAliCands *segAliCandsCreate(int blocksiz)
   ARRCREATE(sacp->candr, blocksiz);
   ECALLOCP(blocksiz, sacp->sort_keys);
   ECALLOCP(blocksiz, sacp->sort_idx);
-  
+
   if ((sacp->candr) && (sacp->sort_keys) && (sacp->sort_idx)) {
     sacp->n_alloc = sacp->alloc_blksz = blocksiz;
     sacp->max_cover = 0;
@@ -1497,8 +1497,8 @@ SegAliCands *segAliCandsCreate(int blocksiz)
   } else {
     segAliCandsDelete(sacp);
     sacp = 0;
-  } 
-  
+  }
+
   return sacp;
 }
 
@@ -1535,7 +1535,7 @@ int segAliCandsAddFast(SegAliCands *sacp, SegQMask *qmp,
 {
   int errcode = ERRCODE_SUCCESS;
   //SEGCOV_t mincover_noindel = calcIndelFreeMincover(sglp->qlen, sglp->ktup, sglp->nskip);
-  
+
   if (sglp->qlen >= qmp->n_alloc &&
       (errcode = reallocQMask(qmp, sglp->qlen+1)))
     return errcode;
@@ -1548,8 +1548,8 @@ int segAliCandsAddFast(SegAliCands *sacp, SegQMask *qmp,
 			 trkp,
 #endif
 			 sglp->segmr, sglp->seedr, sglp->hregr,
-			 qmp->maskp, sglp->qlen, sglp->ktup, sglp->nskip, 
-			 sglp->flags&SEGLSTFLG_REVERSE, mincover, 
+			 qmp->maskp, sglp->qlen, sglp->ktup, sglp->nskip,
+			 sglp->flags&SEGLSTFLG_REVERSE, mincover,
 			 //mincover_noindel,
 			 mincover,
 			 seqidx);
@@ -1580,14 +1580,14 @@ int segAliCandsAdd(SegAliCands *sacp, const SegLst *sglp)
       sacp->sort_idx[j] = i;
     }
     sacp->n_sort = j;
-    if ((errcode = sort2UINTarraysByQuickSort(sacp->n_sort, 
-					      sacp->sort_keys, 
+    if ((errcode = sort2UINTarraysByQuickSort(sacp->n_sort,
+					      sacp->sort_keys,
 					      sacp->sort_idx)))
       return errcode;
     /* sacp->sort_idx are segment indices relative to sglp->segmr + hrp->idx
      * sorted by coverage in ascending order */
     if ((errcode = addCandsFromSortedSegments(&sacp->candr, sglp->segmr, sacp->n_sort, sacp->sort_idx,
-					      sglp->seedr, sglp->hregr, r, mincover_noindel, 
+					      sglp->seedr, sglp->hregr, r, mincover_noindel,
 					      sglp->ktup, sglp->nskip,
 					      sglp->flags&SEGLSTFLG_REVERSE)))
       return errcode;
@@ -1603,7 +1603,7 @@ int segAliCandsAddNoIndel(SegAliCands *sacp, const SegLst *sglp)
 
   if (sglp->maxcover >= mincover) {
     if (!(errcode = transferParamFromSegLst(sacp, sglp))) {
-      errcode = addNoIndelCandsFromSegmentSeeds(&sacp->candr, &sacp->max_cover, 
+      errcode = addNoIndelCandsFromSegmentSeeds(&sacp->candr, &sacp->max_cover,
 						sglp->segmr, sglp->seedr,
 						sglp->hregr, mincover,
 						sglp->ktup, sglp->nskip,
@@ -1617,7 +1617,7 @@ int segAliCandsStats(SegAliCands *sacp,
 #ifdef RESULTS_TRACKER
 		     Track *trkp,
 #endif
-		     SEGCOV_t min_cover_below_max, 
+		     SEGCOV_t min_cover_below_max,
 		     const HashHitInfo *hhiFp,
 		     const HashHitInfo *hhiRp,
 		     SEGNUM_t target_depth,
@@ -1641,11 +1641,11 @@ int segAliCandsStats(SegAliCands *sacp,
 
   if (max_depth< 1 || max_depth > MAXIMUM_DEPTH)
     max_depth =  MAXIMUM_DEPTH;
-  if (target_depth < 1) 
+  if (target_depth < 1)
     target_depth = DEFAULT_TARGET_DEPTH;
   if (target_depth > max_depth)
     target_depth = max_depth;
-  
+
   /* min_cover_below_max depends on the maximimum number of mismatches
    * one would like to capture.  It is the number of bases of the read
    * that might not be covered by k-tuples because mismatches knock
@@ -1684,17 +1684,17 @@ int segAliCandsStats(SegAliCands *sacp,
   }
 
   /* Here, min_cover is a threshold in k-mer cover that can be applied to candidate segments
-   * while guaranteeing that the best match and all matches with a certain maximum number of 
+   * while guaranteeing that the best match and all matches with a certain maximum number of
    * mismatches below the best match are still found.
    * All candidate segments with a coverage higher than min_cover and
    * within nskip of the maximum coverage will be sampled. If this number is less than target_depth
-   * candidate segments with a coverage of nskip within the maximum 
+   * candidate segments with a coverage of nskip within the maximum
    * coverage will be added up to a maximum number of target_depth.
    */
 #ifdef segment_debug
   printf("segment.c::seqAliCandsStats(): unsorted candidate segments\n");
   segAliCandsPrintRaw(stdout, n_cands, sacp);
-#endif 
+#endif
 
   scp = sacp->candr;
   for (i=j=0; i<n_cands; i++) {
@@ -1716,7 +1716,7 @@ int segAliCandsStats(SegAliCands *sacp,
     if (j >= sacp->n_alloc &&
 	(errcode = reallocSortArrays(sacp, j+1)))
       return errcode;
-    if (scp[i].cover > sacp->max_cover) 
+    if (scp[i].cover > sacp->max_cover)
       return ERRCODE_ASSERT;
     sacp->sort_keys[j] = sacp->max_cover - scp[i].cover;
     sacp->sort_idx[j] = i;
@@ -1730,14 +1730,14 @@ int segAliCandsStats(SegAliCands *sacp,
   }
 
 #ifdef segment_debug
-  printf("segment.c::seqAliCandsStats(): maximum coverage = %u\n", 
+  printf("segment.c::seqAliCandsStats(): maximum coverage = %u\n",
 	 sacp->max_cover);
-  printf("segment.c::seqAliCandsStats(): min_cover_below_max = %u, cover_deficit = [%u, %u]\n", 
+  printf("segment.c::seqAliCandsStats(): min_cover_below_max = %u, cover_deficit = [%u, %u]\n",
 	 min_cover_below_max, sacp->cover_deficit[0], sacp->cover_deficit[1]);
-  printf("segment.c::seqAliCandsStats(): %i candidate segments above threshold  min_cover = %u\n", 
+  printf("segment.c::seqAliCandsStats(): %i candidate segments above threshold  min_cover = %u\n",
 	 j, min_cover);
-#endif    
-  
+#endif
+
   if ((errcode = sort2UINTarraysByQuickSort(j, sacp->sort_keys, sacp->sort_idx)))
     return errcode;
 #ifdef RESULTS_TRACKER
@@ -1753,11 +1753,11 @@ int segAliCandsStats(SegAliCands *sacp,
   }
 #endif
   sacp->n_mincover = j;
-  
+
   if (j > target_depth) {
     SEGNUM_t maxj = (j < max_depth)? j: max_depth;
     if (is_sensitive) {
-      for (j=target_depth; j<maxj; j++) { 
+      for (j=target_depth; j<maxj; j++) {
 	is_rev = (scp[j].flag & SEGCANDFLG_REVERSE)? 1:0;
 	if (sacp->sort_keys[j] >= cover_deficit_adjusted[(scp[j].flag & SEGCANDFLG_REVERSE)? 1:0])
 	  break;
@@ -1777,10 +1777,10 @@ int segAliCandsStats(SegAliCands *sacp,
     trackSetFlag(trkp, TRACKFLG_CANDSEG_CUTOFF);
 #endif
 #ifdef segment_debug
-  printf("segment.c::seqAliCandsStats(): %i candidate segments within nskip = %hu of maximum = %u\n", 
+  printf("segment.c::seqAliCandsStats(): %i candidate segments within nskip = %hu of maximum = %u\n",
 	 j, (uint16_t) nskip, sacp->max_cover);
 #endif
- 
+
   return ERRCODE_SUCCESS;
 }
 
@@ -1814,10 +1814,10 @@ void segAliCandsPrintRaw(FILE *fp, short max_depth, const SegAliCands *sacp)
   printf("========== End of raw candidate segments ==========\n");
 }
 
-SEGNUM_t segAliCandsGetNumberOfSegments(const SegAliCands *sacp, 
-					SEGCOV_t *max_cover, 
+SEGNUM_t segAliCandsGetNumberOfSegments(const SegAliCands *sacp,
+					SEGCOV_t *max_cover,
 					SEGCOV_t *max2nd_cover,
-					SEGCOV_t *cover_deficitF,  
+					SEGCOV_t *cover_deficitF,
 					SEGCOV_t *cover_deficitR,
 					SEGNUM_t *n_mincover)
 {
@@ -1841,30 +1841,30 @@ int segAliCandsPrintSegment(FILE *fp, SEEDIDX scidx, const SegAliCands *sacp)
   return errcode;
 }
 
-int segAliCandsGetSegmentData(SEQPOS *qs, SEQPOS *qe, 
+int segAliCandsGetSegmentData(SEQPOS *qs, SEQPOS *qe,
 			      SEQPOS *rs, SEQPOS *re,
 			      SEEDIDX scidx, const SegAliCands *sacp)
 {
   const SEGCAND *scp;
   if (scidx >= ARRLEN(sacp->candr) )
     return ERRCODE_ASSERT;
-  
+
   scp = sacp->candr + scidx;
   if (qs) *qs = scp->qs;
   if (qe) *qe = scp->qe;
   if (rs) *rs = scp->rs;
   if (re) *re = scp->re;
- 
+
   return ERRCODE_SUCCESS;
 }
- 
-int segAliCandsCalcSegmentOffsets(SEQLEN_t *qs, SEQLEN_t *qe, 
+
+int segAliCandsCalcSegmentOffsets(SEQLEN_t *qs, SEQLEN_t *qe,
 				  SETSIZ_t *rs, SETSIZ_t *re,
 				  int *band_l, int *band_r,
 				  SEQLEN_t *qs_directmatch, int *ro_directmatch,
 				  SEQNUM_t *seqidx, SEGBITFLG_t *bitflags,
 				  SEGCOV_t *cover,
-				  short edgelen, uint32_t qlen, 
+				  short edgelen, uint32_t qlen,
 				  const SeqSet *ssp,
 				  SEEDIDX scidx,
 				  const SegAliCands *sacp)
@@ -1893,11 +1893,11 @@ int segAliCandsCalcSegmentOffsets(SEQLEN_t *qs, SEQLEN_t *qe,
   } else {
     rlen = seqSetGetSeqDatByIndex(&roffs, NULL, scandp->seqidx, ssp);
   }
-    
+
   *rs = ((uint64_t) scandp->rs)*nskip;
   *re = ((uint64_t) scandp->re)*nskip + ktup - 1;
 
-  if (*rs + nskip < roffs + 1 || 
+  if (*rs + nskip < roffs + 1 ||
       /* allow start to wobble by 1 kmer pos */
       *re < *rs)
     return ERRCODE_ASSERT;
@@ -1908,8 +1908,8 @@ int segAliCandsCalcSegmentOffsets(SEQLEN_t *qs, SEQLEN_t *qe,
     *rs = 0LL;
   *re -= roffs;
 
-  if (*re >= rlen) 
-    return ERRCODE_ASSERT; 
+  if (*re >= rlen)
+    return ERRCODE_ASSERT;
 
   if (scandp->qe < scandp->qs || scandp->qs >= qlen)
     return ERRCODE_ASSERT;
@@ -1919,18 +1919,18 @@ int segAliCandsCalcSegmentOffsets(SEQLEN_t *qs, SEQLEN_t *qe,
     *qe = qlen - scandp->qs - 1;
   } else {
     *qs = scandp->qs;
-    *qe = scandp->qe;  
+    *qe = scandp->qe;
   }
 
   /* calculate band */
   edge_band = (int) (qlen - scandp->cover)/EDGE_BAND_FACTOR;
   if (edge_band > nskip) {
-    if (edge_band > (int) (qlen>>MAX_BANDEDGE_2POW)) 
+    if (edge_band > (int) (qlen>>MAX_BANDEDGE_2POW))
       edge_band = (int) (qlen>>MAX_BANDEDGE_2POW);
     edge_band -= nskip-1;
   } else
     edge_band = 0;
- 
+
   br = (-scandp->shiftoffs + 1)*nskip + edge_band + 1;
   bl = br - (scandp->srange + 2)*nskip - 2*edge_band - 2;
 
@@ -1939,34 +1939,34 @@ int segAliCandsCalcSegmentOffsets(SEQLEN_t *qs, SEQLEN_t *qe,
   q_edge_r = (*qe + edgelen + 1 <= qlen && edgelen > 0)? edgelen: (int) (qlen - *qe - 1);
   *qs -= q_edge_l;
   *qe += q_edge_r;
- 
+
   r_edge_l = q_edge_l + br;
   r_edge_r = q_edge_r - bl;
- 
+
   if (r_edge_l > 0 && *rs < (SETSIZ_t) r_edge_l) {
     r_edge_l = *rs;
-    *rs = 0;   
+    *rs = 0;
   } else {
-    *rs -= r_edge_l; 
+    *rs -= r_edge_l;
   }
-  
+
   if (*re + r_edge_r >= rlen) {
     r_edge_r = rlen - *re - 1;
     *re = rlen -1;
   } else {
     *re += r_edge_r;
   }
-  
+
   if (*re < *rs)
     return ERRCODE_ASSERT;
-  
+
   /* alignment band is reported along profiled query sequence and
    *  relative to profile origin, not the segment start qs */
   band_offs = q_edge_l - r_edge_l;
   ds = scandp->shift2mm*nskip + band_offs;
   *band_l = bl + band_offs + *qs;
   *band_r = br + band_offs + *qs;
-   
+
   if (ds < 0) {
     *qs_directmatch = *qs - ds;
     *ro_directmatch = 0;
@@ -1982,7 +1982,7 @@ int segAliCandsCalcSegmentOffsets(SEQLEN_t *qs, SEQLEN_t *qe,
   printf("   ro_directmatch = %i, qs_directmatch = %u\n",
 	 *ro_directmatch, *qs_directmatch);
   printf("   band_l = %i, band_r = %i\n", *band_l, *band_r);
-  
+
   printf("   r_edge_l = %i, r_edge_r = %i, q_edge_l = %i, q_edge_r = %i\n",
 	 r_edge_l, r_edge_r, q_edge_l, q_edge_r);
 #endif

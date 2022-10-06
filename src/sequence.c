@@ -4,7 +4,7 @@
  ****************************************************************************
  *                                                                          *
  *  Copyright (C) 2010 - 2014 Genome Research Ltd.                          *
- *                                                                          *        
+ *                                                                          *
  *  Author: Hannes Ponstingl (hp3@sanger.ac.uk)                             *
  *                                                                          *
  *  This file is part of SMALT.                                             *
@@ -51,7 +51,7 @@ enum SEQ_CONSTANTS {
   NBYTES_PER_INT32 = 4,
   MASK_32BIT = 0xFFFFFFFF,
   NUM_32BIT = 32,
-  NBITS_PER_BYTE   = 8,          
+  NBITS_PER_BYTE   = 8,
   SIZE_CODTAB      = 0x100,      /**< number of 8-bit ASCII characters */
   SIZE_DECODTAB    = 0x100,
   BLOCKSIZE_HEADER = 128,        /* default lenght for FASTA string after header */
@@ -90,7 +90,7 @@ enum READNAM_TYPES {
 
 enum SEQIO_FLAGS {
   SEQIOFLG_WRITE= 0x01,
-  SEQIOFLG_GZIP = 0x02,  /**< gzip compressed */ 
+  SEQIOFLG_GZIP = 0x02,  /**< gzip compressed */
 };
 
 static const char READNAM_MATEXT_SEPARATOR[READNAM_NUMTYP] = {'\0', '/', '.'}; /* index corresponds to READNAM_TYPES */
@@ -108,12 +108,12 @@ typedef struct _SEQSEQ {  /**< Sequence container (string, nucleotides, quality 
   char *basep;            /**< allocated memory for sequence data (terminated with 0). In
 			   * SeqSet.sqp: contains several strings each terminated by 0 */
   int block_size;         /**< blocksize for memory allocation */
-  SETSIZ_t size;       /**< sequence length (number of symbols, excl term char). In 
+  SETSIZ_t size;       /**< sequence length (number of symbols, excl term char). In
 			   * SeqSet.sqp: includes terminating '\\0' except final '\\0' */
   size_t alloc_size;  /**< allocated memory in bytes */
   char nbit_symb;         /**< number of bits for one symbol */
 } SEQSEQ;
-  
+
 /******************************************************************************
  ******************************* Opaque Types *********************************
  ******************************************************************************/
@@ -130,8 +130,8 @@ struct _SeqFastq { /**< Holds nucleotide sequence with base call quality values 
   char type;      /**< one of SEQ_TYPES */
   SEQSEQ *headp;  /**< Header of the nucleotide sequence */
   SEQSEQ *datap;  /**< Nucleotide sequence */
-  SEQSEQ *qheadp; /**< Header of quality values (can be NULL if type == SEQTYP_FASTA) */ 
-  SEQSEQ *qualp;  /**< Sequence of quality values (can be NULL if type == SEQTYP_FASTA) */ 
+  SEQSEQ *qheadp; /**< Header of quality values (can be NULL if type == SEQTYP_FASTA) */
+  SEQSEQ *qualp;  /**< Sequence of quality values (can be NULL if type == SEQTYP_FASTA) */
 };
 
 struct _SeqIO { /**< Wrapper of I/O stream from which data is read */
@@ -193,13 +193,13 @@ static int scrollToHeaderLine(
 #ifdef HAVE_ZLIB
 			      gzFile fp,
 #else
-			      FILE *fp, 
+			      FILE *fp,
 #endif
 			      int *prompt, char bufp[LINBUFSIZ])
 {
   char *cp = bufp;
   *prompt = '\0';
-  
+
   do {
     for(;isspace((int) *cp); cp++);
     if (*cp == FASTA_PROMPT ||
@@ -238,7 +238,7 @@ static int cmpPairNamStr(const char *ap, const char *bp, size_t maxlen)
 	    break;
 	  case READNAM_TYP_ILLUMINA:
 	    extstr[0] = READNAM_MATEXT_ILLUMINA[0];
-	    extstr[1] = READNAM_MATEXT_ILLUMINA[1];	
+	    extstr[1] = READNAM_MATEXT_ILLUMINA[1];
 	    break;
 	  case READNAM_TYP_RF:
 	    extstr[0] = READNAM_MATEXT_FR[0];
@@ -263,7 +263,7 @@ static int cmpPairNamStr(const char *ap, const char *bp, size_t maxlen)
 /******************************************************************************
  ************************ Pivate Methods of Type SeqCodec *********************
  ******************************************************************************/
-static int checkCodec(SeqCodec *codep) 
+static int checkCodec(SeqCodec *codep)
 {
   int errcode = ERRCODE_SUCCESS;
   const char bases[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -271,7 +271,7 @@ static int checkCodec(SeqCodec *codep)
 
   for (bp = bases; (*bp); bp++) {
     if (toupper(*bp) != (int) codep->decodtab[codep->codtab[(unsigned char) *bp]] &&
-	(toupper(*bp) != 'U' || 
+	(toupper(*bp) != 'U' ||
 	 (int) codep->decodtab[codep->codtab[(unsigned char) *bp]] != 'T'))  {
       errcode = ERRCODE_FAILURE;
       break;
@@ -288,10 +288,10 @@ static int make3BitMangledCodec(SeqCodec *codp)
 {
   int i, offs;
   unsigned char cu, a;
-  
+
   codp->typ = SEQCODTYP_3BITMANGLED;
   codp->alphlen = (UCHAR_t) strlen(CODEC_ALPHABET);
-  if (codp->alphlen > SIZE_ALPHABET) 
+  if (codp->alphlen > SIZE_ALPHABET)
     return ERRCODE_ASSERT;
 
   strcpy(codp->alphabet, CODEC_ALPHABET);
@@ -313,7 +313,7 @@ static int make3BitMangledCodec(SeqCodec *codp)
   }
   codp->codtab[0] = SEQCOD_TERM;
   codp->decodtab[SEQCOD_TERM] = '\0';
-  
+
   return ERRCODE_SUCCESS;
 }
 
@@ -364,7 +364,7 @@ SeqCodec *seqCodecCreateFromAlphabet(const char *alphabet, unsigned char code_un
 
   EMALLOCP0(codp);
   if (!codp) return NULL;
-  
+
   codp->typ = SEQCODTYP_USERDEFINED;
   strcpy(codp->alphabet, alphabet);
   codp->alphlen = (UCHAR_t) al;
@@ -384,21 +384,21 @@ SeqCodec *seqCodecCreateFromAlphabet(const char *alphabet, unsigned char code_un
 	codp->codtab_complement[(~a)&SEQCOD_STDNT_MASK] = a | MASKBIT4;
       }
       a |= MASKBIT4; /* set the 4th bit (so that the (8-bit) code is != '\0' */
-      codp->decodtab[a] = cu; 
+      codp->decodtab[a] = cu;
     } else {
       a = code_unknown | MASKBIT4; /* set the 4th bit (so that the (8-bit) code is != '\0' */
     }
     codp->codtab[i] = a;
   }
 
-  
+
   return codp;
 }
 
-void seqCodecDelete(SeqCodec *codp)    
+void seqCodecDelete(SeqCodec *codp)
 {
   free(codp);
-}  
+}
 
 const char *seqCodecGetAlphabet(const SeqCodec *codp, short *length)
 {
@@ -424,7 +424,7 @@ const char *seqCodecGetDecoder(const SeqCodec *codp, short *size)
 void seqCodecEncodeString(char *cp, const SeqCodec *codp)
 {
   const UCHAR_t *encodp = codp->codtab;
-  for (;(*cp); cp++) 
+  for (;(*cp); cp++)
     *cp = (char) encodp[(int) *cp];
 }
 
@@ -445,7 +445,7 @@ char seqCodecFindBaseClass(char c, const SeqCodec *codecp)
   if (cod&0x04) {
     if ((cod&ALPHABET_MASK) == UNKNOWN_3BIT) rv = SEQBASTYP_UNKNOWN;
     else rv = SEQBASTYP_NONSTD;
-  } 
+  }
   else if (cod&0x01) rv = SEQBASTYP_PYRIMIDINE;
   else rv = SEQBASTYP_PURINE;
   return rv;
@@ -461,11 +461,11 @@ char seqCodecType(const SeqCodec *codecp)
  ******************************************************************************/
 SeqIO *seqIOopen(int *errcode, const char *filnam, char mode, unsigned long buffsize)
      /**< Open a file for sequence I/O in FASTA/FASTQ format (7-bit ascii)
-      * \param errcode != 0 (one of ERRMSG_CODES) 
+      * \param errcode != 0 (one of ERRMSG_CODES)
       *        if error occurs in which case NULL is returned.
-      * \param filnam file name. 
-      * \param mode one of SEQIO_MODES 
-      *             (SEQIO_READ, SEQIO_WRITE_FASTA, SEQIO_WRITE_FASTQ) 
+      * \param filnam file name.
+      * \param mode one of SEQIO_MODES
+      *             (SEQIO_READ, SEQIO_WRITE_FASTA, SEQIO_WRITE_FASTQ)
       * \param buffsize buffer size, if 0 default buffer size is used.
       */
 {
@@ -508,14 +508,14 @@ SeqIO *seqIOopen(int *errcode, const char *filnam, char mode, unsigned long buff
     ESTRCPY(p->filnam, filnam);
     if (!p->filnam) *errcode = ERRCODE_NOMEM;
   }
-  
+
   if (!*errcode) {
 #ifdef HAVE_ZLIB
-    if (mode == SEQIO_READ || 
+    if (mode == SEQIO_READ ||
 	mode == SEQIO_WRITE_GZIP_FASTA || mode == SEQIO_WRITE_GZIP_FASTA) {
 	p->fp = gzopen(p->filnam, p->fmode);
 #else
-    if (p->filnam[0] == '-' && 
+    if (p->filnam[0] == '-' &&
 	(p->filnam[1] == '\0' || isspace(filnam[1]))) {
       p->fp = (mode == SEQIO_READ)? stdin: stdout;
 #endif
@@ -531,7 +531,7 @@ SeqIO *seqIOopen(int *errcode, const char *filnam, char mode, unsigned long buff
       setvbuf(p->fp, NULL, _IOFBF, p->bufsize))
     *errcode = ERRCODE_IOBUFF;
 #endif
-  
+
   if (!(*errcode) && mode == SEQIO_READ) {
     ECALLOCP(LINBUFSIZ+1, p->linbufp);
     if (p->linbufp) {
@@ -553,8 +553,8 @@ SeqIO *seqIOopen(int *errcode, const char *filnam, char mode, unsigned long buff
     seqIOclose(p);
     p = NULL;
   }
-  
-  return p;      
+
+  return p;
 }
 
 int seqIOclose(SeqIO *p)
@@ -562,7 +562,7 @@ int seqIOclose(SeqIO *p)
   int errcode = ERRCODE_SUCCESS;
   if (p) {
     if (p->fp) {
-#ifdef HAVE_ZLIB  
+#ifdef HAVE_ZLIB
       if ((p->flags & SEQIOFLG_GZIP) || !(p->flags & SEQIOFLG_WRITE)) {
 	if (Z_OK != gzclose(p->fp))
 	  errcode = ERRCODE_FILEIO;
@@ -570,7 +570,7 @@ int seqIOclose(SeqIO *p)
 #endif
       if (fflush(p->fp))
 	errcode = ERRCODE_FILEIO;
-      if (p->filnam[0] != '-' || 
+      if (p->filnam[0] != '-' ||
 	  (p->filnam[1] != '\0' && !isspace(p->filnam[1])))
 	fclose(p->fp);
 #ifdef HAVE_ZLIB
@@ -588,7 +588,7 @@ int seqIOclose(SeqIO *p)
 
 int seqIOReset(SeqIO *p)
 {
-  if (p->mode == SEQIO_READ && 
+  if (p->mode == SEQIO_READ &&
       p->status != ERRCODE_SUCCESS && p->status != ERRCODE_EOF)
     return p->status;
   p->status = ERRCODE_SUCCESS;
@@ -622,7 +622,7 @@ int seqIOstatus(SeqIO *p)
 
  int seqIOCheckReads(ErrMsg *errmsgp, SeqFastq *sqbufp, SeqIO *sfp,
 		     SeqFastq *sqbufBp, SeqIO *sfBp,
-		     SEQNUM_t *seqnum, SEQLEN_t *maxseqlen, 
+		     SEQNUM_t *seqnum, SEQLEN_t *maxseqlen,
 		     SEQLEN_t *maxnamlen)
 {
   int errcode;
@@ -631,7 +631,7 @@ int seqIOstatus(SeqIO *p)
   BOOL_t namflg = 1;
   SEQLEN_t mxnaml, mxseql;
 
-  if (sfp->mode != SEQIO_READ) 
+  if (sfp->mode != SEQIO_READ)
     return ERRCODE_FAILURE;
   mxnaml = mxseql = 0;
   for (snum=0;
@@ -646,7 +646,7 @@ int seqIOstatus(SeqIO *p)
 	ERRMSGNO(errmsgp, errcode);
       return errcode;
     }
- 
+
     if (sqbufp->headp->size > mxnaml) mxnaml = sqbufp->headp->size;
     if (sqbufp->datap->size > mxseql) mxseql = sqbufp->datap->size;
     if ((sqbufp->qheadp) && sqbufp->qheadp->size > mxnaml)
@@ -680,7 +680,7 @@ int seqIOstatus(SeqIO *p)
       errcode = ERRCODE_SUCCESS;
     else if (sfp->status == ERRCODE_SUCCESS) /* did not return EOF (suspicious) */
       errcode = ERRCODE_FASTA;
-    else 
+    else
       errcode = sfp->status;
     return errcode;
   }
@@ -691,13 +691,13 @@ int seqIOstatus(SeqIO *p)
       errcode = ERRCODE_SUCCESS;
     else if (sfBp->status == ERRCODE_SUCCESS)
       errcode = ERRCODE_MATENUMPAIR;
-    else 
+    else
       errcode = sfBp->status;
   } else if (sfp->status == ERRCODE_SUCCESS)
     errcode =  ERRCODE_MATENUMPAIR;
   else
     errcode = sfp->status;
-    
+
   return ( (namflg) )? errcode: ERRCODE_RNAMPAIR;
 }
 
@@ -722,12 +722,12 @@ static SEQSEQ *createSeq(uint32_t blocksize)
   SEQSEQ *sp;
 
   EMALLOCP0(sp);
-  if (sp == NULL) 
+  if (sp == NULL)
     return NULL;
 
   if (blocksize < 1) blocksize = SEQ_BLKSZ_DEFAULT;
   ECALLOCP(blocksize, sp->basep);
-  
+
   if (sp->basep == NULL) {
     deleteSeq(sp);
     return NULL;
@@ -746,7 +746,7 @@ static int reallocSeqBlocks(SEQSEQ *sp, size_t minsize)
   size_t newsiz = minsize/sp->block_size + 1;
   newsiz *= sp->block_size;
   char *hp = EREALLOCP(sp->basep, newsiz);
-  if (hp == NULL) 
+  if (hp == NULL)
     return ERRCODE_NOMEM;
   sp->basep = hp;
   sp->alloc_size = newsiz;
@@ -798,7 +798,7 @@ static int setSeq(SEQSEQ *sp, const char *cp)
   *hp = '\0';
   if (i>=SEQ_MAXLEN) return ERRCODE_SEQLEN;
   sp->size = i;
-  
+
   return ERRCODE_SUCCESS;
 }
 
@@ -809,7 +809,7 @@ static int cropSeq(SEQSEQ *sp, SEQLEN_t s, SEQLEN_t e)
       * \param e End of the new sequence (starting from 0)
       */
 {
-  if (sp->code == SEQCOD_COMPRESSED) 
+  if (sp->code == SEQCOD_COMPRESSED)
     return ERRCODE_SEQCODE;
   if (e < s)
     return ERRCODE_ARGRANGE;
@@ -829,11 +829,11 @@ static int cropSeq(SEQSEQ *sp, SEQLEN_t s, SEQLEN_t e)
   return ERRCODE_SUCCESS;
 }
 
-static int appendSeqSegment(SEQSEQ *top, 
+static int appendSeqSegment(SEQSEQ *top,
 			    SEQLEN_t tcpos[MAXN_TERMCHAR], UCHAR_t *ntc,
-			    const SEQSEQ *fromp, 
-			    SEQLEN_t start, SEQLEN_t length, 
-			    char reverse, char withTerm, 
+			    const SEQSEQ *fromp,
+			    SEQLEN_t start, SEQLEN_t length,
+			    char reverse, char withTerm,
 			    const SeqCodec *codep)
      /** Make a copy of a sequence segment and append it to existing sequence.
       * The sequence must not be compressed.
@@ -859,11 +859,11 @@ static int appendSeqSegment(SEQSEQ *top,
   SEQLEN_t i;
   UCHAR_t nt = 0;
   size_t totsize;
-  
-  if (fromp->code == SEQCOD_COMPRESSED) return ERRCODE_SEQCODE; 
-      
+
+  if (fromp->code == SEQCOD_COMPRESSED) return ERRCODE_SEQCODE;
+
   if (start > fromp->size) return ERRCODE_ARGRANGE;
-  if (!(length) || (start + length > fromp->size)) 
+  if (!(length) || (start + length > fromp->size))
     length = fromp->size - start;
   if ((withTerm) && top->size > 0) top->size++;
   if (length + top->size > SETSIZ_MAX)
@@ -877,7 +877,7 @@ static int appendSeqSegment(SEQSEQ *top,
   cp = fromp->basep + start;
   if (reverse) {
     cp += length-1;
-    if (codep != NULL) { 
+    if (codep != NULL) {
       if (fromp->code == SEQCOD_MANGLED) {
 	for(i=0;i<length;i++, cp--) {
 	  if ((*cp) & SEQCOD_STDNT_TESTBIT) {
@@ -929,8 +929,8 @@ static int appendSeqSegment(SEQSEQ *top,
   return ERRCODE_SUCCESS;
 }
 
-static int appendMangledToCompressedSeq(SEQSEQ *top, 
-					const SEQSEQ *fromp, 
+static int appendMangledToCompressedSeq(SEQSEQ *top,
+					const SEQSEQ *fromp,
 					char withTerm
 					)
      /** Append a compressed sequence to another.
@@ -946,9 +946,9 @@ static int appendMangledToCompressedSeq(SEQSEQ *top,
   SETSIZ_t i, offset, totsiz, n_unit;
   uint32_t to_unit;
   uint32_t *tsp = (uint32_t *) top->basep;
-  
-  if (fromp->code != SEQCOD_MANGLED) 
-    return ERRCODE_SEQCODE; 
+
+  if (fromp->code != SEQCOD_MANGLED)
+    return ERRCODE_SEQCODE;
 
   CALC_UNIT_OFFSET(top->size, offset, nsu);
 
@@ -958,8 +958,8 @@ static int appendMangledToCompressedSeq(SEQSEQ *top,
     top->nbit_symb = NBITS_ALPHABET;
     to_unit = 0;
   } else {
-    if (top->code != SEQCOD_COMPRESSED) 
-      return ERRCODE_SEQCODE; 
+    if (top->code != SEQCOD_COMPRESSED)
+      return ERRCODE_SEQCODE;
     to_unit = tsp[offset]>>((nsu-1)*NBITS_ALPHABET);
     if ((to_unit&ALPHABET_MASK) != SEQCOD_TERM)
       return ERRCODE_ASSERT;
@@ -972,7 +972,7 @@ static int appendMangledToCompressedSeq(SEQSEQ *top,
 	offset++;
 	to_unit = 0;
       }
-    } else 
+    } else
       to_unit >>= NBITS_ALPHABET;
   }
 
@@ -981,7 +981,7 @@ static int appendMangledToCompressedSeq(SEQSEQ *top,
   if (n_alloc >= top->alloc_size &&
       reallocSeqBlocks(top, n_alloc))
     return ERRCODE_NOMEM;
-  
+
   fsp = fromp->basep;
   tsp = (uint32_t *) top->basep;
   for (i=0; i<fromp->size; i++) {
@@ -1019,9 +1019,9 @@ static int reverseComplementSeq(SEQSEQ *sp, const SeqCodec *codecp)
   if ((codecp)) {
     if (sp->code == SEQCOD_MANGLED) {
       while (cp < ep) {
-	tmp = (*cp & SEQCOD_STDNT_TESTBIT)? 
+	tmp = (*cp & SEQCOD_STDNT_TESTBIT)?
 	  *cp: codecp->codtab_complement[(*cp)&SEQCOD_STDNT_MASK];
-	*cp++ = (*ep & SEQCOD_STDNT_TESTBIT)? 
+	*cp++ = (*ep & SEQCOD_STDNT_TESTBIT)?
 	  *ep: codecp->codtab_complement[(*ep)&SEQCOD_STDNT_MASK];
 	*ep-- = tmp;
       }
@@ -1030,10 +1030,10 @@ static int reverseComplementSeq(SEQSEQ *sp, const SeqCodec *codecp)
     } else { /* SEQCOD_ASCII */
       while (cp < ep) {
 	uc = codecp->codtab[(int) *cp];
-	tmp = (uc & SEQCOD_STDNT_TESTBIT)? 
+	tmp = (uc & SEQCOD_STDNT_TESTBIT)?
 	  *cp: codecp->decodtab[codecp->codtab_complement[uc&SEQCOD_STDNT_MASK]];
 	uc = codecp->codtab[(int) *ep];
-	*cp++ = (uc & SEQCOD_STDNT_TESTBIT)? 
+	*cp++ = (uc & SEQCOD_STDNT_TESTBIT)?
 	  *ep: codecp->decodtab[codecp->codtab_complement[uc&SEQCOD_STDNT_MASK]];
 	*ep-- = tmp;
       }
@@ -1055,7 +1055,7 @@ static int reverseComplementSeq(SEQSEQ *sp, const SeqCodec *codecp)
 
 static int readHeader(SEQSEQ *sp,
 #ifdef HAVE_ZLIB
-		      gzFile fp, 
+		      gzFile fp,
 #else
 		      FILE *fp,
 #endif
@@ -1086,13 +1086,13 @@ static int readHeader(SEQSEQ *sp,
   sp->code = SEQCOD_ASCII;
   sp->nbit_symb = NBITS_PER_BYTE;
   *prompt = (int) '\0';
-  
+
   top = sp->basep;
   nextp = bufp;
   i = 0;
 
   for(; !eol_flag && nextp;
-      nextp = 
+      nextp =
 #ifdef HAVE_ZLIB
 	gzgets(fp, bufp, LINBUFSIZ)
 #else
@@ -1132,16 +1132,16 @@ static int readHeader(SEQSEQ *sp,
   }
   *top= '\0';
   sp->size = i;
-  
+
   if (!nextp) {
-    errcode = 
+    errcode =
 #ifdef HAVE_ZLIB
       (gzeof(fp))? ERRCODE_EOF:ERRCODE_FILEIO;
 #else
     (ferror(fp))? ERRCODE_FILEIO: ERRCODE_EOF;
 #endif
   }
-  
+
   return errcode;
 }
 
@@ -1160,17 +1160,17 @@ static SEQLEN_t curtailSeqAtFirstSpace(SEQSEQ *sp)
   return sp->size;
 }
 
-static int readSeq(SEQSEQ *sp, 
+static int readSeq(SEQSEQ *sp,
 #ifdef HAVE_ZLIB
-		   gzFile fp, 
+		   gzFile fp,
 #else
 		   FILE *fp,
 #endif
 		   int *prompt)
-     /**< Read a chunk of sequence of bases or quality factors 
+     /**< Read a chunk of sequence of bases or quality factors
       * from a FASTA/FASTQ file in plain ASCII. Skip all white
       * space. Stop at a haeder prompt preceeded by whitespace
-      * including a new line or stop if EOF. The prompt is returned 
+      * including a new line or stop if EOF. The prompt is returned
       * to the input stream.
       */
 {
@@ -1213,7 +1213,7 @@ static int readSeq(SEQSEQ *sp,
 
       break;
     }
- 
+
     SEQ_REALLOC(sp, cp, i);
 
     *cp++ = c;
@@ -1228,14 +1228,14 @@ static int readSeq(SEQSEQ *sp,
 
 static int readSeqFast(SEQSEQ *sp,
 #ifdef HAVE_ZLIB
-		       gzFile fp, 
+		       gzFile fp,
 #else
 		       FILE *fp,
 #endif
 
 		       int *prompt, char bufp[LINBUFSIZ], SEQLEN_t minlen)
      /**< Like readSeq but read one line at the time
-      * on return, the next header line is in bufp. 
+      * on return, the next header line is in bufp.
       * \param sp Sequence structure.
       * \param fp Input file.
       * \param prompt Returns the FASTA/FASTQ prompt of the line.
@@ -1271,7 +1271,7 @@ static int readSeqFast(SEQSEQ *sp,
 	    *prompt = *cp;
 	    eos_flag = TRUE;
 	    continue;
-	  } 
+	  }
 	  was_newline = FALSE;
 	}
 	SEQ_REALLOC(sp, top, i);
@@ -1280,8 +1280,8 @@ static int readSeqFast(SEQSEQ *sp,
 	if (i>SEQ_MAXLEN) return ERRCODE_SEQLEN;
       }
     }
-  } while (!eos_flag && 
-	   (nextp = 
+  } while (!eos_flag &&
+	   (nextp =
 #ifdef HAVE_ZLIB
 	    gzgets(fp, bufp, LINBUFSIZ)
 #else
@@ -1299,7 +1299,7 @@ static int readSeqFast(SEQSEQ *sp,
     errcode = (ferror(fp))? ERRCODE_FILEIO: ERRCODE_EOF;
   clearerr(fp);
 #endif
- 
+
   return errcode;
 }
 
@@ -1329,7 +1329,7 @@ static int complementAsciiSeqInPlace(SEQSEQ *sp, const SeqCodec *codep)
   if (sp->code != SEQCOD_ASCII) return ERRCODE_SEQCODE;
   for (cp = sp->basep; *cp; cp++) {
     c = (unsigned char) codep->codtab[(int) *cp];
-    *cp = (c&SEQCOD_STDNT_TESTBIT)? 
+    *cp = (c&SEQCOD_STDNT_TESTBIT)?
       CODEC_UNKNOWN_CHAR: codep->alphabet[(~c)&SEQCOD_STDNT_MASK];
   }
   return ERRCODE_SUCCESS;
@@ -1342,8 +1342,8 @@ static int encodeSeq(SEQSEQ *sp, const SeqCodec *codep)
   char *cp;
   SEQLEN_t i;
 
-  if (sp->code != SEQCOD_ASCII) 
-    return (sp->code == SEQCOD_MANGLED)? 
+  if (sp->code != SEQCOD_ASCII)
+    return (sp->code == SEQCOD_MANGLED)?
       ERRCODE_SUCCESS: ERRCODE_SEQCODE;
   cp = sp->basep;
   for(i=0; i<sp->size; i++) {
@@ -1379,13 +1379,13 @@ static int compressSeq(SEQSEQ *sp)
     hp=EREALLOCP(sp->basep, NBYTES_PER_INT32+1);
     if (!hp) return ERRCODE_NOMEM;
     sp->basep = hp;
-    sp->alloc_size = NBYTES_PER_INT32+1; 
+    sp->alloc_size = NBYTES_PER_INT32+1;
   }
   sp->code = SEQCOD_COMPRESSED;
   sp->nbit_symb = NBITS_ALPHABET;
   top = (uint32_t *) sp->basep;
   unit_ctr=1;
-  
+
   fromp = sp->basep;
   for (i=0, nsu=MAXN_PER_UNIT-1, to_unit=0; i<sp->size; i++) {
     if (fromp[i]) {
@@ -1405,7 +1405,7 @@ static int compressSeq(SEQSEQ *sp)
 
   if (unit_ctr != sp->size/MAXN_PER_UNIT + 1) {
 #ifdef seq_debug
-    printf("seq_debug:compressChunk: length=%llu, number of 32-bit ints = %llu\n", 
+    printf("seq_debug:compressChunk: length=%llu, number of 32-bit ints = %llu\n",
 	   (unsigned long long) sp->size,
 	   (unsigned long long) unit_ctr);
 #endif
@@ -1428,11 +1428,11 @@ static int writeCompressedSeq(FILE *fp, SEQSEQ *sp)
   size_t n_unit;
   if (sp->code != SEQCOD_COMPRESSED) return ERRCODE_SEQCODE;
   n_unit = sp->size/MAXN_PER_UNIT + 1;
-  if (fwrite(sp->basep, sizeof(uint32_t), n_unit, fp) != n_unit) 
+  if (fwrite(sp->basep, sizeof(uint32_t), n_unit, fp) != n_unit)
     return ERRCODE_FAILURE;
   return ERRCODE_SUCCESS;
 }
-  
+
 static int readCompressedSeq(SEQSEQ *sp, FILE *fp)
      /**< Read a sequence of bases from a binary file in compressed form up
       * to termination code */
@@ -1444,8 +1444,8 @@ static int readCompressedSeq(SEQSEQ *sp, FILE *fp)
   SETSIZ_t l;
 
   is_terminated=0;
-  for (l=0, bytctr=0, cp = (uint32_t *) sp->basep; 
-       !is_terminated && l < SEQ_MAXLEN; 
+  for (l=0, bytctr=0, cp = (uint32_t *) sp->basep;
+       !is_terminated && l < SEQ_MAXLEN;
        cp++, bytctr += nbytes_uint32_t) {
 
     if (bytctr >= sp->alloc_size-nbytes_uint32_t) {
@@ -1453,7 +1453,7 @@ static int readCompressedSeq(SEQSEQ *sp, FILE *fp)
 	return ERRCODE_NOMEM;
       cp = (uint32_t *) (sp->basep + bytctr);
     }
- 
+
     if (fread(cp, nbytes_uint32_t, 1, fp) != 1)
       break;
 
@@ -1464,7 +1464,7 @@ static int readCompressedSeq(SEQSEQ *sp, FILE *fp)
       }
       l++;
     }
-  } 
+  }
   sp->size = l;
   sp->code = SEQCOD_COMPRESSED;
   if (!is_terminated) return ERRCODE_FILEFORM;
@@ -1473,7 +1473,7 @@ static int readCompressedSeq(SEQSEQ *sp, FILE *fp)
 }
 
 static int readCompressedSeqOfKnownLength(SEQSEQ *sp, FILE *fp, SETSIZ_t length)
-     /**< Read a sequence of known length in compressed format 
+     /**< Read a sequence of known length in compressed format
       * length is the number of nucleotides */
 {
   int errcode;
@@ -1488,7 +1488,7 @@ static int readCompressedSeqOfKnownLength(SEQSEQ *sp, FILE *fp, SETSIZ_t length)
   /* check if properly terminated */
   termoffs = n_units * MAXN_PER_UNIT - length - 1;
   cp = (uint32_t *) sp->basep;
-  if ((((cp[n_units-1]>>(termoffs*3))) & ALPHABET_MASK) != SEQCOD_TERM) 
+  if ((((cp[n_units-1]>>(termoffs*3))) & ALPHABET_MASK) != SEQCOD_TERM)
     return ERRCODE_FILEFORM;
   sp->size = length;
   sp->code = SEQCOD_COMPRESSED;
@@ -1497,12 +1497,12 @@ static int readCompressedSeqOfKnownLength(SEQSEQ *sp, FILE *fp, SETSIZ_t length)
 }
 
 static int uncompressSeq(SEQSEQ *ucp, SEQLEN_t tcpos[MAXN_TERMCHAR], UCHAR_t *ntc,
-			 const SEQSEQ *sp, 
-			 SETSIZ_t start, SETSIZ_t length, 
+			 const SEQSEQ *sp,
+			 SETSIZ_t start, SETSIZ_t length,
 			 const SeqCodec *codep)
-     /**< uncompress a segment of the sequence back to ASCII 
-      * \param tcpos Returns position of maximum MAXN_TERMCHAR positions of 
-      *        termination characters (can be null) 
+     /**< uncompress a segment of the sequence back to ASCII
+      * \param tcpos Returns position of maximum MAXN_TERMCHAR positions of
+      *        termination characters (can be null)
       * \param ntc Returns the number of termination codes found (can be null)
       */
 {
@@ -1512,12 +1512,12 @@ static int uncompressSeq(SEQSEQ *ucp, SEQLEN_t tcpos[MAXN_TERMCHAR], UCHAR_t *nt
   const uint32_t *fromp;
   SETSIZ_t ctr, offset;
   unsigned char code;
-  
+
   if (sp->code != SEQCOD_COMPRESSED) return ERRCODE_SEQCODE;
   if (start > sp->size) return ERRCODE_ARGRANGE;
   if (!(length) ||
       start + length > sp->size) length = sp->size-start;
-  if (ucp->alloc_size < length + 1 && 
+  if (ucp->alloc_size < length + 1 &&
       (reallocSeqBlocks(ucp, length + 1)))
     return ERRCODE_NOMEM;
   bufp  = ucp->basep;
@@ -1562,10 +1562,10 @@ static int decodeSeq(SEQSEQ *sp, const SeqCodec *codep)
   return ERRCODE_SUCCESS;
 }
 
-static int decodeSeqAsStandardNt(SEQSEQ *dep, 
-				 const SEQSEQ *sp, 
-				 SETSIZ_t start, 
-				 SETSIZ_t length, 
+static int decodeSeqAsStandardNt(SEQSEQ *dep,
+				 const SEQSEQ *sp,
+				 SETSIZ_t start,
+				 SETSIZ_t length,
 				 const SeqCodec *codep,
 				 char as_rcp)
      /**< Decode sequence as ASCII standard nucleotide codes (ACGT).
@@ -1578,14 +1578,14 @@ static int decodeSeqAsStandardNt(SEQSEQ *dep,
       *               entire sequence.
       * \param codep En/Decoder
       * \param as_rcp Flag, if !=0 return reverse complement.
-      *               Start position is given in forward direction. 
+      *               Start position is given in forward direction.
       */
 {
   char *bufp;
   unsigned char c;
   const unsigned char *fromp, *endp;
 
-  if (sp->code != SEQCOD_MANGLED) 
+  if (sp->code != SEQCOD_MANGLED)
     return ERRCODE_SEQCODE;
   if (start > sp->size) return ERRCODE_ARGRANGE;
   if (!(length) || length > sp->size) length = sp->size - start;
@@ -1599,7 +1599,7 @@ static int decodeSeqAsStandardNt(SEQSEQ *dep,
     fromp = endp + length;
     while(fromp>endp) {
       c = *--fromp;
-      *bufp++ = (c&SEQCOD_STDNT_TESTBIT)? 
+      *bufp++ = (c&SEQCOD_STDNT_TESTBIT)?
 	CODEC_UNKNOWN_CHAR: codep->alphabet[(~c)&SEQCOD_STDNT_MASK];
     }
   } else {
@@ -1632,7 +1632,7 @@ static int fprintSeqFastqHeader(void *top,
 #ifdef HAVE_ZLIB
 				BOOL_t is_gzipped,
 #endif
-				const SEQSEQ *sp, 
+				const SEQSEQ *sp,
 				int prompt)
 {
 #ifdef HAVE_ZLIB
@@ -1640,7 +1640,7 @@ static int fprintSeqFastqHeader(void *top,
   FILE *fp = (is_gzipped)? NULL: (FILE *) top;
 #else
   FILE *fp = (FILE *) top;
-#endif 
+#endif
 
   if (
 #ifdef HAVE_ZLIB
@@ -1649,7 +1649,7 @@ static int fprintSeqFastqHeader(void *top,
       (fputc(prompt, fp) == EOF)
       ) return ERRCODE_WRITEERR;
   if (sp != NULL) {
-    if (sp->code != SEQCOD_ASCII) 
+    if (sp->code != SEQCOD_ASCII)
       return ERRCODE_SEQCODE;
 #ifdef HAVE_ZLIB
     if (is_gzipped) {
@@ -1693,7 +1693,7 @@ static int fprintSeqFastqSequence(void *top,
   FILE *fp = (is_gzipped)? NULL: (FILE *) top;
 #else
   FILE *fp = (FILE *) top;
-#endif  
+#endif
 
 
   if (sp->code != SEQCOD_ASCII) return ERRCODE_SEQCODE;
@@ -1724,7 +1724,7 @@ static int fprintSeqFastqSequence(void *top,
       } else {
 #endif
 	fputs(buf, fp);
-	if (fputc('\n', fp) == EOF) 
+	if (fputc('\n', fp) == EOF)
 	  return ERRCODE_WRITEERR;
 #ifdef HAVE_ZLIB
       }
@@ -1735,7 +1735,7 @@ static int fprintSeqFastqSequence(void *top,
   return ERRCODE_SUCCESS;
 }
 
-   
+
 /******************************************************************************
  ************************ Private Methods of Type SeqFastq ********************
  ******************************************************************************/
@@ -1745,17 +1745,17 @@ static int readQual(SeqFastq *sqp, SeqIO *ifp)
   int this_prompt;
 
   /* read sequence of quality factors if present */
-  if (sqp->qheadp == NULL && 
+  if (sqp->qheadp == NULL &&
       (sqp->qheadp = createSeq(sqp->headp->block_size)) == NULL)
     return ERRCODE_NOMEM;
 
-  if ((ifp->status = readHeader(sqp->qheadp, ifp->fp, 
-				&this_prompt, ifp->linbufp))) 
+  if ((ifp->status = readHeader(sqp->qheadp, ifp->fp,
+				&this_prompt, ifp->linbufp)))
     return ifp->status;
- 
+
   if (this_prompt != FASTQ_PROMPT_QUAL)  /* expect a FASTQ prompt */
     return (ifp->status = ERRCODE_FASTA);
-    
+
   if (sqp->qualp == NULL &&
       (sqp->qualp = createSeq(sqp->datap->block_size)) == NULL)
     return ifp->status = ERRCODE_NOMEM;
@@ -1787,7 +1787,7 @@ SeqFastq *seqFastqCreate(int blocksize, char type)
        !(sqp->qualp = createSeq(blocksize)))) {
     seqFastqDelete(sqp);
     sqp = NULL;
-  }  
+  }
   return sqp;
 }
 
@@ -1829,7 +1829,7 @@ int seqFastqCheck(const SeqFastq *sqp)
   if (sqp->type == SEQTYP_FASTQ &&
       (sqp->qualp == NULL || sqp->datap->size != sqp->qualp->size))
     return ERRCODE_FAILURE;
-  
+
   return checkSeqNtSymbolsAreLetters(sqp->datap);
 }
 
@@ -1854,11 +1854,11 @@ int seqFastqSetType(SeqFastq *sqp, char type)
   }
   sqp->type = type;
 
-  return errcode;   
+  return errcode;
 }
 
 int seqFastqSetAscii(SeqFastq *sqp,
-		     const char *name, const char *seqp, 
+		     const char *name, const char *seqp,
 		     const char *name_qual, const char *qualp)
 {
   int errcode;
@@ -1868,7 +1868,7 @@ int seqFastqSetAscii(SeqFastq *sqp,
 
   if ((seqp) && (errcode = setSeq(sqp->datap, seqp)))
     return errcode;
-  
+
   if ((name_qual)) {
     if (!(sqp->qheadp ||
 	  (sqp->qheadp = createSeq(BLOCKSIZE_HEADER))))
@@ -1884,7 +1884,7 @@ int seqFastqSetAscii(SeqFastq *sqp,
       return ERRCODE_NOMEM;
     if ((errcode = setSeq(sqp->qualp, qualp)))
       return errcode;
- 
+
     if (sqp->datap->size != sqp->qualp->size) return ERRCODE_QUALLEN;
   } else if (sqp->type != SEQTYP_FASTQ || !(sqp->qualp) ||
 	     sqp->datap->size != sqp->qualp->size) {
@@ -1910,17 +1910,17 @@ int seqFastqSetQual(SeqFastq *sqp, const char qval)
     sqp->qualp->basep[i] = qval;
   sqp->qualp->basep[i] = '\0';
   sqp->qualp->size = i;
-  
+
   sqp->type = SEQTYP_FASTQ;
 
   return ERRCODE_SUCCESS;
 }
-  
-int seqFastqAppendSegment(SeqFastq *top, const SeqFastq *fromp, 
-			  SEQLEN_t start, SEQLEN_t length, 
+
+int seqFastqAppendSegment(SeqFastq *top, const SeqFastq *fromp,
+			  SEQLEN_t start, SEQLEN_t length,
 			  char reverse, const SeqCodec *codep)
 {
-  int errcode; 
+  int errcode;
   if ((errcode = appendSeqSegment(top->datap, NULL, NULL, fromp->datap, start, length,
 				  reverse, 0, codep)))
     return errcode;
@@ -1929,17 +1929,17 @@ int seqFastqAppendSegment(SeqFastq *top, const SeqFastq *fromp,
       (errcode = appendSeqSegment(top->headp, NULL, NULL, fromp->headp, 0, 0, 0, 0, NULL)))
       return errcode;
 
-  if (top->type == SEQTYP_UNKNOWN) top->type = fromp->type; 
+  if (top->type == SEQTYP_UNKNOWN) top->type = fromp->type;
 
   if (fromp->qualp == NULL ||
-      fromp->qualp->size < 1) 
+      fromp->qualp->size < 1)
     return errcode;
-  
+
   if (top->qualp == NULL &&
       ((top->qualp = createSeq(top->datap->block_size)) == NULL))
     return ERRCODE_NOMEM;
 
-  if ((errcode = appendSeqSegment(top->qualp, NULL, NULL, fromp->qualp, 
+  if ((errcode = appendSeqSegment(top->qualp, NULL, NULL, fromp->qualp,
 				  start, length,
 				  reverse, 0, NULL)))
     return errcode;
@@ -1969,7 +1969,7 @@ int seqFastqRead(SeqFastq *sqp, SeqIO *ifp)
   while (this_prompt == FASTQ_PROMPT_QUAL) {
 
     if ((ifp->status = readHeader(sqp->headp, ifp->fp,
-				  &this_prompt, ifp->linbufp))) 
+				  &this_prompt, ifp->linbufp)))
       return ifp->status;
     ifp->status = readSeqFast(sqp->datap, ifp->fp,
 			      &next_prompt, ifp->linbufp, 0);
@@ -1982,7 +1982,7 @@ int seqFastqRead(SeqFastq *sqp, SeqIO *ifp)
   }
   errcode = readQual(sqp, ifp);
 
-  if (!(errcode) && sqp->type == SEQTYP_FASTQ && 
+  if (!(errcode) && sqp->type == SEQTYP_FASTQ &&
       sqp->datap->size != sqp->qualp->size)
     errcode = ERRCODE_FASTA;
 
@@ -2004,14 +2004,14 @@ int seqFastqFind(SeqFastq *sqp, const char *nam, SeqIO *ifp)
     curtailSeqAtFirstSpace(sqp->headp);
     cmp = strcmp(sqp->headp->basep, nam);
   }
-  if (ifp->status) 
+  if (ifp->status)
     return ifp->status;
   if (cmp) return ERRCODE_FAILURE;
 
   ifp->status = readSeq(sqp->datap, ifp->fp,
 			&next_prompt);
   if (ifp->status ||
-      sqp->type == SEQTYP_FASTA || 
+      sqp->type == SEQTYP_FASTA ||
       next_prompt != FASTQ_PROMPT_QUAL) {
     sqp->type = SEQTYP_FASTA;
     return (ifp->status == ERRCODE_EOF)? ERRCODE_SUCCESS: ifp->status;
@@ -2027,7 +2027,7 @@ int seqFastqWrite(SeqIO *ofp, const SeqFastq *sqp, short linewidth)
   if (ofp->mode ==  SEQIO_READ) return ERRCODE_NOWRITE;
 
   if (ofp->status) return ofp->status;
-    
+
   if (sqp->type == SEQTYP_FASTA) {
     cprompt = FASTA_PROMPT;
   } else if (sqp->type == SEQTYP_FASTQ) {
@@ -2036,13 +2036,13 @@ int seqFastqWrite(SeqIO *ofp, const SeqFastq *sqp, short linewidth)
     return ERRCODE_SEQTYP;
   }
 
-  ofp->status = fprintSeqFastqHeader(ofp->fp, 
+  ofp->status = fprintSeqFastqHeader(ofp->fp,
 #ifdef HAVE_ZLIB
 				     (ofp->flags & SEQIOFLG_GZIP) != 0,
 #endif
 				     sqp->headp, cprompt);
-  if (!ofp->status) 
-    ofp->status = fprintSeqFastqSequence(ofp->fp, 
+  if (!ofp->status)
+    ofp->status = fprintSeqFastqSequence(ofp->fp,
 #ifdef HAVE_ZLIB
 					 (ofp->flags & SEQIOFLG_GZIP) != 0,
 #endif
@@ -2050,13 +2050,13 @@ int seqFastqWrite(SeqIO *ofp, const SeqFastq *sqp, short linewidth)
   if (ofp->status || sqp->type != SEQTYP_FASTQ || sqp->qualp == NULL)
     return ofp->status;
 
-  ofp->status = fprintSeqFastqHeader(ofp->fp, 
+  ofp->status = fprintSeqFastqHeader(ofp->fp,
 #ifdef HAVE_ZLIB
 				     (ofp->flags & SEQIOFLG_GZIP) != 0,
 #endif
 				     sqp->qheadp, FASTQ_PROMPT_QUAL);
-  if (!ofp->status) 
-    ofp->status = fprintSeqFastqSequence(ofp->fp, 
+  if (!ofp->status)
+    ofp->status = fprintSeqFastqSequence(ofp->fp,
 #ifdef HAVE_ZLIB
 					 (ofp->flags & SEQIOFLG_GZIP) != 0,
 #endif
@@ -2069,33 +2069,33 @@ int seqFastqWriteCompressedToFile(FILE *fp, const SeqFastq *sqp)
   if (!sqp) return ERRCODE_NULLPTR;
   return writeCompressedSeq(fp, sqp->datap);
 }
-  
+
 /* Accessors of type SeqFastq */
-const char *seqFastqGetConstSequence(const SeqFastq *sfqp, 
-				     SEQLEN_t *length, 
-				     char *codtyp) 
+const char *seqFastqGetConstSequence(const SeqFastq *sfqp,
+				     SEQLEN_t *length,
+				     char *codtyp)
 {
     if (!sfqp) {
       if (length)
 	*length = 0;
 	return NULL;
     }
-    if ((length) && sfqp->datap->size < SEQLEN_MAX) 
+    if ((length) && sfqp->datap->size < SEQLEN_MAX)
       *length = (SEQLEN_t) sfqp->datap->size;
     if (codtyp) *codtyp = sfqp->datap->code;
     return sfqp->datap->basep;
 }
 
-char *seqFastqGetSequence(SeqFastq *sfqp, 
-			  SEQLEN_t *length, 
-			  char *codtyp) 
+char *seqFastqGetSequence(SeqFastq *sfqp,
+			  SEQLEN_t *length,
+			  char *codtyp)
 {
     if (!sfqp) {
       if (length)
 	*length = 0;
 	return NULL;
     }
-    if (length && sfqp->datap->size < SEQLEN_MAX) 
+    if (length && sfqp->datap->size < SEQLEN_MAX)
       *length = (SEQLEN_t) sfqp->datap->size;
     if (codtyp) *codtyp = sfqp->datap->code;
     return sfqp->datap->basep;
@@ -2108,7 +2108,7 @@ const char *seqFastqGetConstQualityFactors(const SeqFastq *sfqp, SEQLEN_t *lengt
     if (length) *length = 0;
     return NULL;
   }
-  if (length && sfqp->qualp->size < SEQLEN_MAX) 
+  if (length && sfqp->qualp->size < SEQLEN_MAX)
     *length = (SEQLEN_t) sfqp->qualp->size;
   if (code) *code = sfqp->qualp->code;
   return sfqp->qualp->basep;
@@ -2121,7 +2121,7 @@ char *seqFastqGetQualityFactors(SeqFastq *sfqp, SEQLEN_t *length, char *code)
     if (length) *length = 0;
     return NULL;
   }
-  if (length && sfqp->qualp->size < SEQLEN_MAX) 
+  if (length && sfqp->qualp->size < SEQLEN_MAX)
      *length = (SEQLEN_t) sfqp->qualp->size;
   if (code) *code = sfqp->qualp->code;
   return sfqp->qualp->basep;
@@ -2160,7 +2160,7 @@ int seqFastqCompress(SeqFastq *sqp)
 
 
 int seqFastqUncompress(SeqFastq *ucp, const SeqFastq *sqp,
-		       SEQLEN_t start, SEQLEN_t length, 
+		       SEQLEN_t start, SEQLEN_t length,
 		       const SeqCodec *codep, char as_rcp)
 {
   int errcode;
@@ -2170,7 +2170,7 @@ int seqFastqUncompress(SeqFastq *ucp, const SeqFastq *sqp,
   blankSeq(ucp->headp);
   if ((errcode = appendSeqSegment(ucp->headp, NULL, NULL, sqp->headp, 0, 0, 0, 0, NULL)))
     return errcode;
-  if (as_rcp && 
+  if (as_rcp &&
       ((errcode = reverseSeqInPlace(ucp->datap)) ||
        (errcode = complementAsciiSeqInPlace(ucp->datap, codep))))
     return errcode;
@@ -2198,7 +2198,7 @@ int seqFastqReadCompressedBinary(SeqFastq *sqp, FILE *fp, const char *label)
   return errcode;
 }
 
-int seqFastqReadCompressedBinaryOfKnownLength(SeqFastq *sqp, FILE *fp, SEQLEN_t len, 
+int seqFastqReadCompressedBinaryOfKnownLength(SeqFastq *sqp, FILE *fp, SEQLEN_t len,
 					      const char *label)
 {
   int errcode = readCompressedSeqOfKnownLength(sqp->datap, fp, len);
@@ -2211,8 +2211,8 @@ int seqFastqReadCompressedBinaryOfKnownLength(SeqFastq *sqp, FILE *fp, SEQLEN_t 
 }
 
 
-int seqFastqDecodeAsStandardNt(SeqFastq *dep, const SeqFastq *sqp, 
-			       SEQLEN_t start, SEQLEN_t length, 
+int seqFastqDecodeAsStandardNt(SeqFastq *dep, const SeqFastq *sqp,
+			       SEQLEN_t start, SEQLEN_t length,
 			       const SeqCodec *codep,
 			       char as_rcp)
      /* threre is still a problem for as_rcp != 0 */
@@ -2223,7 +2223,7 @@ int seqFastqDecodeAsStandardNt(SeqFastq *dep, const SeqFastq *sqp,
   if (!errcode && dep->type == SEQTYP_FASTQ) {
     if (sqp->type == SEQTYP_FASTQ)
       errcode = appendSeqSegment(dep->qualp, NULL, NULL, sqp->qualp, start, length, as_rcp, 0, NULL);
-    else 
+    else
       errcode = ERRCODE_SEQTYP;
   }
   return errcode;
@@ -2259,13 +2259,13 @@ static int reallocSeqSetName(SeqSet *ssp, size_t len)
   size_t nsiz;
   char *hp;
 
-  if (len < 1) 
+  if (len < 1)
     return ERRCODE_ARGRANGE;
   nsiz = (((len-1)/ssp->nam_blocksiz)+1)*ssp->nam_blocksiz;
-  
-  if (nsiz > INT_MAX) 
+
+  if (nsiz > INT_MAX)
     return ERRCODE_OVERFLOW;
-			
+
   hp = EREALLOCP(ssp->namebasep, nsiz);
   if (!hp) return ERRCODE_NOMEM;
 
@@ -2290,12 +2290,12 @@ SeqSet *seqSetCreate(int blocksiz, UCHAR_t flags)
   ssp->sqp = createSeq(blocksiz);
   if ((flags & SEQSET_BASQUAL))
     ssp->qqp = createSeq(blocksiz);
-    
+
   ECALLOCP(blocksiz, ssp->sop);
   ECALLOCP(blocksiz, ssp->namoffs);
   ECALLOCP(SEQSET_NAMBLOCKSIZ_DEFAULT, ssp->namebasep);
 
-  if (!(ssp->sqp) || ((flags & SEQSET_BASQUAL) && !(ssp->qqp)) || 
+  if (!(ssp->sqp) || ((flags & SEQSET_BASQUAL) && !(ssp->qqp)) ||
       !(ssp->sop) || !(ssp->namoffs) || !(ssp->namebasep)) {
     seqSetDelete(ssp);
     return 0;
@@ -2303,7 +2303,7 @@ SeqSet *seqSetCreate(int blocksiz, UCHAR_t flags)
   ssp->nam_blocksiz = SEQSET_NAMBLOCKSIZ_DEFAULT;
   ssp->n_alloc = ssp->blocksiz = blocksiz;
   ssp->nam_alloc = ssp->nam_blocksiz;
-  
+
   return ssp;
 }
 
@@ -2332,8 +2332,8 @@ int seqSetAddSequence(SeqSet *ssp, const SeqFastq *sqp)
   int errcode;
   char *cp;
   SETSIZ_t namsiz;
- 
-  if (sqp->datap->code == SEQCOD_COMPRESSED) 
+
+  if (sqp->datap->code == SEQCOD_COMPRESSED)
     return ERRCODE_SEQCODE;
 
   if ((ssp->statusflag&SEQSET_COMPRESSED)) {
@@ -2347,36 +2347,36 @@ int seqSetAddSequence(SeqSet *ssp, const SeqFastq *sqp)
   if (ssp->n_seq+1 >= (SEQNUM_t) SEQNUM_MAX)
     return ERRCODE_SEQNUMSET;
 
-  if ((ssp->statusflag & SEQSET_BASQUAL) && 
+  if ((ssp->statusflag & SEQSET_BASQUAL) &&
       (sqp->qualp == NULL || sqp->type != SEQTYP_FASTQ))
     return ERRCODE_SEQTYP;
 
   if (ssp->statusflag&SEQSET_COMPRESSED) {
-    errcode = appendMangledToCompressedSeq(ssp->sqp, sqp->datap, 
+    errcode = appendMangledToCompressedSeq(ssp->sqp, sqp->datap,
 					  (ssp->statusflag & SEQSET_TERMCHAR)>0);
   } else {
-    errcode = appendSeqSegment(ssp->sqp, NULL, NULL, sqp->datap, 0, 0, 0, 
+    errcode = appendSeqSegment(ssp->sqp, NULL, NULL, sqp->datap, 0, 0, 0,
 			       (ssp->statusflag & SEQSET_TERMCHAR)>0,NULL);
   }
   if ((errcode))
     return errcode;
 
   if ((ssp->statusflag & SEQSET_BASQUAL) &&
-      (errcode = appendSeqSegment(ssp->qqp, NULL, NULL, sqp->qualp, 0, 0, 0, 
+      (errcode = appendSeqSegment(ssp->qqp, NULL, NULL, sqp->qualp, 0, 0, 0,
 				  (ssp->statusflag & SEQSET_TERMCHAR)>0,NULL)))
     return errcode;
 
   if (ssp->n_seq+1 >= ssp->n_alloc &&
       (errcode = reallocSeqSet(ssp, ssp->n_seq+2)))
     return errcode;
-  
+
   ssp->sop[ssp->n_seq+1] =  ssp->sop[ssp->n_seq] + sqp->datap->size;
   if (ssp->statusflag & SEQSET_TERMCHAR) {
     ssp->sop[ssp->n_seq+1]++;
   }
 
   namsiz = (ssp->n_seq > 0)? ssp->namoffs[ssp->n_seq]: 0;
-  if (sqp->headp->size + namsiz >= ssp->nam_alloc && 
+  if (sqp->headp->size + namsiz >= ssp->nam_alloc &&
       (errcode = reallocSeqSetName(ssp, sqp->headp->size + namsiz + 1)))
     return errcode;
 
@@ -2388,10 +2388,10 @@ int seqSetAddSequence(SeqSet *ssp, const SeqFastq *sqp)
   return ERRCODE_SUCCESS;
 }
 
-int seqSetAddFromFastqFile(ErrMsg *errmsg, SeqSet *ssp, 
+int seqSetAddFromFastqFile(ErrMsg *errmsg, SeqSet *ssp,
 			   SeqFastq *sqbufp,
-			   const SeqCodec *codecp, 
-			   const char *filnam, 
+			   const SeqCodec *codecp,
+			   const char *filnam,
 			   char verbose)
 {
   int errcode = ERRCODE_SUCCESS;
@@ -2403,13 +2403,13 @@ int seqSetAddFromFastqFile(ErrMsg *errmsg, SeqSet *ssp,
     seqIOclose(sfp);
     ERRMSGNO(errmsg, errcode);
   }
-  if (verbose) 
+  if (verbose)
     printf("File %s opened for reading sequences in FASTA/FASTQ format ...\n",
 	   filnam);
 
-  sctr = 0; 
+  sctr = 0;
   while(!seqIOstatus(sfp)) {
-    if (verbose) 
+    if (verbose)
       printf("Reading sequence %llu ...\n", (unsigned long long) sctr++);
     if ((errcode = seqFastqRead(sqbufp, sfp)))
       ERRMSGNO(errmsg, errcode);
@@ -2418,12 +2418,12 @@ int seqSetAddFromFastqFile(ErrMsg *errmsg, SeqSet *ssp,
     if ((errcode = seqSetAddSequence(ssp, sqbufp)))
       ERRMSGNO(errmsg, errcode);
   }
-  if (seqIOstatus(sfp) && 
-      seqIOstatus(sfp) != ERRCODE_EOF) 
+  if (seqIOstatus(sfp) &&
+      seqIOstatus(sfp) != ERRCODE_EOF)
     ERRMSGNO(errmsg, seqIOstatus(sfp));
   seqIOclose(sfp);
 
-  if ((ssp->statusflag & SEQSET_BASQUAL) && 
+  if ((ssp->statusflag & SEQSET_BASQUAL) &&
       (ssp->sqp->size != ssp->qqp->size))
      return ERRCODE_ASSERT;
 
@@ -2436,7 +2436,7 @@ int seqSetAddFromFastqFile(ErrMsg *errmsg, SeqSet *ssp,
 int seqSetCompress(SeqSet *ssp, const SeqCodec *codecp)
 {
   int errcode = ERRCODE_SUCCESS;
-  if (!(ssp->statusflag & SEQSET_COMPRESSED) && 
+  if (!(ssp->statusflag & SEQSET_COMPRESSED) &&
       ssp->sqp->code == SEQCOD_ASCII &&
       (errcode = encodeSeq(ssp->sqp, codecp)))
     return errcode;
@@ -2474,7 +2474,7 @@ int seqSetWriteBinFil(const SeqSet *ssp, const char *filnam)
   headval[6] = (uint32_t) ssp->statusflag;
   headval[7] = (uint32_t) 0;
 
-  /* calculate space occupied by name offsets as multiple of 
+  /* calculate space occupied by name offsets as multiple of
    * 32-bit integer */
   seqnamsiz = (ssp->namoffs[ssp->n_seq]-1)/NBYTES_PER_INT32+1;
   seqsiz = ssp->sqp->size/MAXN_PER_UNIT+1;
@@ -2509,9 +2509,9 @@ int seqSetWriteBinFil(const SeqSet *ssp, const char *filnam)
 
   /* write base qualities */
   if (!errcode && (ssp->statusflag & SEQSET_BASQUAL)) {
-    if (ssp->sqp->size != ssp->qqp->size) 
+    if (ssp->sqp->size != ssp->qqp->size)
       errcode = ERRCODE_ASSERT;
-    else 
+    else
       fwrite(ssp->qqp->basep, sizeof(char), ssp->qqp->size+1, fp);
   }
 
@@ -2525,7 +2525,7 @@ SeqSet *seqSetReadBinFil(int *errcode, const char *filnam)
   uint32_t totsiz, version;
   uint32_t headsiz = SEQSET_HEADLEN;
   SEQNUM_t i, seqnum_dat;
-  
+
   uint32_t *seqlenp = NULL;
   uint64_t seqsiz, namsiz, seqnum;
   SETSIZ_t j;
@@ -2548,7 +2548,7 @@ SeqSet *seqSetReadBinFil(int *errcode, const char *filnam)
     fclose(fp);
     return 0;
   }
-  
+
   if (version == SEQSET_FORMAT_VERSION) {
     seqnum = (((uint64_t) header[1])<<NUM_32BIT) + header[0];
     namsiz = (((uint64_t) header[3])<<NUM_32BIT) + header[2];
@@ -2598,12 +2598,12 @@ SeqSet *seqSetReadBinFil(int *errcode, const char *filnam)
     *errcode = ERRCODE_NOMEM;
   if (!(*errcode))
     *errcode = reallocSeqSetName(ssp, namsiz);
-  
+
   if (!(*errcode) &&
       ECALLOCP(seqnum_dat, seqlenp) == NULL)
     *errcode =  ERRCODE_NOMEM;
 
-  
+
   if (!(*errcode) &&
       fread(ssp->namebasep, sizeof(char), namsiz, fp) != namsiz)
     *errcode = ERRCODE_FILEFORM;
@@ -2613,18 +2613,18 @@ SeqSet *seqSetReadBinFil(int *errcode, const char *filnam)
     fclose(fp);
     return 0;
   }
-    
+
   /* set sequence name pointers */
   ssp->namoffs[0] = 0;
   for (i=1, j=0; j<namsiz && i<= (SEQNUM_t) seqnum; j++)
     if (!(ssp->namebasep[j]))
       ssp->namoffs[i++] = j+1;
 
-  if (i-1 != (SEQNUM_t) seqnum || 
+  if (i-1 != (SEQNUM_t) seqnum ||
       ssp->namoffs[seqnum] != namsiz) {
     *errcode = ERRCODE_ASSERT;
   } else {
-    if (fread(seqlenp, sizeof(uint32_t), 
+    if (fread(seqlenp, sizeof(uint32_t),
 	      seqnum_dat, fp) != (size_t) seqnum_dat) {
       *errcode = ERRCODE_FILEFORM;
     } else {
@@ -2684,22 +2684,22 @@ SEQNUM_t seqSetGetOffsets(const SeqSet *ssp, const SETSIZ_t **soffs)
   if (soffs) *soffs = ssp->sop;
   return ssp->n_seq;
 }
-    
+
 int seqSetFetchSegment(SeqFastq *sqp,
-		       SETSIZ_t *offs_start, SETSIZ_t *offs_end, 
+		       SETSIZ_t *offs_start, SETSIZ_t *offs_end,
 		       const SeqSet *ssp, const SeqCodec *codecp)
 {
   int errcode;
   UCHAR_t ntc = 0;
   BOOL_t with_qual = (ssp->statusflag & SEQSET_BASQUAL) && (sqp->type == SEQTYP_FASTQ);
   SEQLEN_t len, os, oe, tcpos[MAXN_TERMCHAR];
-  
+
   if (*offs_start >= ssp->sop[ssp->n_seq] || *offs_start >= *offs_end ||
       *offs_end >= ssp->sqp->size)
     return ERRCODE_ARGRANGE;
   len = *offs_end - *offs_start + 1;
   blankSeq(sqp->datap);
-  if (with_qual) 
+  if (with_qual)
     blankSeq(sqp->qualp);
 
   if ((ssp->statusflag&SEQSET_COMPRESSED)) {
@@ -2739,37 +2739,37 @@ int seqSetFetchSegment(SeqFastq *sqp,
 }
 
 int seqSetFetchSegmentBySequence(SeqFastq *sqp, SEQNUM_t seqidx,
-				 SEQLEN_t offs, SEQLEN_t len, 
+				 SEQLEN_t offs, SEQLEN_t len,
 				 const SeqSet *ssp, const SeqCodec *codecp)
 {
   int errcode;
   BOOL_t with_qual = (ssp->statusflag & SEQSET_BASQUAL) && (sqp->type == SEQTYP_FASTQ);
   SEQLEN_t slen;
-  
+
   if (seqidx >= ssp->n_seq)
     return ERRCODE_ARGRANGE;
 
   slen = ssp->sop[seqidx+1] - ssp->sop[seqidx];
   if (slen>0 && (ssp->statusflag & SEQSET_TERMCHAR)) slen--;
-  if (offs >= slen) 
+  if (offs >= slen)
     return ERRCODE_SEQOFFS;
   if (len < 1) len = slen;
   if (offs + len > slen) {
     len = slen - offs;
-  } 
+  }
   blankSeq(sqp->datap);
   if ((with_qual))
     blankSeq(sqp->qualp);
 
   if ((ssp->statusflag & SEQSET_COMPRESSED))
-    errcode = uncompressSeq(sqp->datap, NULL, NULL, ssp->sqp, 
+    errcode = uncompressSeq(sqp->datap, NULL, NULL, ssp->sqp,
 			    ssp->sop[seqidx]+offs, len, codecp);
   else
-    errcode = appendSeqSegment(sqp->datap, NULL, NULL, ssp->sqp, 
+    errcode = appendSeqSegment(sqp->datap, NULL, NULL, ssp->sqp,
 			       ssp->sop[seqidx]+offs, len, 0, 0, NULL);
 
-  if (!(errcode) && (with_qual)) 
-    errcode = appendSeqSegment(sqp->qualp, NULL, NULL, ssp->qqp, 
+  if (!(errcode) && (with_qual))
+    errcode = appendSeqSegment(sqp->qualp, NULL, NULL, ssp->qqp,
 			       ssp->sop[seqidx]+offs, len, 0, 0, NULL);
 
   return errcode;
@@ -2783,7 +2783,7 @@ int seqSetGetIndexAndOffset(SEQNUM_t *seqidx, SEQLEN_t *seqoffs, SETSIZ_t offs, 
   if (offs >= ssp->sop[ssp->n_seq])
     return ERRCODE_ARGRANGE;
 
-  if (ssp->n_seq < 1) 
+  if (ssp->n_seq < 1)
     return ERRCODE_FAILURE;
 
   a = 0;
@@ -2823,7 +2823,7 @@ SEQNUM_t seqSetGetSeqNumAndTotLen(SETSIZ_t *totseqlen, const SeqSet *ssp)
     if (ssp->statusflag & SEQSET_TERMCHAR) {
       if (*totseqlen > (SETSIZ_t) ssp->n_seq)
 	*totseqlen -= ssp->n_seq;
-      else 
+      else
 	*totseqlen = 0;
     }
   }

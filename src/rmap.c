@@ -3,7 +3,7 @@
 /*****************************************************************************
  *****************************************************************************
  *                                                                           *
- *  Copyright (C) 2010 - 2014 Genome Research Ltd.                           * 
+ *  Copyright (C) 2010 - 2014 Genome Research Ltd.                           *
  *                                                                           *
  *  Author: Hannes Ponstingl (hp3@sanger.ac.uk)                              *
  *                                                                           *
@@ -51,7 +51,7 @@ enum {
   HITINFO_BLKSZ =  1024,        /**< Block size for hit info */
   HITBINS_TARGETNUM = 8192,     /**< Number of hit bins for filtering ktuple hits */
   HITFILTR_BLKSZ = 128,         /**< Block size for hit filter */
-  SEGLST_BLOCKSIZ = 64*1024,    /**< memory allocation block size for segment list */ 
+  SEGLST_BLOCKSIZ = 64*1024,    /**< memory allocation block size for segment list */
   SEGCANDS_BLOCKSIZ = 32*1024,  /**< memory allocation block size for candidate segments */
   RMAPCANDS_BLOCKSIZ = 512,     /**< memory allocation block size for filtered candidate segments */
   EDGELEN_MAX = 500,            /**< maximum edge length */
@@ -65,16 +65,16 @@ enum {
   NUM_STRANDS = 2,              /**< For loops over forward [0] and reverse [1] strands */
   FILTERIVALEXT = 30,           /**< Extenstion (% of read length) for search intervals of
 				 *   paired reads.*/
-  FILTERIVAL_BLKSZ = 1028,      /**< Block size for momory allocation for array of search 
+  FILTERIVAL_BLKSZ = 1028,      /**< Block size for momory allocation for array of search
 				 * intervals */
-  MAPSCORE_UNIQUE_MAPPED_1ST = 20, /**< Mapping score threshold that defines a 'unique' hit for 
-				    * the rare mate which is mapped first. If the mapping score 
-				    * satisfies this threshold, the 2nd mate is found via a 
+  MAPSCORE_UNIQUE_MAPPED_1ST = 20, /**< Mapping score threshold that defines a 'unique' hit for
+				    * the rare mate which is mapped first. If the mapping score
+				    * satisfies this threshold, the 2nd mate is found via a
 				    * restricted mapping */
   MAXNUM_PAIRS_TOTAL = 1028,     /**< Maximum number of pairs to be considered */
   MAXNUM_PAIRS_PROPER = 2,      /**< Maximum number of pairs to consider when looking for
 				 * proper pairs */
-  KTUPCOUNT_REDUCTION_FACTOR = 2, /**< Reduce the minimum count of k-tuples by this amount when 
+  KTUPCOUNT_REDUCTION_FACTOR = 2, /**< Reduce the minimum count of k-tuples by this amount when
 				   * filtering bins */
   KTUPCOUNT_PERBIN_THRESHOLD = 2, /**< Minimum number of ktuple hits for a bin to pass filtering */
   KTUPCOUNT_THRESHOLD_FOR_BINNING = 256, /**< If the number of k-tuple counts is above that threshold,
@@ -82,7 +82,7 @@ enum {
   SEED_PERCENTILE = 80,          /**< uses only least frequent seeds as percentage of total */
   MINLEN_QUERY_STRIPED = 32,     /**< minimum read length Smith-Waterman using SIMD */
   BWSCAL_QLEN = 16*3,            /**< The length of the profiled sequence must be less than the bandwidth
-				  * times BWSCAL_QLEN so that it pays to run vectorised rather than 
+				  * times BWSCAL_QLEN so that it pays to run vectorised rather than
 				  * in the band and scalar. */
   MINSCOR_BELOW_MAX_BEST = 0,    /**< look only for best mapping */
   MINSCOR_BELOW_MAX_ALL = -1,    /**< consider all mappings */
@@ -150,7 +150,7 @@ typedef struct RMAPPROF_ {
   ScoreProfile *scorprofRCp; /**< Profile for reverse complement of read */
 } RMAPPROF;
 
-struct RMap_ {  
+struct RMap_ {
   RMAPBUFF *bfp;  /**< Buffers for mapping a single read */
   RMAPPROF *prp;  /**< Profile for read */
   RMAPPROF *pmp;  /**< Profile for mate */
@@ -175,7 +175,7 @@ static const float MINFRACT_MAXSCOR_2ND = 0.8;
 /******************************************************************************
  ******************************* Private Methods ******************************
  ******************************************************************************/
-static BOOL scorIsAboveFractMax(int scor_read, int scor_mate, float fract, 
+static BOOL scorIsAboveFractMax(int scor_read, int scor_mate, float fract,
 				const SeqFastq *readp, const SeqFastq *matep)
 {
   SEQLEN_t rlen, mlen;
@@ -218,7 +218,7 @@ static int tryUngappedAlignment(int *maxscor,
   for (j=0; j<maxlen && (rstr[j]) && (qstr[j]); j++) {
     if (!(rstr[j]&SEQCOD_STDNT_TESTBIT) && !(qstr[j]&SEQCOD_STDNT_TESTBIT)) {
       if ((qstr[j]&SEQCOD_STDNT_MASK) == (rstr[j]&SEQCOD_STDNT_MASK)) {
-	if (mmconsec_ctr) 
+	if (mmconsec_ctr)
 	  mmconsec_ctr--;
 	swscor += DEFAULT_SCORE_MATCH;
 	if (swscor > *maxscor)
@@ -240,17 +240,17 @@ static int tryUngappedAlignment(int *maxscor,
 static uint32_t calcMinKtup(uint32_t *mincover, const HashTable *htp)
 {
   UCHAR nskip;
-  UCHAR ktup = hashTableGetKtupLen(htp, &nskip); 
+  UCHAR ktup = hashTableGetKtupLen(htp, &nskip);
   uint32_t minktup = (*mincover >= ktup + nskip)? ((*mincover)-ktup)/nskip: 1;
   *mincover = (minktup-1)*nskip + ktup;
   return minktup;
 }
 
 #ifdef RMAP_SUPERFLUOUS_CODE
-static uint32_t calcMinCover(int *min_ktup, UCHAR mincov_percent, 
+static uint32_t calcMinCover(int *min_ktup, UCHAR mincov_percent,
 			   const SeqFastq *sqp, const HashTable *htp)
      /** Return the minimum covarage as the number of bases and
-      * as the minimum number of k-tuples corresponding to a fraction of 
+      * as the minimum number of k-tuples corresponding to a fraction of
       * the read length covered by k-tuples.
       */
 {
@@ -258,11 +258,11 @@ static uint32_t calcMinCover(int *min_ktup, UCHAR mincov_percent,
   UCHAR nskip;
 
   hashTableGetKtupLen(htp, &nskip);
-  seqFastqGetConstSequence(sqp, &readlen, NULL); 
+  seqFastqGetConstSequence(sqp, &readlen, NULL);
 
   if (mincov_percent > 100)
     mincover = readlen;
-  else 
+  else
     mincover = readlen*mincov_percent/100;
   *min_ktup = calcMinKtup(&mincover, htp);
 
@@ -270,7 +270,7 @@ static uint32_t calcMinCover(int *min_ktup, UCHAR mincov_percent,
 }
 #endif
 
-static int collectHits(SegAliCands *sacp, BOOL with_seqidx, 
+static int collectHits(SegAliCands *sacp, BOOL with_seqidx,
 		       SegLst *slp, HashHitList *hlp, SegQMask *qmp,
 #ifdef RESULTS_TRACKER
 		       Track *trkp,
@@ -289,10 +289,10 @@ static int collectHits(SegAliCands *sacp, BOOL with_seqidx,
     SEQNUM_t s;
     const SETSIZ_t *soffsp;
     const SEQNUM_t nseq = seqSetGetOffsets(ssp, &soffsp);
-    
+
     for (s=0; s<nseq; s++) {
       hashBlankHitList(hlp);
-      if ((errcode = hashCollectHitsForSegment(hlp, 
+      if ((errcode = hashCollectHitsForSegment(hlp,
 #ifdef RESULTS_TRACKER
 					       trkp,
 #endif
@@ -300,7 +300,7 @@ static int collectHits(SegAliCands *sacp, BOOL with_seqidx,
 					       dumpfp,
 					       dumpctr,
 #endif
-					       soffsp[s], soffsp[s+1], 
+					       soffsp[s], soffsp[s+1],
 #ifndef hashhit_minimise_coverdeficit
 					       n_hit_max,
 					       1,
@@ -308,24 +308,24 @@ static int collectHits(SegAliCands *sacp, BOOL with_seqidx,
 					       hip, htp, NULL)))
 	break;
       segLstBlank(slp);
-      if ((errcode = segLstFillHits(slp, 
+      if ((errcode = segLstFillHits(slp,
 #ifdef RESULTS_TRACKER
 				    trkp,
 #endif
 				    n_ktup_min, hlp)))
 	break;
-    
+
       if ((errcode = segAliCandsAddFast(sacp, qmp,
 #ifdef RESULTS_TRACKER
 					trkp,
-#endif 
+#endif
 					slp, cover_min, s)))
 	break;
     }
   } else {
     /* treat reference sequence as one (concatenated) sequence
      * find out sequence index later */
-    errcode = hashCollectHitsUsingCutoff(hlp, 
+    errcode = hashCollectHitsUsingCutoff(hlp,
 #ifdef hashhit_dump_sortarray
 					 dumpfp,
 					 dumpctr,
@@ -333,29 +333,29 @@ static int collectHits(SegAliCands *sacp, BOOL with_seqidx,
 					 n_hit_max, htp, hip);
     if (!errcode) {
       segLstBlank(slp);
-      errcode = segLstFillHits(slp, 
+      errcode = segLstFillHits(slp,
 #ifdef RESULTS_TRACKER
 			       trkp,
 #endif
 			       n_ktup_min, hlp);
-      if (!errcode) 
-	errcode = segAliCandsAddFast(sacp, qmp, 
+      if (!errcode)
+	errcode = segAliCandsAddFast(sacp, qmp,
 #ifdef RESULTS_TRACKER
 				     trkp,
 #endif
 				     slp, cover_min, SEGCAND_UNKNOWN_SEQIDX);
     }
   }
-  
+
   return errcode;
 }
 
 
-static int setupInterValFromResultSet(InterVal *ivr, int dmin, int dmax, 
+static int setupInterValFromResultSet(InterVal *ivr, int dmin, int dmax,
 				      const SeqFastq *readp, const SeqFastq *matep,
 				      const HashTable *htp, const SeqSet *ssp,
 				      const ResultSet *rsp)
-     /**< Derrive from the best hits in the set of results, an array 
+     /**< Derrive from the best hits in the set of results, an array
       * of distance intervals that can be used to filter seeds from
       * the hash table.
       * \param ivr Set of intervals
@@ -383,7 +383,7 @@ static int setupInterValFromResultSet(InterVal *ivr, int dmin, int dmax,
 
 #define ADJUST_INTERVAL(tmp, rlen) if ((tmp) >= (rlen)) (tmp) = ((int64_t) (rlen)) - 1; \
                                    if ((tmp) < 1) (tmp) = 0;
-  if (dmin > dmax) 
+  if (dmin > dmax)
     return ERRCODE_ARGRANGE;
   seqFastqGetConstSequence(readp, &readlen, NULL);
   seqFastqGetConstSequence(matep, &matelen, NULL);
@@ -403,7 +403,7 @@ static int setupInterValFromResultSet(InterVal *ivr, int dmin, int dmax,
       break;
     }
     /* qs, qe, rs, re start from 1 !, sx < 0 means sequence indices have no yet been assigned */
-    
+
     rlen =  seqSetGetSeqDatByIndex(NULL, NULL, sx, ssp);
 
     /* lower interval: (re-1) + readlen - qe  - dmax;
@@ -435,14 +435,14 @@ static int setupInterValFromResultSet(InterVal *ivr, int dmin, int dmax,
   return errcode;
 }
 
-static int collectHitsFromInterVal(SegAliCands *sacp, SegLst *slp, 
+static int collectHitsFromInterVal(SegAliCands *sacp, SegLst *slp,
 				   HashHitList *hlp, SegQMask *qmp,
 #ifdef RESULTS_TRACKER
 				   Track *trkp,
 #endif
 				   uint32_t n_hit_max, uint32_t n_ktup_min, uint32_t cover_min,
 				   const HashHitInfo *hip,
-				   const HashTable *htp, const SeqSet *ssp, 
+				   const HashTable *htp, const SeqSet *ssp,
 				   const InterVal *ivr)
 {
   int errcode = ERRCODE_SUCCESS;
@@ -459,7 +459,7 @@ static int collectHitsFromInterVal(SegAliCands *sacp, SegLst *slp,
 
     hashBlankHitList(hlp);
     offs = soffsp[sx];
-    if ((errcode = hashCollectHitsForSegment(hlp, 
+    if ((errcode = hashCollectHitsForSegment(hlp,
 #ifdef RESULTS_TRACKER
 					     trkp,
 #endif
@@ -467,14 +467,14 @@ static int collectHitsFromInterVal(SegAliCands *sacp, SegLst *slp,
 					     NULL,
 					     NULL,
 #endif
-					     offs + lo, offs + hi+1, 
+					     offs + lo, offs + hi+1,
 #ifndef hashhit_minimise_coverdeficit
-					     n_hit_max, 0, 
+					     n_hit_max, 0,
 #endif
 					     hip, htp, NULL)))
       break;
     segLstBlank(slp);
-    if ((errcode = segLstFillHits(slp, 
+    if ((errcode = segLstFillHits(slp,
 #ifdef RESULTS_TRACKER
 				  trkp,
 #endif
@@ -483,7 +483,7 @@ static int collectHitsFromInterVal(SegAliCands *sacp, SegLst *slp,
     if ((errcode = segAliCandsAddFast(sacp, qmp,
 #ifdef RESULTS_TRACKER
 				      trkp,
-#endif 
+#endif
 				      slp, cover_min, sx)))
       break;
   }
@@ -492,9 +492,9 @@ static int collectHitsFromInterVal(SegAliCands *sacp, SegLst *slp,
 }
 
 #ifdef rmap_finehash_2ndmate
-static int setupFineHashTable(HashTable *htfinep, 
+static int setupFineHashTable(HashTable *htfinep,
 			      SeqFastq *sqbfp,
-			      const SeqSet *ssp, 
+			      const SeqSet *ssp,
 			      const InterVal *ivr,
 			      const HashTable *htp,
 			      const SeqCodec *codecp)
@@ -509,7 +509,7 @@ static int setupFineHashTable(HashTable *htfinep,
       hashTableReset(htfinep, (UCHAR) s);
       errcode = hashTableSetUp(htfinep, sqbfp, ssp, ivr, codecp, NULL, 0);
     }
-  } 
+  }
   if (ERRCODE_KPOSOFLO == errcode)
     errcode = ERRCODE_MAXKPOS;
 
@@ -521,9 +521,9 @@ static int setupFineHashTable(HashTable *htfinep,
  ******************************************************************************/
 #ifdef rmap_debug
 static void fprintRMAPCAND(FILE *fp, const RMAPCAND *rcp)
-{ 
+{
   if (rcp) {
-    fprintf(fp, "RMAPCAND: qe = %u, qs = %u, re = %llu, rs = %llu, sqidx = %i, band_l = %i, band_r = %i\n", 
+    fprintf(fp, "RMAPCAND: qe = %u, qs = %u, re = %llu, rs = %llu, sqidx = %i, band_l = %i, band_r = %i\n",
 	    rcp->qe, rcp->qs, (unsigned long long) rcp->rs, (unsigned long long) rcp->re,
 	    rcp->sqidx, rcp->band_l, rcp->band_r);
   } else {
@@ -539,20 +539,20 @@ static int makeRMAPCANDfromSegment(RMAPCAND *cp, SeqFastq *sqbufp, COVERAGE *cov
   int errcode;
   uint8_t bitflags;
   SETSIZ_t rs, re;
-  errcode = segAliCandsCalcSegmentOffsets(&cp->qs, &cp->qe, 
+  errcode = segAliCandsCalcSegmentOffsets(&cp->qs, &cp->qe,
 					  &cp->rs, &cp->re,
-					  &cp->band_l, &cp->band_r, 
+					  &cp->band_l, &cp->band_r,
 					  &cp->dqo, &cp->dro,
 					  &cp->sqidx, &bitflags,
 					  coverp,
 #ifdef SCORE_SIMD
 					  0,
 #else
-					  EDGELEN_MAX, 
+					  EDGELEN_MAX,
 #endif
-					  qlen, 
+					  qlen,
 					  ssp, i, sacp);
-  if (errcode) 
+  if (errcode)
     return errcode;
 
   /* for the moment, offsets still have to be representable by signed/unsigned ints */
@@ -565,7 +565,7 @@ static int makeRMAPCANDfromSegment(RMAPCAND *cp, SeqFastq *sqbufp, COVERAGE *cov
 #ifdef results_debug
   cp->segidx = (int) i;
 #endif
-    
+
 
   re =  cp->re;
   rs =  cp->rs;
@@ -579,7 +579,7 @@ static int makeRMAPCANDfromSegment(RMAPCAND *cp, SeqFastq *sqbufp, COVERAGE *cov
       return errcode;
     /* can throw ERRCODE_SEQOFFS */
   }
-    
+
   errcode = seqFastqEncode(sqbufp, codecp);
 
   return errcode;
@@ -613,8 +613,8 @@ static int scoreRMAPCAND(RMAPCANDARR *csr,
   COVERAGE cover, curr_min_cover, max_cover, min_cover, dcov, cdf;
   COVERAGE cover_deficit[NUM_STRANDS];
   SEQLEN_t i, qlen;
-  const uint32_t n_candseg = segAliCandsGetNumberOfSegments(sacp, &curr_min_cover, NULL, 
-							    cover_deficit, cover_deficit+1, 
+  const uint32_t n_candseg = segAliCandsGetNumberOfSegments(sacp, &curr_min_cover, NULL,
+							    cover_deficit, cover_deficit+1,
 							    NULL);
   RMAPCAND *cp;
 #ifdef rmap_stop_candlist_early
@@ -629,7 +629,7 @@ static int scoreRMAPCAND(RMAPCANDARR *csr,
   BOOL isSIMDAliCand;
 #endif
 
-  if (n_candseg > INT_MAX || mmscordiff < 1 
+  if (n_candseg > INT_MAX || mmscordiff < 1
 #ifdef rmap_stop_candlist_early
       || gapscordiff < 1
 #endif
@@ -638,7 +638,7 @@ static int scoreRMAPCAND(RMAPCANDARR *csr,
 
   if (n_candseg >= ARRNALLOC(*csr)) {
     hp = ARREALLOC(*csr, n_candseg);
-    if (hp == NULL) 
+    if (hp == NULL)
       return ERRCODE_NOMEM;
     *csr = hp;
   }
@@ -657,7 +657,7 @@ static int scoreRMAPCAND(RMAPCANDARR *csr,
   cover_rank_break = n_candseg;
 #endif
 
-  for (cp = *csr, i = 0; i<n_candseg; i++, cp++) { 
+  for (cp = *csr, i = 0; i<n_candseg; i++, cp++) {
     const char *unprofiled_seqp = NULL;
     SEQLEN_t unprofiled_seqlen = 0;
     const ScoreProfile *scprofp = NULL;  /* points to profp or profRCp */
@@ -665,8 +665,8 @@ static int scoreRMAPCAND(RMAPCANDARR *csr,
 #if defined alignment_debug || defined alignment_matrix_debug
     const char *profdseqp = NULL;        /* points to profiled_seqp or profiled_seqRCp */
 #endif
-    if ((errcode = makeRMAPCANDfromSegment(cp, sqbufp, &cover, 
-					   qlen, ssp, codecp, 
+    if ((errcode = makeRMAPCANDfromSegment(cp, sqbufp, &cover,
+					   qlen, ssp, codecp,
 					   i, sacp)))
       return errcode;
 
@@ -690,10 +690,10 @@ static int scoreRMAPCAND(RMAPCANDARR *csr,
       profdseqp = profiled_seqp;
 #endif
     }
-  
+
 
     unprofiled_seqp = seqFastqGetConstSequence(sqbufp, &unprofiled_seqlen, NULL);
-  
+
     if (unprofiled_seqlen > INT_MAX || unprofiled_seqlen != cp->re - cp->rs + 1)
       return ERRCODE_ASSERT;
 
@@ -712,28 +712,28 @@ static int scoreRMAPCAND(RMAPCANDARR *csr,
 #endif
 
 #ifdef SCORE_SIMD
-    isSIMDAliCand = (BOOL) 
-      (qlen >= MINLEN_QUERY_STRIPED && 
+    isSIMDAliCand = (BOOL)
+      (qlen >= MINLEN_QUERY_STRIPED &&
        ((SEQLEN_t) (cp->band_r - cp->band_l)*BWSCAL_QLEN) > qlen &&
        cp->qs == 0 && cp->qe >= qlen-1);
     if ( (isSIMDAliCand) ) {
-      errcode = swSIMDAlignStriped(&cp->swscor, 
-				   alibufp, 
+      errcode = swSIMDAlignStriped(&cp->swscor,
+				   alibufp,
 				   scprofp,
-#ifdef  alignment_matrix_debug 
+#ifdef  alignment_matrix_debug
 				   codecp,
 				   profdseqp,
 #endif
 				   unprofiled_seqp,
 				   unprofiled_seqlen);
-    } 
+    }
     if ( !(isSIMDAliCand) || (errcode == ERRCODE_SWATEXCEED) ) {
 #endif /* #ifdef SCORE_SIMD */
       if (cp->qs > INT_MAX)
 	return ERRCODE_ASSERT;
-      errcode = aliSmiWatInBandFast(&cp->swscor, 
-				    alibufp, 
-				    scprofp, 
+      errcode = aliSmiWatInBandFast(&cp->swscor,
+				    alibufp,
+				    scprofp,
 #if defined alignment_matrix_debug
 				    codecp,
 				    profdseqp,
@@ -751,10 +751,10 @@ static int scoreRMAPCAND(RMAPCANDARR *csr,
 
 #ifdef rmap_debug
     printf("rmap_debug:scoreRMAPCAND:score =%i\n", cp->swscor);
-#endif    
+#endif
     cp->flags |= RMAPCANDFLG_SCORED;
     cdf = cover_deficit[(cp->flags & RMAPCANDFLG_REVERSE)? 1 :0];
-    if ((rmapflag & RMAPFLG_BEST) && 
+    if ((rmapflag & RMAPFLG_BEST) &&
 	(cover + cdf < min_cover))
 	break;
     if (cp->swscor > (*max2scor)) {
@@ -774,7 +774,7 @@ static int scoreRMAPCAND(RMAPCANDARR *csr,
 #endif
 	if (cover + cdf > max_cover)
 	  max_cover = (cover > cdf)? cover - cdf: 0;
-      } else {	
+      } else {
 	*max2scor = cp->swscor;
       }
       dcov = ((int)((*max1scor - *max2scor)/mmscordiff) + 1)*nskip;
@@ -801,7 +801,7 @@ static int alignRMAPCANDFull(ResultSet *rsp,
 			     const char *profiled_seqp,
 			     const char *profiled_seqRCp,
 #endif
-			     const SeqSet *ssp, 
+			     const SeqSet *ssp,
 			     const SeqCodec *codecp,
 			     const RMAPCANDARR candr)
 {
@@ -840,7 +840,7 @@ static int alignRMAPCANDFull(ResultSet *rsp,
 	return errcode;
     /* can throw ERRCODE_SEQOFFS */
     }
-   
+
     if ((errcode = seqFastqEncode(sqbufp, codecp)))
       return errcode;
 
@@ -895,7 +895,7 @@ static int alignRMAPCANDFull(ResultSet *rsp,
       band_r = cp->band_r;
     }
 
-    errcode = aliSmiWatInBand(alirsp, alibufp, scprofp, 
+    errcode = aliSmiWatInBand(alirsp, alibufp, scprofp,
 #if defined alignment_debug || defined alignment_matrix_debug
 			      codecp,
 			      profdseqp,
@@ -903,15 +903,15 @@ static int alignRMAPCANDFull(ResultSet *rsp,
 			      unprofiled_seqp, (int) unprofiled_seqlen,
 			      band_l, band_r,
 			      (int) cp->qs, (int) cp->qe,
-			      0, (int) unprofiled_seqlen-1, 
+			      0, (int) unprofiled_seqlen-1,
 			      min_swatscor, scorlen_min);
-    
+
     if (!errcode) {
-      errcode = resultSetAddFromAli(rsp, alirsp, cp->rs, 
+      errcode = resultSetAddFromAli(rsp, alirsp, cp->rs,
 				    0, profiled_seqlen,
 				    (cp->sqidx == SEGCAND_UNKNOWN_SEQIDX)?
 				    RESULTSET_UNKNOWN_SEQIDX: cp->sqidx,
-#ifdef results_debug 
+#ifdef results_debug
 				    cp->segidx,
 				    sqbufp,
 				    profdseqp,
@@ -962,20 +962,20 @@ static RMAPPROF *createRMAPPROF(const SeqCodec * const codecp)
   p->readRCp = seqFastqCreate(0, SEQTYP_FASTQ);
   p->scorprofp = scoreCreateProfile(0, codecp, mode);
   p->scorprofRCp = scoreCreateProfile(0, codecp, mode);
-  
+
   if (NULL == p->readRCp ||
       NULL == p->scorprofp ||
       NULL == p->scorprofRCp) {
     deleteRMAPPROF(p);
     p = NULL;
   }
-  
+
   return p;
 }
 
-static int makeRMAPPROFfromRead(RMAPPROF *prp, 
-				const SeqFastq *readp, 
-				const ScoreMatrix *scormtxp, 
+static int makeRMAPPROFfromRead(RMAPPROF *prp,
+				const SeqFastq *readp,
+				const ScoreMatrix *scormtxp,
 				const SeqCodec *codecp)
 {
   int errcode;
@@ -984,10 +984,10 @@ static int makeRMAPPROFfromRead(RMAPPROF *prp,
 
   errcode = seqFastqAppendSegment(prp->readRCp, readp, 0, 0, 1, codecp);
 
-  if (!(errcode)) {    
+  if (!(errcode)) {
     errcode = scoreMakeProfileFromSequence(prp->scorprofp, readp, scormtxp);
   }
-   
+
   if (!(errcode))
     errcode = scoreMakeProfileFromSequence(prp->scorprofRCp, prp->readRCp, scormtxp);
 
@@ -1012,7 +1012,7 @@ static RMAPINFO *createRMAPINFO(const HashTable *htp)
   RMAPINFO *rmp;
   EMALLOCP0(rmp);
   if (!rmp) return 0;
-  
+
   rmp->hhiFp = hashCreateHitInfo(HITINFO_BLKSZ, htp);
   rmp->hhiRp = hashCreateHitInfo(HITINFO_BLKSZ, htp);
 
@@ -1020,7 +1020,7 @@ static RMAPINFO *createRMAPINFO(const HashTable *htp)
     deleteRMAPINFO(rmp);
     rmp = 0;
   }
- 
+
   return rmp;
 }
 
@@ -1047,7 +1047,7 @@ static int initRMAPINFOshort(RMAPINFO *rmp,
 			     int maxhit_per_tuple,
 			     UCHAR min_basqval,
 			     const SeqFastq *readp, const HashTable *htp)
-     /**< Initialise per-read data structures using a 'short' list of hits 
+     /**< Initialise per-read data structures using a 'short' list of hits
       * \param rmp Structure to be initialised.
       * \param maxhit_per_tuple Cut-off of the number of hits per kmer word. Kmer words
       *        with more than maxhit_per_tuple hits are skipped.
@@ -1055,12 +1055,12 @@ static int initRMAPINFOshort(RMAPINFO *rmp,
       */
 {
   int errcode;
-  errcode = hashCollectHitInfoShort(rmp->hhiFp, 0, 
+  errcode = hashCollectHitInfoShort(rmp->hhiFp, 0,
 				    maxhit_per_tuple, HASH_MAXNHITS,
 				    min_basqval,
 				    readp, htp);
   if (!(errcode)) {
-    errcode = hashCollectHitInfoShort(rmp->hhiRp, 1, 
+    errcode = hashCollectHitInfoShort(rmp->hhiRp, 1,
 				      maxhit_per_tuple, HASH_MAXNHITS,
 				      min_basqval,
 				      readp, htp);
@@ -1132,7 +1132,7 @@ static RMAPBUFF *createRMAPBUFF(const ScoreMatrix *scormtxp)
 	(rmp->alibufp) && (rmp->alirsltp) && (rmp->qmp))) {
     deleteRMAPBUFF(rmp);
     rmp = 0;
-  } 
+  }
   return rmp;
 }
 
@@ -1140,7 +1140,7 @@ static void blankRMAPBUFF(RMAPBUFF *rmp)
 {
   if (rmp) {
     seqFastqBlank(rmp->sqbfp);
-    if ((rmp->qbfp)) 
+    if ((rmp->qbfp))
       seqFastqBlank(rmp->qbfp);
     hashBlankHitList(rmp->hhlp);
     segLstBlank(rmp->sglp);
@@ -1158,7 +1158,7 @@ static int fillRMAPBUFF(RMAPBUFF *bufp, const RMAPINFO *rmrp,
 			FILE *dumpfp,
 			int *dumpctr,
 #endif
-			BOOL with_seqidx, int ktuple_maxhit, 
+			BOOL with_seqidx, int ktuple_maxhit,
 			uint32_t min_ktup, uint32_t min_cover,
 			const HashTable *htp,
 			const SeqSet *ssp,
@@ -1174,7 +1174,7 @@ static int fillRMAPBUFF(RMAPBUFF *bufp, const RMAPINFO *rmrp,
 #endif
 
   blankRMAPBUFF(bufp);
-  
+
   if ((ivr)) {
     /* filtered */
     /* forward strand */
@@ -1196,7 +1196,7 @@ static int fillRMAPBUFF(RMAPBUFF *bufp, const RMAPINFO *rmrp,
 					ivr);
     }
   } else {
-    errcode = collectHits(bufp->sacp, with_seqidx, 
+    errcode = collectHits(bufp->sacp, with_seqidx,
 			  bufp->sglp, bufp->hhlp, bufp->qmp,
 #ifdef RESULTS_TRACKER
 			  (trk_flg&TRACKFLG_REVERSE)? NULL:trkp,
@@ -1226,7 +1226,7 @@ static int fillRMAPBUFF(RMAPBUFF *bufp, const RMAPINFO *rmrp,
 }
 
 static int mapSingleRead(ErrMsg *errmsgp,
-			 RMAPBUFF *bufp, 
+			 RMAPBUFF *bufp,
 			 ResultSet *rssp,
 #ifdef RESULTS_TRACKER
 			 Track *trkp,
@@ -1237,11 +1237,11 @@ static int mapSingleRead(ErrMsg *errmsgp,
 #endif
 			 const RMAPINFO *rmrp,
 			 const RMAPPROF *rprofp,
-			 SeqFastq *readp, 
+			 SeqFastq *readp,
 			 int ktuple_maxhit,
-			 uint32_t min_cover, 
+			 uint32_t min_cover,
 			 int min_swatscor, int min_swatscor_below_max,
-			 short target_depth, short max_depth, RMAPFLG_t rmapflg, 
+			 short target_depth, short max_depth, RMAPFLG_t rmapflg,
 			 const HashTable *htp, const SeqSet *ssp, const SeqCodec *codecp,
 			 const InterVal *ivr)
 {
@@ -1249,7 +1249,7 @@ static int mapSingleRead(ErrMsg *errmsgp,
   char cod;
   uint32_t rlen, mincov_below_max;
 #if defined alignment_matrix_debug || defined alignment_debug || defined rmap_debug || defined results_debug
-  const char *qbasp = 0; 
+  const char *qbasp = 0;
   const char *qbasRCp = 0;
 #endif
   UCHAR nskip;
@@ -1263,7 +1263,7 @@ static int mapSingleRead(ErrMsg *errmsgp,
   SWATSCOR max1scor = 0, max2scor = 0, maxscor_perfect;
   uint32_t nseg, nseg_tot, nhit, nhit_tot;
 
-  if (mismatchdiff < 0 || gapextscor >= 0 || mismatchscor >= 0) 
+  if (mismatchdiff < 0 || gapextscor >= 0 || mismatchscor >= 0)
     ERRMSGNO(errmsgp, ERRCODE_ASSERT);
 
   /* mincov_below max translates the thresholds of the Smith-Waterman score
@@ -1290,14 +1290,14 @@ static int mapSingleRead(ErrMsg *errmsgp,
 
   /* set minimum Smith_Waterman score */
   /* if (min_swatscor < ktup*matchscor) min_swatscor = ktup*matchscor;  */
-  
+
 #ifdef rmap_debug
   printf("rmap_debug::rmapSingle(): ");
-  printf("min_swatscor = %i, min_swatscor_below_max = %i\n", 
+  printf("min_swatscor = %i, min_swatscor_below_max = %i\n",
 	 min_swatscor, min_swatscor_below_max);
 #endif
-  
-  if ((errcode = fillRMAPBUFF(bufp, rmrp, 
+
+  if ((errcode = fillRMAPBUFF(bufp, rmrp,
 #ifdef RESULTS_TRACKER
 			      trkp,
 #endif
@@ -1305,11 +1305,11 @@ static int mapSingleRead(ErrMsg *errmsgp,
 			      dumpfp,
 			      dumpctr,
 #endif
-			      (BOOL) (rmapflg&RMAPFLG_SEQBYSEQ), 
+			      (BOOL) (rmapflg&RMAPFLG_SEQBYSEQ),
 			      //(rmapflg&RMAPFLG_NOSHRTINFO)? ktuple_maxhit: 0,
 			      ktuple_maxhit,
 			      min_ktup, min_cover, htp, ssp, ivr)))
-    
+
     ERRMSGNO(errmsgp, errcode);
 
   if ((errcode = aliBufferInit(bufp->alibufp, rlen)))
@@ -1319,10 +1319,10 @@ static int mapSingleRead(ErrMsg *errmsgp,
 #ifdef RESULTS_TRACKER
 				  trkp,
 #endif
-				  mincov_below_max, 
+				  mincov_below_max,
 				  rmrp->hhiFp,
-				  rmrp->hhiRp, 
-				  target_depth, max_depth, 
+				  rmrp->hhiRp,
+				  target_depth, max_depth,
 				  (uint8_t)(rmapflg & RMAPFLG_SENSITIVE))))
     ERRMSGNO(errmsgp, errcode);
 
@@ -1349,7 +1349,7 @@ static int mapSingleRead(ErrMsg *errmsgp,
   qbasRCp = seqFastqGetConstSequence(rprofp->readRCp, NULL, NULL);
 #endif
 
-  errcode = scoreRMAPCAND(&bufp->candr, 
+  errcode = scoreRMAPCAND(&bufp->candr,
 			  &max1scor,
 			  &max2scor,
 			  bufp->sqbfp,
@@ -1362,11 +1362,11 @@ static int mapSingleRead(ErrMsg *errmsgp,
 #endif
 			  rprofp->scorprofp,
 			  rprofp->scorprofRCp,
-			  ssp, 
+			  ssp,
 			  codecp,
 			  bufp->sacp);
-    
-  if ((errcode) && 
+
+  if ((errcode) &&
       ((rmapflg&RMAPFLG_SEQBYSEQ) || errcode != ERRCODE_SEQOFFS))
     ERRMSGNO(errmsgp, errcode);
 
@@ -1377,13 +1377,13 @@ static int mapSingleRead(ErrMsg *errmsgp,
     return ERRCODE_SUCCESS;
 
   bandwidth_min = (maxscor_perfect - max1scor)/(-1*gapextscor);
- 
+
   if (min_swatscor_below_max >= max1scor)
     min_swatscor_below_max = max1scor;
 
   if (min_swatscor > max2scor && max2scor > 0)
     min_swatscor = max2scor;
- 
+
   if (min_swatscor_below_max >= 0) {
      SWATSCOR minswc = (max2scor > 0)? max2scor: max1scor;
      if ((rmapflg&RMAPFLG_BEST)) {
@@ -1395,57 +1395,57 @@ static int mapSingleRead(ErrMsg *errmsgp,
 	 min_swatscor = minswc;
      }
   }
-  
+
   if (min_swatscor > scorlen_min*matchscor && matchscor > 0)
     scorlen_min = min_swatscor/matchscor;
 
-  if ((errcode = alignRMAPCANDFull(rssp, 
-				   bufp->alirsltp, 
-				   bufp->alibufp, 
+  if ((errcode = alignRMAPCANDFull(rssp,
+				   bufp->alirsltp,
+				   bufp->alibufp,
 				   bufp->sqbfp,
 				   min_swatscor,
 				   scorlen_min,
 				   bandwidth_min,
 				   rmapflg,
 				   rprofp->scorprofp,
-				   rprofp->scorprofRCp, 
+				   rprofp->scorprofRCp,
 #if defined alignment_matrix_debug || defined alignment_debug || defined rmap_debug || defined results_debug
 				   qbasp,
 				   qbasRCp,
 #endif
 				   ssp, codecp, bufp->candr)))
     ERRMSGNO(errmsgp, errcode);
-  
+
   errcode = resultSetSortAndAssignSequence(rssp,
-					   bufp->sqbfp, 
-					   0, 
+					   bufp->sqbfp,
+					   0,
 					   readp,
-#ifdef results_debug 
+#ifdef results_debug
 					   rprofp->readRCp,
 #endif
-					   rprofp->scorprofp, 
+					   rprofp->scorprofp,
 					   rprofp->scorprofRCp,
 					   ssp, codecp);
-  if (errcode) 
+  if (errcode)
     ERRMSGNO(errmsgp, errcode);
-  
+
   return errcode;
 }
 
 static int mapSecondary(ErrMsg *errmsgp,
-			RMAPBUFF *bufp, ResultSet *rssp, 
+			RMAPBUFF *bufp, ResultSet *rssp,
 #ifdef RESULTS_TRACKER
 			Track *trkp,
 #endif
 			RMAPINFO *rmrp,
 			const RMAPPROF *rmprp,
-			SeqFastq *readp, 
+			SeqFastq *readp,
 			int ktuple_maxhit,
 			uint32_t min_cover,
 			int min_swatscor, int min_swatscor_below_max,
 			UCHAR min_basqval,
-			short target_depth, short max_depth, RMAPFLG_t rmapflg, 
-			const HashTable *htp, 
+			short target_depth, short max_depth, RMAPFLG_t rmapflg,
+			const HashTable *htp,
 			const SeqSet *ssp,
 			const SeqCodec *codecp)
 {
@@ -1460,13 +1460,13 @@ static int mapSecondary(ErrMsg *errmsgp,
   if (ERRCODE_SUCCESS != errcode) {
     if (ERRCODE_FAILURE == errcode) {
       return ERRCODE_SUCCESS; /* no alignment found, keep silent */
-    } else 
+    } else
       ERRMSGNO(errmsgp, errcode);
   }
 
   if ((errcode = resultGetData(&qs, &qe, NULL, NULL, NULL, NULL, NULL, rp)))
     ERRMSGNO(errmsgp, errcode);
-  
+
   if (qe > qlen || qs > qe)
     ERRMSGNO(errmsgp, ERRCODE_ASSERT);
 
@@ -1496,9 +1496,9 @@ static int mapSecondary(ErrMsg *errmsgp,
 		NULL,
 		NULL,
 #endif
-		rmrp, rmprp, readp, ktuple_maxhit, min_cover, 
+		rmrp, rmprp, readp, ktuple_maxhit, min_cover,
 		min_swatscor, min_swatscor_below_max,
-		target_depth, max_depth, rmapflg, 
+		target_depth, max_depth, rmapflg,
 		htp, ssp, codecp, NULL);
 
   return errcode;
@@ -1508,7 +1508,7 @@ static int mapSecondary(ErrMsg *errmsgp,
  ************************* Public Methods of Type RMap ************************
  ******************************************************************************/
 
-RMap *rmapCreate(const HashTable *htp, const SeqCodec *codecp, 
+RMap *rmapCreate(const HashTable *htp, const SeqCodec *codecp,
 		 const SeqSet *ssp,
 		 const ScoreMatrix *scormtxp, RMAPFLG_t rmapflg)
 {
@@ -1517,16 +1517,16 @@ RMap *rmapCreate(const HashTable *htp, const SeqCodec *codecp,
   RMap *rmp;
   EMALLOCP0(rmp);
   if (!rmp) return 0;
-  
+
   seqSetGetSeqNumAndTotLen(&totlen, ssp);
 
   rmp->bfp = createRMAPBUFF((rmapflg & RMAPFLG_CMPLXW)? scormtxp: NULL);
   rmp->prp = createRMAPPROF(codecp);
   rmp->mrp = createRMAPINFO(htp);
   rmp->rsrp = resultSetCreate(0,0);
-  okflg = (BOOL) (rmp->bfp != NULL && 
+  okflg = (BOOL) (rmp->bfp != NULL &&
 		  rmp->prp != NULL &&
-		  rmp->mrp != NULL && 
+		  rmp->mrp != NULL &&
 		  rmp->rsrp != NULL);
   if ((okflg) && (rmapflg & RMAPFLG_PAIRED)) {
 #ifdef rmap_finehash_2ndmate
@@ -1548,16 +1548,16 @@ RMap *rmapCreate(const HashTable *htp, const SeqCodec *codecp,
       rmp->htflyp = hashTableCreate(FINEHASH_WORDLEN, nskip, 0, 0, HASHIDXTYP_PERFECT);
       if (rmp->htflyp)
 	rmp->mflyp = createRMAPINFO(rmp->htflyp);
-    
+
 #endif
-      okflg = (BOOL) ((rmp->mmp != NULL) && 
-		      (rmp->rsmp != NULL) && 
+      okflg = (BOOL) ((rmp->mmp != NULL) &&
+		      (rmp->rsmp != NULL) &&
 		      (rmp->ivr != NULL) &&
 #ifdef rmap_finehash_2ndmate
 		      (rmp->htflyp != NULL) &&
 #endif
-		      (rmp->pairp != NULL)); 
-#ifdef rmap_finehash_2ndmate 
+		      (rmp->pairp != NULL));
+#ifdef rmap_finehash_2ndmate
     }
 #endif
   } else {
@@ -1624,17 +1624,17 @@ void rmapBlank(RMap *rmp)
     resultSetBlank(rmp->rsrp);
     if (rmp->rsmp != NULL)
       resultSetBlank(rmp->rsmp);
-    if (rmp->ivr != NULL) 
+    if (rmp->ivr != NULL)
       interValBlank(rmp->ivr);
     if (rmp->pairp != NULL)
       resultSetBlankPairs(rmp->pairp);
   }
 }
 
-void rmapGetData(const ResultSet **rslt_readp, 
-		 const ResultSet **rslt_matep, 
-		 const ResultPairs **pairp, 
-		 SeqFastq **sbufAp, 
+void rmapGetData(const ResultSet **rslt_readp,
+		 const ResultSet **rslt_matep,
+		 const ResultPairs **pairp,
+		 SeqFastq **sbufAp,
 		 SeqFastq **sbufBp,
 		 const RMap *rmp)
 {
@@ -1646,12 +1646,12 @@ void rmapGetData(const ResultSet **rslt_readp,
 }
 
 int rmapSingle(ErrMsg *errmsgp,
-	       RMap *rmp, 
+	       RMap *rmp,
 #ifdef hashhit_dump_sortarray
 	       FILE *dumpfp,
 	       int *dumpctr,
 #endif
-	       SeqFastq *readp, 
+	       SeqFastq *readp,
 #ifdef RESULTS_TRACKER
 	       Track *trkrp,
 #endif
@@ -1661,9 +1661,9 @@ int rmapSingle(ErrMsg *errmsgp,
 	       short target_depth, short max_depth,
 	       RMAPFLG_t rmapflg,
 	       const ScoreMatrix *scormtxp,
-	       const ResultFilter *rsfp, 
-	       const HashTable *htp, 
-	       const SeqSet *ssp, 
+	       const ResultFilter *rsfp,
+	       const HashTable *htp,
+	       const SeqSet *ssp,
 	       const SeqCodec *codecp)
 {
   int errcode;
@@ -1671,8 +1671,8 @@ int rmapSingle(ErrMsg *errmsgp,
   rmapBlank(rmp);
 
 #ifdef RESULTS_TRACKER
-  if ((errcode = trackMakeFromSequence(trkrp, readp, 
-				       RESULTS_TRACKER_IS1BASED, 
+  if ((errcode = trackMakeFromSequence(trkrp, readp,
+				       RESULTS_TRACKER_IS1BASED,
 				       ssp, htp)))
     ERRMSGNO(errmsgp, errcode);
 #endif
@@ -1686,19 +1686,19 @@ int rmapSingle(ErrMsg *errmsgp,
     errcode = initRMAPINFO(rmp->mrp, min_basqval, 0, 0, readp, htp);
 #ifdef rmap_short_hitinfo
   } else {
-    errcode = initRMAPINFOshort(rmp->mrp, 
-				ktuple_maxhit, 
+    errcode = initRMAPINFOshort(rmp->mrp,
+				ktuple_maxhit,
 				min_basqval,
 				readp, htp);
   }
 #endif
-  if ((errcode) && errcode != ERRCODE_SHORTSEQ) 
+  if ((errcode) && errcode != ERRCODE_SHORTSEQ)
     ERRMSGNO(errmsgp, errcode);
 
   if (!errcode) {
     mapSingleRead(errmsgp,
-		  rmp->bfp, 
-		  rmp->rsrp, 
+		  rmp->bfp,
+		  rmp->rsrp,
 #ifdef RESULTS_TRACKER
 		  trkrp,
 #endif
@@ -1706,31 +1706,31 @@ int rmapSingle(ErrMsg *errmsgp,
 		  dumpfp,
 		  dumpctr,
 #endif
-		  rmp->mrp, rmp->prp, readp, 
-		  ktuple_maxhit, min_cover, 
+		  rmp->mrp, rmp->prp, readp,
+		  ktuple_maxhit, min_cover,
 		  min_swatscor, min_swatscor_below_max,
-		  target_depth, max_depth, rmapflg, 
+		  target_depth, max_depth, rmapflg,
 		  htp, ssp, codecp, NULL);
   }
 
   if (!(errcode) && (rmapflg & RMAPFLG_SPLIT)) {
     mapSecondary(errmsgp,
-		 rmp->bfp, 
+		 rmp->bfp,
 		 rmp->rsrp,
 #ifdef RESULTS_TRACKER
 		 trkrp,
 #endif
-		 rmp->mr2p, rmp->prp, readp, 
-		 ktuple_maxhit, min_cover, 
+		 rmp->mr2p, rmp->prp, readp,
+		 ktuple_maxhit, min_cover,
 		 min_swatscor, min_swatscor_below_max, min_basqval,
-		 target_depth, max_depth, rmapflg, 
+		 target_depth, max_depth, rmapflg,
 		 htp, ssp, codecp);
   }
 
-  if ((errcode) && errcode != ERRCODE_SHORTSEQ) 
+  if ((errcode) && errcode != ERRCODE_SHORTSEQ)
     ERRMSGNO(errmsgp, errcode);
 
-  if (!errcode) 
+  if (!errcode)
     errcode = resultSetFilterResults(rmp->rsrp, rsfp, readp);
 
   if (errcode == ERRCODE_SHORTSEQ)
@@ -1742,7 +1742,7 @@ int rmapSingle(ErrMsg *errmsgp,
 }
 
 int rmapPair(ErrMsg *errmsgp,
-	     RMap *rmp, 
+	     RMap *rmp,
 	     SeqFastq *readp, SeqFastq *matep,
 #ifdef RESULTS_TRACKER
 	     Track *trkrp,
@@ -1777,15 +1777,15 @@ int rmapPair(ErrMsg *errmsgp,
   printf("rmapPair: d_min=%i, dmax=%i, ktuple_maxhit=%i,\n",
 	 d_min, d_max, ktuple_maxhit);
   printf("          mincov_read=%u, mincov_mate=%u, min_swatscor=%i,\n",
-	 mincov_read, mincov_mate, min_swatscor); 
+	 mincov_read, mincov_mate, min_swatscor);
   printf("          target_depth=%hi, max_depth=%hi, rmapflg=%i\n",
-	 target_depth, max_depth, (int) rmapflg);   
+	 target_depth, max_depth, (int) rmapflg);
 #endif
   if (!((rmmp) && (rmp->ivr) && (rmp->pairp)))
     ERRMSGNO(errmsgp, ERRCODE_ASSERT);
 
   rmapBlank(rmp);
-  *pairflgp = RSLTPAIRFLG_PAIRED;  
+  *pairflgp = RSLTPAIRFLG_PAIRED;
 
 #ifdef RESULTS_TRACKER
   if ((errcode = trackMakeFromSequence(trkrp, readp, RESULTS_TRACKER_IS1BASED,
@@ -1815,8 +1815,8 @@ int rmapPair(ErrMsg *errmsgp,
       ERRMSGNO(errmsgp, errcode_mate);
 #ifdef rmap_short_hitinfo
   } else {
-    if ((errcode_read = initRMAPINFOshort(rmrp, 
-					  ktuple_maxhit, 
+    if ((errcode_read = initRMAPINFOshort(rmrp,
+					  ktuple_maxhit,
 					  min_basqval,
 					  readp, htp)) &&
 	errcode_read != ERRCODE_SHORTSEQ)
@@ -1846,10 +1846,10 @@ int rmapPair(ErrMsg *errmsgp,
 #endif
 		  rmmp, rmp->pmp, matep, ktuple_maxhit, mincov_mate,
 		  min_swatscor, MINSCOR_BELOW_MAX_BEST,
-		  target_depth, max_depth, rmapflg, 
+		  target_depth, max_depth, rmapflg,
 		  htp, ssp, codecp, NULL);
   }
-  
+
   if ((errcode_mate)) {
     mapSingleRead(errmsgp,
 		  bufp,
@@ -1863,10 +1863,10 @@ int rmapPair(ErrMsg *errmsgp,
 #endif
 		  rmrp, rmp->prp, readp, ktuple_maxhit, mincov_read,
 		  min_swatscor, MINSCOR_BELOW_MAX_BEST,
-		  target_depth, max_depth, rmapflg, 
+		  target_depth, max_depth, rmapflg,
 		  htp, ssp, codecp, NULL);
   }
- 
+
   nhit_read = calcTotalNumberOfHits(rmrp, ktuple_maxhit);
   nhit_mate = calcTotalNumberOfHits(rmmp, ktuple_maxhit);
   if (nhit_read > nhit_mate) {
@@ -1905,7 +1905,7 @@ int rmapPair(ErrMsg *errmsgp,
   }
 
   mapSingleRead(errmsgp,
-		bufp, 
+		bufp,
 		rs1p,
 #ifdef RESULTS_TRACKER
 		trk1p,
@@ -1916,9 +1916,9 @@ int rmapPair(ErrMsg *errmsgp,
 #endif
 		rr1p, rp1p, read1p, ktuple_maxhit, mincov1,
 		min_swatscor, MINSCOR_BELOW_MAX_BEST,
-		target_depth, max_depth, rmapflg, 
+		target_depth, max_depth, rmapflg,
 		htp, ssp, codecp, NULL);
-  
+
   n_proper = 0;
   mapq1 = resultSetGetMappingScore(rs1p, &swscor1);
   swscor2_restricted = 0;
@@ -1933,13 +1933,13 @@ int rmapPair(ErrMsg *errmsgp,
 
   errcode = setupInterValFromResultSet(rmp->ivr, d_min, d_max, read1p, read2p,
 				       htp, ssp, rs1p);
-  if ((errcode)) 
+  if ((errcode))
     ERRMSGNO(errmsgp, errcode);
   interValPrune(rmp->ivr);
 
   mapSingleRead(errmsgp,
-		bufp, 
-		rs2p, 
+		bufp,
+		rs2p,
 #ifdef RESULTS_TRACKER
 		trk2p,
 #endif
@@ -1954,7 +1954,7 @@ int rmapPair(ErrMsg *errmsgp,
 		htp, ssp, codecp, rmp->ivr);
 
   errcode = resultSetFindProperPairs(rmp->pairp, d_min, d_max,
-				     MAXNUM_PAIRS_TOTAL, 
+				     MAXNUM_PAIRS_TOTAL,
 				     0, pairlibcode,
 				     rsrp, rsmp);
   if ((errcode) && errcode != ERRCODE_PAIRNUM)
@@ -1969,12 +1969,12 @@ int rmapPair(ErrMsg *errmsgp,
       !scorIsAboveFractMax(swscor2_restricted, swscor1, MINFRACT_MAXSCOR_2ND, read2p, read1p)) {
     int mapq2;
     int swscor2;
-    /* no proper pairs or not confident of 1st mate -> 
+    /* no proper pairs or not confident of 1st mate ->
      * unrestricted mapping of 2nd mate */
     if (n_proper < 1)
       resultSetBlank(rs2p);
     mapSingleRead(errmsgp,
-		  bufp, rs2p, 
+		  bufp, rs2p,
 #ifdef RESULTS_TRACKER
 		  trk2p,
 #endif
@@ -2010,21 +2010,21 @@ int rmapPair(ErrMsg *errmsgp,
 #ifdef rmap_finehash_2ndmate
       seqFastqGetConstSequence(read1p, &rlen, NULL);
       if (hashTableGetKtupLen(htp, NULL) <= rlen) {
-	errcode = setupFineHashTable(rmp->htflyp, bufp->sqbfp, 
+	errcode = setupFineHashTable(rmp->htflyp, bufp->sqbfp,
 				     ssp, rmp->ivr, htp, codecp);
 	if ((errcode) && errcode != ERRCODE_MAXKPOS)
 	  ERRMSGNO(errmsgp, errcode);
 
 	if (!(errcode)) {
 
-	  if ((errcode = initRMAPINFO(rmp->mflyp, min_basqval, 0, 0, 
+	  if ((errcode = initRMAPINFO(rmp->mflyp, min_basqval, 0, 0,
 				    read1p, rmp->htflyp)) &&
 	      errcode != ERRCODE_SHORTSEQ)
 	    ERRMSGNO(errmsgp, errcode);
 
 	  mapSingleRead(errmsgp,
-			bufp, 
-			rs1p, 
+			bufp,
+			rs1p,
 #ifdef RESULTS_TRACKER
 			trk1p,
 #endif
@@ -2032,17 +2032,17 @@ int rmapPair(ErrMsg *errmsgp,
 			NULL,
 			NULL,
 #endif
-			rmp->mflyp, 
+			rmp->mflyp,
 			rp1p, read1p, ktuple_maxhit, mincov1,
 			swscor1_2ndbest, MINSCOR_BELOW_MAX_BEST,
-			target_depth, max_depth, rmapflg, 
+			target_depth, max_depth, rmapflg,
 			rmp->htflyp, ssp, codecp, rmp->ivr);
 	} else {
 	  errcode = ERRCODE_SUCCESS;
 #endif //#ifdef rmap_finehash_2ndmate
 	  mapSingleRead(errmsgp,
-			bufp, 
-			rs1p, 
+			bufp,
+			rs1p,
 #ifdef RESULTS_TRACKER
 			trk1p,
 #endif
@@ -2053,17 +2053,17 @@ int rmapPair(ErrMsg *errmsgp,
 			rr1p,
 			rp1p, read1p, ktuple_maxhit, mincov1,
 			swscor1_2ndbest, MINSCOR_BELOW_MAX_BEST,
-			target_depth, max_depth, rmapflg, 
+			target_depth, max_depth, rmapflg,
 			htp, ssp, codecp, rmp->ivr);
 #ifdef rmap_finehash_2ndmate
 	}
       }
-#endif 
+#endif
     }
   } else {
-    *pairflgp = (RSLTPAIRFLG_t)((*pairflgp) | 
-				((rare_mate == 0)? 
-				 RSLTPAIRFLG_RESTRICT_2nd: 
+    *pairflgp = (RSLTPAIRFLG_t)((*pairflgp) |
+				((rare_mate == 0)?
+				 RSLTPAIRFLG_RESTRICT_2nd:
 				 RSLTPAIRFLG_RESTRICT_1st));
   }
 
@@ -2072,32 +2072,32 @@ int rmapPair(ErrMsg *errmsgp,
 
   if (rmapflg & RMAPFLG_SPLIT) {
     mapSecondary(errmsgp,
-		 bufp, 
+		 bufp,
 		 rmp->rsrp,
 #ifdef RESULTS_TRACKER
 		 trkrp,
 #endif
 		 rmp->mr2p,
-		 rmp->prp, readp, ktuple_maxhit, mincov_read, 
+		 rmp->prp, readp, ktuple_maxhit, mincov_read,
 		 min_swatscor, MINSCOR_BELOW_MAX_BEST, min_basqval,
-		 target_depth, max_depth, rmapflg, 
+		 target_depth, max_depth, rmapflg,
 		 htp, ssp, codecp);
 
     mapSecondary(errmsgp,
-		 bufp, 
+		 bufp,
 		 rmp->rsmp,
 #ifdef RESULTS_TRACKER
 		 trkmp,
-#endif 
+#endif
 		 rmp->mm2p,
-		 rmp->pmp, matep, ktuple_maxhit, mincov_mate, 
+		 rmp->pmp, matep, ktuple_maxhit, mincov_mate,
 		 min_swatscor, MINSCOR_BELOW_MAX_BEST, min_basqval,
-		 target_depth, max_depth, rmapflg, 
+		 target_depth, max_depth, rmapflg,
 		 htp, ssp, codecp);
   }
-  
-  errcode = resultSetFindPairs(rmp->pairp, *pairflgp, pairlibcode, 
-			       d_min, d_max, 
+
+  errcode = resultSetFindPairs(rmp->pairp, *pairflgp, pairlibcode,
+			       d_min, d_max,
 			       rsrp, rsmp);
   if ((errcode))
     ERRMSGNO(errmsgp, errcode);

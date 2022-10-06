@@ -67,7 +67,7 @@ enum OUTPUT_FORMAT_LABELS {
   OUFMT_NAMSTR_MATE1 = '1',
   OUFMT_NAMSTR_MATE2 = '2',
   OUFMT_CIGAR_MAXTAG = 99,    /**< Maximum mapping score if score is output after the tag,
-			       * separeted by '::' from the tag */  
+			       * separeted by '::' from the tag */
   OUFMT_BAM_NOQUAL = -1,      /**< Signals no quality value in BAM format (char) -1 or (unsinged char) 0xff */
 };
 
@@ -126,7 +126,7 @@ typedef struct _REPNAMBUF {
 typedef struct _REPALI { /**< Alignmment results */
   BOOL_t was_output;  /**< 0 if Alignment was not yet printed */
   REPMATEFLG_t status;/**< Combination of REPORT_MATE_FLAGS */
-  int swatscor;      /**< Smith-Waterman alignment score */ 
+  int swatscor;      /**< Smith-Waterman alignment score */
   short mapscor;       /**< 'Mapping' score */
   SEQLEN_t q_start;  /**< Start in query sequence (counting from 1) */
   SEQLEN_t q_end;    /**< End in query sequence, counting from 1 (q_start <= q_end) */
@@ -134,7 +134,7 @@ typedef struct _REPALI { /**< Alignmment results */
   SEQLEN_t s_start;  /**< Start in reference sequence (counting from 1) */
   SEQLEN_t s_end;    /**< if sidx >= 0: End in reference sequence, counting from 1 ( s_start <= s_end) */
   SEQNUM_t s_idx;     /**< Index of reference sequence in set of refrence sequences */
-  int dfo;            /**< Offset of compressed alignment string in Report.dfs.dstrp 
+  int dfo;            /**< Offset of compressed alignment string in Report.dfs.dstrp
 		       * alignment in direction of reference [s_start, s_end] */
 } REPALI;
 
@@ -145,7 +145,7 @@ typedef struct _REPPAIR {
   int iB;               /**< Index into Report.arBr for 2nd mate */
 } REPPAIR;
 
-struct _Report {  /**< Holds Results for output, (Report.arAr[0], Report.arBr[0]) 
+struct _Report {  /**< Holds Results for output, (Report.arAr[0], Report.arBr[0])
 		   *   is the paired mapping */
   REPPAIR *pairr; /**< Pairs (can be multiple degenerate mappings) */
   REPALI *arAr;   /**< Alignment results 1st mate */
@@ -196,7 +196,6 @@ static const char OUFMT_SAM_AFTER[] = "\t%s\t%i\t%i\t%s\t%s\tNM:i:%i\tAS:i:%i\n"
 
 /**< TAG VTYPE VALUE */
 static const char OUFMT_SAM_NULLSTR[] = "*";
-static const char OUFMT_BAM_NULLSTR[] = "";
 
 static const char OUFMT_CIGAR[] = "cigar:%c:%2.2d %s%s %u %u %c %s %u %u + %d ";
 static const char OUFMT_ALIGN[] =\
@@ -224,8 +223,8 @@ static char getMapLabelFromFlag(REPMATEFLG_t mateflg, REPPAIRFLG_t pairflg)
     } else if (pairflg & REPPAIR_MAPPED) {
       if (pairflg & REPPAIR_CONTIG) {
 	if (pairflg & REPPAIR_PROPER) {
-	  flagchr = (char) ((pairflg & REPPAIR_WITHIN)? 
-			    CIGFLG_PROPER_INSIDE: 
+	  flagchr = (char) ((pairflg & REPPAIR_WITHIN)?
+			    CIGFLG_PROPER_INSIDE:
 			    CIGFLG_PROPER_OUTSIDE);
 	} else {
 	  flagchr = CIGFLG_IMPROPER_SAMEREF;
@@ -245,10 +244,10 @@ static char getMapLabelFromFlag(REPMATEFLG_t mateflg, REPPAIRFLG_t pairflg)
   return flagchr;
 }
 
-static int fprintAlignment(FILE *fp, SeqFastq *sbufp, SeqFastq *qbufp, 
+static int fprintAlignment(FILE *fp, SeqFastq *sbufp, SeqFastq *qbufp,
 			   const SeqFastq *sqp,
-			   USHORT_t linwidth, const DiffStr *dfsp, 
-			   const SeqSet *ssp, const SeqCodec *codecp, 
+			   USHORT_t linwidth, const DiffStr *dfsp,
+			   const SeqSet *ssp, const SeqCodec *codecp,
 			   const REPALI *rp)
      /**< Print out the alignment explicitly.
       */
@@ -278,12 +277,12 @@ static int fprintAlignment(FILE *fp, SeqFastq *sbufp, SeqFastq *qbufp,
 
   seqFastqBlank(qbufp);
   if (rp->status & REPMATEFLG_REVERSE) {
-    if ((errcode = seqFastqAppendSegment(qbufp, sqp, rp->q_start-1, 
+    if ((errcode = seqFastqAppendSegment(qbufp, sqp, rp->q_start-1,
 					 rp->q_end - rp->q_start + 1,
 					 1, codecp)))
       return errcode;
   } else {
-    if ((errcode = seqFastqAppendSegment(qbufp, sqp, rp->q_start-1, 
+    if ((errcode = seqFastqAppendSegment(qbufp, sqp, rp->q_start-1,
 					 rp->q_end - rp->q_start + 1,
 					 0, NULL)))
       return errcode;
@@ -294,17 +293,17 @@ static int fprintAlignment(FILE *fp, SeqFastq *sbufp, SeqFastq *qbufp,
     return errcode;
 
   qcp = seqFastqGetConstSequence(qbufp, &qlen, &cod);
-  
+
   if (cod != SEQCOD_ASCII)
     return ERRCODE_SEQCODE;
 
   if (rp->s_start < 1 || rp->s_start > rp->s_end)
     return ERRCODE_ASSERT;
   len = rp->s_end - rp->s_start + 1;
-  if (rp->s_idx < 0) 
+  if (rp->s_idx < 0)
     return ERRCODE_NOSEQIDX;
-  if ((errcode = seqSetFetchSegmentBySequence(sbufp, rp->s_idx, 
-					      (SEQLEN_t) rp->s_start-1, 
+  if ((errcode = seqSetFetchSegmentBySequence(sbufp, rp->s_idx,
+					      (SEQLEN_t) rp->s_start-1,
 					      len, ssp, codecp)))
     return errcode;
   scp = seqFastqGetConstSequence(sbufp, &slen, NULL);
@@ -316,14 +315,14 @@ static int fprintAlignment(FILE *fp, SeqFastq *sbufp, SeqFastq *qbufp,
   DIFFSTR_GET(*ucp, count, typ);
 
   for (k=0, q=s=0; (*ucp) && q<=qlen && s<=slen;) {
-    for (j=0; j<linwidth && q<=qlen && s<=slen; j++) {  
+    for (j=0; j<linwidth && q<=qlen && s<=slen; j++) {
 
       if (k++ < count) {
 	qbuf[j] = qcp[q++];
 	dbuf[j] = ALIMATCHTYP_MATCH;
 	sbuf[j] = scp[s++];
 	continue;
-      } 
+      }
       k = 0;
       ucp++;
 
@@ -344,7 +343,7 @@ static int fprintAlignment(FILE *fp, SeqFastq *sbufp, SeqFastq *qbufp,
 	    dbuf[j] = ALIMATCHTYP_UNKNOWN;
 	  else if (q_bastyp == s_bastyp)
 	    dbuf[j] = ALIMATCHTYP_SAMETYP;
-	  else 
+	  else
 	    dbuf[j] = ALIMATCHTYP_SWITCHTYP;
 	  q++;
 	  s++;
@@ -360,30 +359,30 @@ static int fprintAlignment(FILE *fp, SeqFastq *sbufp, SeqFastq *qbufp,
 	dbuf[j] = ALIMATCHTYP_GAP;
 	sbuf[j] = ALIMATCHTYP_GAP;
       }
-   
+
       if (!(*ucp)) break;
       DIFFSTR_GET(*ucp, count, typ);
     } /* for (j=0; j<linwidth; j++) */
 
     /* print the line */
     qbuf[j] = dbuf[j] = sbuf[j] = '\0';
-    fprintf(fp, OUFMT_ALIGN,				  
-	    (rp->status&REPMATEFLG_REVERSE)? 
-	    rp->q_end-q_linstart: 
-	    rp->q_start+q_linstart, 
+    fprintf(fp, OUFMT_ALIGN,
+	    (rp->status&REPMATEFLG_REVERSE)?
+	    rp->q_end-q_linstart:
+	    rp->q_start+q_linstart,
 	    qbuf,
-	    (rp->status&REPMATEFLG_REVERSE)? 
-	    rp->q_end - q + 1: 
-	    rp->q_start + q - 1, 
+	    (rp->status&REPMATEFLG_REVERSE)?
+	    rp->q_end - q + 1:
+	    rp->q_start + q - 1,
 	    dbuf,
 	    (int) rp->s_start+s_linstart, sbuf,
 	    (int) rp->s_start+s-1);
 
     s_linstart = s;
-    q_linstart = q; 
+    q_linstart = q;
     j = 0;
   } /* (*ucp) */
-  
+
   return ((*ucp))? ERRCODE_DIFFSTR: ERRCODE_SUCCESS;
 }
 
@@ -431,7 +430,7 @@ static int reallocREPSTR(REPSTR *rsp, size_t newlen)
   return errcode;
 }
 
-static int copyReadNamStrToREPSTR(REPSTR *rsp, 
+static int copyReadNamStrToREPSTR(REPSTR *rsp,
 				  BOOL_t is_stripped, const char *namp)
 {
   int errcode = ERRCODE_SUCCESS;
@@ -443,7 +442,7 @@ static int copyReadNamStrToREPSTR(REPSTR *rsp,
       break;
     if (isspace(c))
       break;
-    if (((size_t) i) + 1 >= rsp->n_alloc && 
+    if (((size_t) i) + 1 >= rsp->n_alloc &&
 	(errcode = reallocREPSTR(rsp, i+1)))
       break;
     rsp->strp[i] = (char) c;
@@ -451,12 +450,12 @@ static int copyReadNamStrToREPSTR(REPSTR *rsp,
 
   /* don't copy the '/1', '/2' extension */
   if ((is_stripped) && i>2 && rsp->strp[i-2] == OUFMT_NAMSTR_MATESEP &&
-      (rsp->strp[i-1] == OUFMT_NAMSTR_MATE1 || rsp->strp[i-1] == OUFMT_NAMSTR_MATE2)) 
+      (rsp->strp[i-1] == OUFMT_NAMSTR_MATE1 || rsp->strp[i-1] == OUFMT_NAMSTR_MATE2))
     i -= 2;
 
   rsp->strp[i] = '\0';
   rsp->strl = (size_t) i;
-  
+
   return (i < INT_MAX)? errcode: ERRCODE_SEQNAMLEN;
 }
 
@@ -465,15 +464,15 @@ static int copyReadNameToREPSTR(REPSTR *rsp, BOOL_t is_stripped, const SeqFastq 
   const char *namp;
 
   namp = (NULL == sqp)? OUFMT_SAM_NULLSTR: seqFastqGetSeqName(sqp);
- 
+
   return copyReadNamStrToREPSTR(rsp, is_stripped, namp);
 }
 
 #ifdef HAVE_BAMBAMC
-static int copySAMheaderCommandLineToREPSTR(REPSTR *rsp, 
+static int copySAMheaderCommandLineToREPSTR(REPSTR *rsp,
 					    const char *prognam,
 					    const char *progversion,
-					    int narg, 
+					    int narg,
 					    char * const *argv)
 {
   int errcode = ERRCODE_SUCCESS;
@@ -493,7 +492,7 @@ static int copySAMheaderCommandLineToREPSTR(REPSTR *rsp,
     return errcode;
 
   if ((nc = sprintf(rsp->strp, SAMFORM_PROGLINE, prognam, prognam, progversion)) < 1)
-    return ERRCODE_WRITEERR; 
+    return ERRCODE_WRITEERR;
   rsp->strl += (size_t) nc;
 
   if ((nc = sprintf(rsp->strp + rsp->strl, "%s", argv[0])) < 1)
@@ -505,10 +504,10 @@ static int copySAMheaderCommandLineToREPSTR(REPSTR *rsp,
 	return ERRCODE_WRITEERR;
     rsp->strl += (size_t) nc;
   }
-  if ((nc = sprintf(rsp->strp + rsp->strl, "\n")) < 1) 
+  if ((nc = sprintf(rsp->strp + rsp->strl, "\n")) < 1)
     return ERRCODE_WRITEERR;
   rsp->strl += (size_t) nc;
-	
+
   return ERRCODE_SUCCESS;
 }
 #endif
@@ -542,12 +541,12 @@ static REPNAMBUF *createREPNAMBUF(void)
 /******************************************************************************
  *********************** Private Methods of Type REPALI ***********************
  ******************************************************************************/
-static int findREPALI(const REPALI *rar, 
+static int findREPALI(const REPALI *rar,
 		      int *idxp,
 		      SEQLEN_t q_start, SEQLEN_t q_end,
 		      REPMATEFLG_t rmatflg,
 		      SEQLEN_t s_start, SEQLEN_t s_end, SEQNUM_t s_idx)
-/**< check whether there is an alignment exactly like this already in the 
+/**< check whether there is an alignment exactly like this already in the
  * array rar. If there is return ERRCODE_SUCCESS and the indes in idxp,
  * otherwise return ERRCODE_FAILURE and *idxp < 0;
  */
@@ -562,7 +561,7 @@ static int findREPALI(const REPALI *rar,
   if (n > INT_MAX)
     return ERRCODE_OVERFLOW;
 
-  for (i=(int) n-1; 
+  for (i=(int) n-1;
        i >=0 &&
 	 (s_start != rar[i].s_start ||
 	  s_end !=rar[i].s_end ||
@@ -575,10 +574,10 @@ static int findREPALI(const REPALI *rar,
 
   return (i < 0)? ERRCODE_FAILURE: ERRCODE_SUCCESS;
 }
-		  
+
 static int fprintREPALIssaha(FILE *fp, const REPALI *rp, short mapscor,
 			     REPSTR *q_namp,
-			     const SeqFastq *q_sqp, const char *q_namext, 
+			     const SeqFastq *q_sqp, const char *q_namext,
 			     const char *s_nam, SEQLEN_t s_len, const DIFFSTR_T *diffstr,
 			     REPPAIRFLG_t pairflg)
 {
@@ -593,7 +592,7 @@ static int fprintREPALIssaha(FILE *fp, const REPALI *rp, short mapscor,
     return errcode;
 
   seqFastqGetConstSequence(q_sqp, &qlen, NULL);
-  
+
   if ((rp != NULL) && (rp->status & REPMATEFLG_MAPPED)) {
     if (rp->status&REPMATEFLG_REVERSE) {
       qs = rp->q_end;
@@ -613,7 +612,7 @@ static int fprintREPALIssaha(FILE *fp, const REPALI *rp, short mapscor,
    if ((diffstr)) {
       alilen = diffStrCalcAliLen(&matchlen, diffstr);
       idfrac = (alilen > 0)? ((double) 100*matchlen)/alilen: .0;
-    } 
+    }
   } else {
     qs = qe = rs = re = 0;
     sensechr = OUFMT_SENSE_UNKNOWN;
@@ -632,7 +631,7 @@ static int fprintREPALIssaha(FILE *fp, const REPALI *rp, short mapscor,
   fprintf(fp, OUFMT_SSAHA, flagchr,
 	  (mapscor > OUFMT_CIGAR_MAXTAG)? OUFMT_CIGAR_MAXTAG:mapscor,
 	  swatscor,
-	  q_namp->strp, q_namext, 
+	  q_namp->strp, q_namext,
 	  s_nam,
 	  (unsigned int) qs, (unsigned int) qe,
 	  (unsigned int) rs, (unsigned int) re,
@@ -641,14 +640,14 @@ static int fprintREPALIssaha(FILE *fp, const REPALI *rp, short mapscor,
 	  idfrac,
 	  qlen,
 	  s_len);
-  
+
   return errcode;
 }
 
 static int fprintREPALIgff2(FILE *fp, const REPALI *rp,
 			    REPSTR *q_namp,
-			    const SeqFastq *q_sqp, const char *q_namext, 
-			    const char *s_nam, 
+			    const SeqFastq *q_sqp, const char *q_namext,
+			    const char *s_nam,
 			    const DiffBlocks *dfblkp)
 {
   int errcode, swatscor;
@@ -662,7 +661,7 @@ static int fprintREPALIgff2(FILE *fp, const REPALI *rp,
     return errcode;
 
   seqFastqGetConstSequence(q_sqp, &qlen, NULL);
-  
+
   if ((rp != NULL) && (rp->status & REPMATEFLG_MAPPED)) {
     if (isReverse) {
       qs = rp->q_end;
@@ -685,12 +684,12 @@ static int fprintREPALIgff2(FILE *fp, const REPALI *rp,
   }
 
   fprintf(fp, OUFMT_GFF2,
-	  q_namp->strp, q_namext, 
+	  q_namp->strp, q_namext,
 	  (unsigned int) qs, (unsigned int) qe,
 	  swatscor, sensechr,
 	  s_nam,
 	  (unsigned int) rs, (unsigned int) re);
-  
+
   for (b=0; b<blkn; b++) {
     int q0 = 0;
     int r0 = 0;
@@ -698,7 +697,7 @@ static int fprintREPALIgff2(FILE *fp, const REPALI *rp,
     if (len < 1) break;
     if (isReverse) {
       q0 = rp->q_end - rp->q_start - q0;
-    } 
+    }
     fprintf(fp, OUFMT_GFF2_ALIBLOCK, q0 + 1, r0 + 1, len);
   }
   if (b == 0)
@@ -710,8 +709,8 @@ static int fprintREPALIgff2(FILE *fp, const REPALI *rp,
 
 static int fprintREPALIcigar(FILE *fp, const REPALI *rp, short mapscor,
 			     REPSTR *q_namp,
-			     const SeqFastq *q_sqp, const char *q_namext, 
-			     const char *s_nam, const DIFFSTR_T *diffstr, 
+			     const SeqFastq *q_sqp, const char *q_namext,
+			     const char *s_nam, const DIFFSTR_T *diffstr,
 			     REPPAIRFLG_t pairflg)
 {
   int errcode, swatscor;
@@ -745,13 +744,13 @@ static int fprintREPALIcigar(FILE *fp, const REPALI *rp, short mapscor,
     mapscor = 0;
     flagchr = (char) (((rp->status & REPMATEFLG_MULTI))? CIGFLG_MULTI: CIGFLG_NOMAP);
   }
-      
+
   fprintf(fp, OUFMT_CIGAR, flagchr,
 	  //mapscor*OUFMT_CIGAR_MAXTAG/MAPSCOR_MAX,
 	  (mapscor > OUFMT_CIGAR_MAXTAG)? OUFMT_CIGAR_MAXTAG:mapscor,
 	  q_namp->strp, q_namext, qs, qe,
 	  sensechr,
-	  s_nam, 
+	  s_nam,
 	  (unsigned int) rs, (unsigned int) re,
 	  swatscor);
   errcode = diffStrPrintf(fp, diffstr, DIFFSTRFORM_CIGNORM, 0, 0, 0);
@@ -759,7 +758,7 @@ static int fprintREPALIcigar(FILE *fp, const REPALI *rp, short mapscor,
   return errcode;
 }
 
-static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp, 
+static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp,
 			   REPSTR *readnamp,
 			   short mapscor,
 			   const REPALI *rrp, const DIFFSTR_T *diffstr,
@@ -781,7 +780,7 @@ static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp,
   int swatscor;
   SEQLEN_t pos=0, mpos=0;
 
-  if (!rrp) 
+  if (!rrp)
     return ERRCODE_ASSERT;
 
   if (!(sqbufp))
@@ -790,7 +789,7 @@ static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp,
 
   if ((errcode = copyReadNameToREPSTR(readnamp, 1, q_sqp)))
     return errcode;
-    
+
   seqFastqGetConstSequence(q_sqp, &qlen, &cod);
 
   if (rrp->status & REPMATEFLG_PAIRED) {
@@ -801,7 +800,7 @@ static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp,
     } else {
       samflg |=  SAMFLAG_1stMATE;
     }
- 
+
     if ((rmp) && (rmp->status & REPMATEFLG_MAPPED)) {
       mpos = (SEQLEN_t) rmp->s_start;
       if (rmp->status&REPMATEFLG_REVERSE)
@@ -811,11 +810,11 @@ static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp,
       isize = 0;
       mpos = 0;
       ms_nam = OUFMT_SAM_NULLSTR;
-    }		
+    }
   } else {
     ms_nam = OUFMT_SAM_NULLSTR;
   }
-  
+
   if ((rrp->status & REPMATEFLG_MAPPED)) {
     BOOL_t isReverse = (BOOL_t) ((rrp->status & REPMATEFLG_REVERSE)? 1 : 0);
     SEQLEN_t qseg_start, qseg_len;
@@ -827,7 +826,7 @@ static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp,
       qseg_start = rrp->q_start-1;
       qseg_len = rrp->q_end - rrp->q_start + 1;
     }
-    errcode = seqFastqAppendSegment(sqbufp, q_sqp, 
+    errcode = seqFastqAppendSegment(sqbufp, q_sqp,
 				    qseg_start, qseg_len,
 				    (isReverse), (isReverse)? codecp: NULL);
     if (errcode)
@@ -835,7 +834,7 @@ static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp,
     if (cod == SEQCOD_MANGLED &&
 	(errcode = seqFastqDecode(sqbufp, codecp)))
       return errcode;
-    
+
     seqstr = seqFastqGetConstSequence(sqbufp, NULL, &cod);
     if (cod != SEQCOD_ASCII)
       return ERRCODE_SEQCODE;
@@ -872,7 +871,7 @@ static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp,
       if (cod != SEQCOD_ASCII)
 	return ERRCODE_SEQCODE;
       qualstr = seqFastqGetConstQualityFactors(sqbufp, NULL, NULL);
-    } else { 
+    } else {
       seqstr = OUFMT_SAM_NULLSTR;
       qualstr = OUFMT_SAM_NULLSTR;
     }
@@ -885,21 +884,21 @@ static int fprintREPALIsam(FILE *fp, SeqFastq *sqbufp,
   if (!qualstr || !qualstr[0])
     qualstr = OUFMT_SAM_NULLSTR;
 
-  fprintf(fp, OUFMT_SAM_BEFORE, 
+  fprintf(fp, OUFMT_SAM_BEFORE,
 	  readnamp->strp, samflg, s_nam, pos, mapscor);
 
   if (rrp->status & REPMATEFLG_MAPPED) {
-    errcode = diffStrPrintf(fp, diffstr, 
-			    (char) ((oumodiflg & REPORTMODIF_XMISMATCH)? 
-				    DIFFSTRFORM_CIGEXT_XMISMATCH: DIFFSTRFORM_CIGEXT), 
-				    clip_start, clip_end, 
+    errcode = diffStrPrintf(fp, diffstr,
+			    (char) ((oumodiflg & REPORTMODIF_XMISMATCH)?
+				    DIFFSTRFORM_CIGEXT_XMISMATCH: DIFFSTRFORM_CIGEXT),
+				    clip_start, clip_end,
 			    (char) ((oumodiflg & REPORTMODIF_SOFTCLIP) != 0));
     if (!errcode)
       editdist = diffStrGetLevenshteinDistance(diffstr);
   } else {
     fprintf(fp, OUFMT_SAM_NULLSTR);
   }
-  fprintf(fp, OUFMT_SAM_AFTER, 
+  fprintf(fp, OUFMT_SAM_AFTER,
 	  ms_nam, mpos, isize, seqstr, qualstr, editdist, swatscor);
 
   return errcode;
@@ -914,8 +913,8 @@ void fprintREPALIraw(FILE *fp, const REPALI *p)
 }
 #endif
 #ifdef HAVE_BAMBAMC
-static int writeREPALIbam(BamBam_BamWriter *bamwriterp, 
-			  SeqFastq *sqbufp, 
+static int writeREPALIbam(BamBam_BamWriter *bamwriterp,
+			  SeqFastq *sqbufp,
 			  REPSTR *readnamp,
 			  DiffView *dvp,
 			  short mapscor,
@@ -938,7 +937,7 @@ static int writeREPALIbam(BamBam_BamWriter *bamwriterp,
   SEQLEN_t qlen;
   const char *seqstr, *qualstr, *cigarstr;
 
-  if (!rrp) 
+  if (!rrp)
     return ERRCODE_ASSERT;
 
   if (!(sqbufp))
@@ -947,13 +946,13 @@ static int writeREPALIbam(BamBam_BamWriter *bamwriterp,
 
   if ((errcode = copyReadNameToREPSTR(readnamp, 1, q_sqp)))
     return errcode;
-    
+
   if (rrp->s_idx > INT_MAX)
     return ERRCODE_OVERFLOW;
   s_idx = (int) rrp->s_idx;
 
   seqFastqGetConstSequence(q_sqp, &qlen, &cod);
-  
+
   if (rrp->status & REPMATEFLG_PAIRED) {
     bamflg |= BAMBAMC_FPAIRED;
     if ((rrp->status & REPMATEFLG_2NDMATE)) {
@@ -962,7 +961,7 @@ static int writeREPALIbam(BamBam_BamWriter *bamwriterp,
     } else {
       bamflg |= BAMBAMC_FREAD1;
     }
- 
+
     if ((rmp) && (rmp->status & REPMATEFLG_MAPPED)) {
       mpos = (SEQLEN_t) rmp->s_start;
       if (rmp->s_idx > INT_MAX)
@@ -975,14 +974,14 @@ static int writeREPALIbam(BamBam_BamWriter *bamwriterp,
       isize = 0;
       mpos = 0;
       ms_idx = -1;
-    }		
+    }
   } else {
     ms_idx = -1;
   }
-  
+
   if ((rrp->status & REPMATEFLG_MAPPED)) {
     BOOL_t isReverse = (BOOL_t) ((rrp->status & REPMATEFLG_REVERSE)? 1 : 0);
-    errcode = seqFastqAppendSegment(sqbufp, q_sqp, 
+    errcode = seqFastqAppendSegment(sqbufp, q_sqp,
 				    0, 0,
 				    (isReverse), (isReverse)? codecp: NULL);
     if (errcode)
@@ -990,7 +989,7 @@ static int writeREPALIbam(BamBam_BamWriter *bamwriterp,
     if (cod == SEQCOD_MANGLED &&
 	(errcode = seqFastqDecode(sqbufp, codecp)))
       return errcode;
-    
+
     seqstr = seqFastqGetConstSequence(sqbufp, NULL, &cod);
     if (cod != SEQCOD_ASCII)
       return ERRCODE_SEQCODE;
@@ -1040,19 +1039,19 @@ static int writeREPALIbam(BamBam_BamWriter *bamwriterp,
   }
 
   if (rrp->status & REPMATEFLG_MAPPED) {
-    errcode = diffStrAsView(dvp, diffstr, 
-			    (char) ((oumodiflg & REPORTMODIF_XMISMATCH)? 
-				    DIFFSTRFORM_CIGEXT_XMISMATCH:DIFFSTRFORM_CIGEXT), 
+    errcode = diffStrAsView(dvp, diffstr,
+			    (char) ((oumodiflg & REPORTMODIF_XMISMATCH)?
+				    DIFFSTRFORM_CIGEXT_XMISMATCH:DIFFSTRFORM_CIGEXT),
 			    clip_start, clip_end, (char) ((oumodiflg & REPORTMODIF_SOFTCLIP) != 0));
     cigarstr = ((errcode))? OUFMT_BAM_NULLSTR: diffStrGetViewStr(dvp);
     /* don't use asterisk here - bambam library can't handle that - use empty string */
-    
+
     if (!errcode)
       editdist = diffStrGetLevenshteinDistance(diffstr);
   } else {
     cigarstr = OUFMT_BAM_NULLSTR;
   }
-  
+
   errc = BamBam_BamWriter_PutAlignment(bamwriterp,
 					bamflg,
 					s_idx, /* chromosome */
@@ -1105,7 +1104,7 @@ static int writeREPALI(
 		       REPNAMBUF *nambufp,
 		       const SeqCodec *codecp
 		       )
-     /**< Print one result element 
+     /**< Print one result element
       * \param fp Stream to which result should be printed.
       * \param rp Mapping result of the read.
       * \param rdfsp Compressed alignment string pointed to by rp->dfo.
@@ -1122,9 +1121,9 @@ static int writeREPALI(
       * \param matep Sequence of the mate (NULL if single read or mate not mapped).
       * \param sqbufp Buffer (used for SAM output).
       * \param codecp Sequence De-/Entcoder (used for SAM output)
-      * 
+      *
       */
-{ 
+{
   int errcode = ERRCODE_SUCCESS;
   short mapscor =0;
   BOOL_t is_mapped = (BOOL_t) (rp != NULL && (rp->status & REPMATEFLG_MAPPED));
@@ -1143,7 +1142,7 @@ static int writeREPALI(
 
 #ifdef report_debug
   printf("report_debug:fprintRESULT()\n");
-#endif  
+#endif
 
   if (is_mapped) {
     ref_len = seqSetGetSeqDatByIndex(NULL, &s_nam, rp->s_idx, ssp);
@@ -1195,30 +1194,30 @@ static int writeREPALI(
     else m_snam = OUFMT_SAM_NULLSTR;
     errcode = copyReadNamStrToREPSTR(&nambufp->mref_nam, 0, m_snam);
     if (!errcode)
-      errcode = fprintREPALIsam(fp, sqbufp, 
+      errcode = fprintREPALIsam(fp, sqbufp,
 				&nambufp->q_nam,
 				mapscor, rp,
 				dstrp,
-				q_sqp, 
-				nambufp->ref_nam.strp, 
-				rsltmp, 
+				q_sqp,
+				nambufp->ref_nam.strp,
+				rsltmp,
 				nambufp->mref_nam.strp,
 				isize, pairflg,
-				oumodiflg, 
+				oumodiflg,
 				codecp);
     break;
 #ifdef HAVE_BAMBAMC
   case REPORTFMT_BAM:
-    errcode = writeREPALIbam(bamwriterp, 
-			     sqbufp, 
+    errcode = writeREPALIbam(bamwriterp,
+			     sqbufp,
 			     &nambufp->q_nam,
 			     dvp,
 			     mapscor, rp,
 			     dstrp,
-			     q_sqp, 
+			     q_sqp,
 			     rsltmp,
 			     isize, pairflg,
-			     oumodiflg, 
+			     oumodiflg,
 			     codecp);
     break;
 #endif
@@ -1228,12 +1227,12 @@ static int writeREPALI(
   }
 #ifdef RESULTS_TRACKER
   trackGetData(trackp, &target_pos, &target_refidx, &target_flags, NULL, &target_dfsp);
-  
+
   if ((rp) && target_refidx == rp->s_idx) {
     int reflen;
     if ((errcode = diffStrCalcSeqLen(NULL, &reflen, target_dfsp->dstrp)))
       return errcode;
-    if ((((SEQLEN_t) target_pos) <= rp->s_start) && 
+    if ((((SEQLEN_t) target_pos) <= rp->s_start) &&
 	(rp->s_end < (SEQLEN_t) (target_pos + reflen))) {
       BOOL_t revflag = (rp->status&REPMATEFLG_REVERSE)? 1:0;
       if (revflag == ((target_flags & TRACKFLG_REVERSE)? 1:0))
@@ -1243,10 +1242,10 @@ static int writeREPALI(
 #endif
 #ifdef report_debug
   printf("report_debug:writeREPALI(): ");
-  if (!errcode) 
+  if (!errcode)
     errcode = diffStrPrintf(stdout, dstrp, DIFFSTRFORM_RAW, 0, 0, 0);
   printf("\n");
-#endif  
+#endif
   return errcode;
 }
 
@@ -1263,14 +1262,14 @@ static int writeREPALI(
  ****************** Private Methods Used by Type ReportWriter *****************
  ******************************************************************************/
 
-static int writeSAMHeaderf(FILE *oufp, const SeqSet *ssp, 
+static int writeSAMHeaderf(FILE *oufp, const SeqSet *ssp,
 		    const char *prognam, const char *progversion,
 		    int narg, char * const *argv)
 {
   SEQNUM_t s, snum = seqSetGetSeqNumAndTotLen(NULL, ssp);
   int i;
   char nambf[SEQNAM_SAM_MAXLEN];
- 
+
   if (fprintf(oufp, SAMFORM_HEADLINE) < 1)
     return ERRCODE_WRITEERR;
   for (s=0; s<snum; s++) {
@@ -1300,12 +1299,12 @@ static int writeSAMHeaderf(FILE *oufp, const SeqSet *ssp,
 }
 
 #ifdef HAVE_BAMBAMC
-static int initBAMHeader(BamBam_BamWriter **bamwriterpp, 
-			 BamBam_BamHeaderInfo **headinfopp, 
+static int initBAMHeader(BamBam_BamWriter **bamwriterpp,
+			 BamBam_BamHeaderInfo **headinfopp,
 			 REPSTR * sbufp,
-			 const char *prognam, 
+			 const char *prognam,
 			 const char *progversion,
-			 int narg, 
+			 int narg,
 			 char * const *argv,
 			 const char *filnamp,
 			 const SeqSet *ssp)
@@ -1315,15 +1314,15 @@ static int initBAMHeader(BamBam_BamWriter **bamwriterpp,
 
   if (NULL == ssp)
     return ERRCODE_ASSERT;
-  
-  if ((errcode = copySAMheaderCommandLineToREPSTR(sbufp, 
+
+  if ((errcode = copySAMheaderCommandLineToREPSTR(sbufp,
 						  prognam, progversion,
 						  narg, argv)))
     return errcode;
- 
-  
-  *headinfopp = BamBam_BamHeaderInfo_New(SAMBAM_HEADER_VERSION, 
-					 SAMBAM_SORTORDER_UNKNOWN, 
+
+
+  *headinfopp = BamBam_BamHeaderInfo_New(SAMBAM_HEADER_VERSION,
+					 SAMBAM_SORTORDER_UNKNOWN,
 					 sbufp->strp);
 
   if (NULL == *headinfopp)
@@ -1346,8 +1345,8 @@ static int initBAMHeader(BamBam_BamWriter **bamwriterpp,
   if (errcode != ERRCODE_SUCCESS)
     return errcode;
 
-  *bamwriterpp = BamBam_BamWriter_New(*headinfopp, 
-				      filnamp, 
+  *bamwriterpp = BamBam_BamWriter_New(*headinfopp,
+				      filnamp,
 				      SAMBAM_COMPRESSION_LEVEL);
 
   return (NULL == *bamwriterpp)? ERRCODE_NOMEM: ERRCODE_SUCCESS;
@@ -1360,7 +1359,7 @@ static int initBAMHeader(BamBam_BamWriter **bamwriterpp,
 
 ReportWriter *reportCreateWriter(int *errcode,
 				 const char * const filnam,
-				 const REPOUFMT_t outform, 
+				 const REPOUFMT_t outform,
 				 const REPMODIFLG_t modiflg,
 				 const SeqSet *ssp,
 				 const char *prognam,
@@ -1390,7 +1389,7 @@ ReportWriter *reportCreateWriter(int *errcode,
     p->dfblkp = diffBlocksCreate(0);
     if (NULL == p->dfblkp)
       errc = ERRCODE_NOMEM;
-    else 
+    else
       p->dfblkp = NULL;
   }
 
@@ -1401,17 +1400,17 @@ ReportWriter *reportCreateWriter(int *errcode,
   p->namext_mate[0] = '\0';
   p->dfblkp = NULL;
 
-  if (ERRCODE_SUCCESS == errc) {   
+  if (ERRCODE_SUCCESS == errc) {
 #ifdef HAVE_BAMBAMC
     if (REPORTFMT_BAM == outform) {
       p->oufp = stdout; /* needed e.g. for explicit alignment output */
-      errc = initBAMHeader(&p->bamwriterp, &p->headinfop, 
-			   &p->nambufp->ref_nam, 
+      errc = initBAMHeader(&p->bamwriterp, &p->headinfop,
+			   &p->nambufp->ref_nam,
 			   prognam, progversion,
 			   cmdlin_narg, cmdlin_argv,
-			   p->filnam, 
+			   p->filnam,
 			   ssp);
-     if (!(errc) && 
+     if (!(errc) &&
 	  ((p->dvp = diffStrCreateView(0)) == NULL))
 	errc = ERRCODE_NOMEM;
     } else {
@@ -1425,7 +1424,7 @@ ReportWriter *reportCreateWriter(int *errcode,
 	p->oufp = EFOPEN(p->filnam, "w");
 	if (NULL == p->oufp) {
 	  errc = ERRCODE_NOFILE;
-	} 
+	}
       }
       if ((outform == REPORTFMT_SAM) && (modiflg & REPORTMODIF_HEADER)) {
 	if (NULL == ssp) {
@@ -1440,7 +1439,7 @@ ReportWriter *reportCreateWriter(int *errcode,
     }
 #endif
   }
- 
+
   if (ERRCODE_SUCCESS != errc) {
     reportDeleteWriter(p);
     p = NULL;
@@ -1500,9 +1499,9 @@ static int writeReportForRead(const ReportWriter *wrp,
 
 #ifdef RESULTS_TRACKER
   BOOL_t isHitRead = 0;
-#endif 
+#endif
 
-  if ((errcode = writeREPALI(wrp->oufp, 
+  if ((errcode = writeREPALI(wrp->oufp,
 #ifdef HAVE_BAMBAMC
 			     wrp->bamwriterp,
 			     wrp->dvp,
@@ -1511,7 +1510,7 @@ static int writeReportForRead(const ReportWriter *wrp,
 #ifdef RESULTS_TRACKER
 			     trackp,
 			     &isHitRead,
-#endif 
+#endif
 			      ssp,
 			      wrp->namext, wrp->oufmt, wrp->modflg, wrp->dfblkp,
 			      pairflg, isize, malip, wrp->qbufp, wrp->nambufp,
@@ -1520,7 +1519,7 @@ static int writeReportForRead(const ReportWriter *wrp,
 
   if ((wrp->modflg & REPORTMODIF_ALIOUT) != 0 && (ralip) &&
       (ralip->status & REPMATEFLG_MAPPED) != 0 &&
-      (errcode = fprintAlignment(wrp->oufp, wrp->sbufp, wrp->qbufp, 
+      (errcode = fprintAlignment(wrp->oufp, wrp->sbufp, wrp->qbufp,
 				 readp, wrp->linwidth,
 				 rdfsp, ssp, codecp, ralip)))
     return errcode;
@@ -1528,7 +1527,7 @@ static int writeReportForRead(const ReportWriter *wrp,
 #ifdef RESULTS_TRACKER
   if (!isHitRead)
     trackPrintf(wrp->oufp, trackp);
-#endif 
+#endif
 
   return errcode;
 }
@@ -1543,7 +1542,7 @@ static int writeReportForRead(const ReportWriter *wrp,
 Report *reportCreate(int blksz)
 {
   Report *p;
-  
+
   if (NULL != EMALLOCP0(p)) {
     if (blksz <= 0) blksz = REPORT_DEFBLKSZ;
     if (NULL == ARRCREATE(p->pairr, blksz) ||
@@ -1552,7 +1551,7 @@ Report *reportCreate(int blksz)
 	diffStrInit(&p->dfs, 0)) {
       reportDelete(p);
       p = NULL;
-    } 
+    }
   }
   return p;
 }
@@ -1593,7 +1592,7 @@ int reportNextPairID(Report *rep)
   return pairid;
 }
 
-int reportAddMap(Report *rep, 
+int reportAddMap(Report *rep,
 		 int pairid,
 		 int swatscor, short mapscor,
 		 SEQLEN_t q_start, SEQLEN_t q_end,
@@ -1606,12 +1605,12 @@ int reportAddMap(Report *rep,
   int idx = -1;
   REPALI *rp = NULL;
   REPPAIR *pp = NULL;
-  
+
   if (NULL == dstrp || dfslen < 1) {
     mateflg &= ~REPMATEFLG_MAPPED;
   }
 
-  
+
 
   if ((mateflg & REPMATEFLG_PAIRED) && pairid >= 0) {
     if (((size_t) pairid) >= ARRLEN(rep->pairr))
@@ -1626,7 +1625,7 @@ int reportAddMap(Report *rep,
 
   if (pp != NULL &&
       (mateflg & REPMATEFLG_2NDMATE)) {
-    if (pp->iA >= 0) { 
+    if (pp->iA >= 0) {
       /* 1st mate already set, so check insert size is consistent */
       if (insiz != pp->isize)
 	return ERRCODE_ASSERT;
@@ -1650,7 +1649,7 @@ int reportAddMap(Report *rep,
     /* here, the 1st mate of a paired read is added or
        a single read that is not part of a pair */
     REPALI **arp = &rep->arAr;
-    if (NULL == pp) { 
+    if (NULL == pp) {
       /* add single read */
       if (mateflg & REPMATEFLG_2NDMATE)
 	arp = &rep->arBr;
@@ -1667,10 +1666,10 @@ int reportAddMap(Report *rep,
     errc = findREPALI(*arp, &idx, q_start, q_end, mateflg,
 		      s_start, s_end, s_idx);
     if (ERRCODE_FAILURE == errc) {
-      if (pp != NULL) 
+      if (pp != NULL)
 	pp->iA = ARRLEN(rep->arAr);
       ARRNEXTP(rp, *arp);
-      if (NULL == rp) 
+      if (NULL == rp)
 	errcode = ERRCODE_NOMEM;
     } else if (ERRCODE_SUCCESS == errc) {
       if (NULL == pp) {
@@ -1685,7 +1684,7 @@ int reportAddMap(Report *rep,
       errcode = errc;
     }
   }
- 
+
   if (!(errcode) && rp != NULL) {
     rp->status = mateflg;
     rp->dfo = DIFFSTR_LENGTH(&rep->dfs);
@@ -1745,23 +1744,23 @@ void reportFixMultiplePrimary(Report *rep)
 	n_primary_B++;
   }
   if ( n_primary_A > 1)
-    for (n=0; n < na; n++) 
+    for (n=0; n < na; n++)
       rep->arAr[n].status &= ~REPMATEFLG_PRIMARY;
-  
+
    if ( n_primary_B > 1)
-    for (n=0; n < nb; n++) 
+    for (n=0; n < nb; n++)
       rep->arBr[n].status &= ~REPMATEFLG_PRIMARY;
-   
-   return;   
+
+   return;
 }
 
 int reportWrite(const ReportWriter *wrp,
 #ifdef RESULTS_TRACKER
 		const Track *read_trackp,
 		const Track *mate_trackp,
-#endif 
-		const SeqFastq *readp, 
-		const SeqFastq *matep, 
+#endif
+		const SeqFastq *readp,
+		const SeqFastq *matep,
 		const SeqSet *ssp,
 		const SeqCodec *codecp,
 		const Report *rep)
@@ -1772,36 +1771,36 @@ int reportWrite(const ReportWriter *wrp,
   int np = ARRLEN(rep->pairr);
   REPPAIRFLG_t pairflg;
   REPALI *ap = NULL, *bp = NULL;
-  
+
   /* print all the pairs first */
   for (n=0; n<na; n++)
     rep->arAr[n].was_output = 0;
   for (n=0; n<nb; n++)
     rep->arBr[n].was_output = 0;
-  
+
   for (n=0; n<np; n++) {
     REPPAIR *pp = rep->pairr + n;
     ap = rep->arAr + pp->iA;
     bp = rep->arBr + pp->iB;
     ap->was_output = 1;
     bp->was_output = 1;
-    errcode = writeReportForRead(wrp, 
+    errcode = writeReportForRead(wrp,
 #ifdef RESULTS_TRACKER
 				 read_trackp,
-#endif				    
+#endif
 				 ap,readp,
 				 &rep->dfs,
 				 bp,
 				 pp->isize,
 				 pp->pairflg,
 				 ssp, codecp);
-    
+
     if ((errcode)) break;
-    
-    errcode = writeReportForRead(wrp, 
+
+    errcode = writeReportForRead(wrp,
 #ifdef RESULTS_TRACKER
 				 mate_trackp,
-#endif				    
+#endif
 				 bp,matep,
 				 &rep->dfs,
 				 ap,
@@ -1811,7 +1810,7 @@ int reportWrite(const ReportWriter *wrp,
     if ((errcode))
       break;
   }
-  
+
   if ((errcode))
     return errcode;
 
@@ -1821,19 +1820,19 @@ int reportWrite(const ReportWriter *wrp,
   } else {
    pairflg = 0;
   }
-  
+
   for (n=0; n < na && !(errcode); n++) {
     ap = rep->arAr + n;
     if ((rep->arAr[n].was_output))
       continue;
-    errcode = writeReportForRead(wrp, 
+    errcode = writeReportForRead(wrp,
 #ifdef RESULTS_TRACKER
 				 read_trackp,
-#endif				    
+#endif
 				 ap,readp,
 				 &rep->dfs,
 				 NULL,
-				 0, 
+				 0,
 				 pairflg,
 				 ssp, codecp);
   }
@@ -1847,11 +1846,11 @@ int reportWrite(const ReportWriter *wrp,
     bp = rep->arBr + n;
     if ((rep->arBr[n].was_output))
       continue;
-    errcode = writeReportForRead(wrp, 
+    errcode = writeReportForRead(wrp,
 #ifdef RESULTS_TRACKER
 
 				 mate_trackp,
-#endif				    
+#endif
 				 bp, matep,
 				 &rep->dfs,
 				 NULL,

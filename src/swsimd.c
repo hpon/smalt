@@ -3,7 +3,7 @@
 /*****************************************************************************
  *****************************************************************************
  *                                                                           *
- *  Copyright (C) 2010 - 2014 Genome Research Ltd.                           * 
+ *  Copyright (C) 2010 - 2014 Genome Research Ltd.                           *
  *                                                                           *
  *  Author: Hannes Ponstingl (hp3@sanger.ac.uk)                              *
  *                                                                           *
@@ -43,10 +43,10 @@ enum {
 typedef unsigned char UCHAR;
 
 #ifdef SCORE_SIMD_IMIC
-static __attribute__((align(64))) const int SIMD_LEFTSHIFT_PERMXV[NELEM_REGISTER] = 
+static __attribute__((align(64))) const int SIMD_LEFTSHIFT_PERMXV[NELEM_REGISTER] =
   {0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
 #else
-static short BIAS = ((short) 1)<<15;
+static short BIAS = (short) ((short) 1<<15);
 #endif
 
 /******************************************************************************
@@ -97,7 +97,7 @@ static short BIAS = ((short) 1)<<15;
 #define SIMD_NEGBIAS_VECTOR(v) \
   SIMD_ZERO_VECTOR((v)); \
   (v) = _mm_cmpeq_epi16 ((v), (v));\
-  (v) = _mm_slli_epi16 ((v), 15); 
+  (v) = _mm_slli_epi16 ((v), 15);
 
 #define COPY_BYTE_TO_REGISTER_VALUE(b, v) \
   SIMD_ZERO_VECTOR((v)); \
@@ -166,7 +166,7 @@ static void printfStripedIntVector(int *vp, unsigned int qlen, int segsiz)
   if (segsiz <= 0)
     return;
   nseg = (qlen + segsiz - 1)/segsiz;
-  
+
   for (j=0; j<nseg; j++)
     for (k = (unsigned int) j; k<qlen; k += SCORSIMD_NINTS)
       printf("%3i|", vp[k]);
@@ -180,7 +180,7 @@ static void printfStripedShortVector(short *vp, unsigned int qlen, int segsiz)
   if (segsiz <= 0)
     return;
   nseg = (qlen + segsiz - 1)/segsiz;
-  
+
   for (j=0; j<nseg; j++)
     for (k = (unsigned int) j; k<qlen; k += SCORSIMD_NSHORTS)
       printf("%3hi|", vp[k]-BIAS);
@@ -194,7 +194,7 @@ static void printfStripedByteVector(unsigned char *vp, unsigned int qlen, int se
   if (segsiz <= 0)
     return;
   nseg = (qlen + segsiz - 1)/segsiz;
-  
+
   for (j=0; j<nseg; j++)
     for (k = (unsigned int) j; k<qlen; k += SCORSIMD_NBYTES)
       printf("%3hu|", (unsigned short) vp[k]);
@@ -205,7 +205,7 @@ static void printfStripedByteVector(unsigned char *vp, unsigned int qlen, int se
 
 #ifdef SCORE_SIMD_IMIC
 static int alignSmiWatIntStriped(unsigned int *maxscor,
-				 const AliBuffer *abp, 
+				 const AliBuffer *abp,
 				 const ScoreProfile *spp,
 #ifdef alignment_matrix_debug
 				 const char *psqp,
@@ -249,12 +249,12 @@ static int alignSmiWatIntStriped(unsigned int *maxscor,
   if (!((vEp) && (vHSp) && (vHLp)))
     return ERRCODE_ASSERT;
 
-  vProfp = (const __m512i *) 
-    scoreGetStripedProfile(NULL, 
+  vProfp = (const __m512i *)
+    scoreGetStripedProfile(NULL,
 #ifdef alignment_matrix_debug
 			   &qlen,
 #else
-			   NULL, 
+			   NULL,
 #endif
 			   &gap_init, &gap_ext, NULL, &segsiz,
 			   SCORPROF_STRIPED_32, spp);
@@ -264,7 +264,7 @@ static int alignSmiWatIntStriped(unsigned int *maxscor,
   /* Set SSE constants */
   SIMD_COPY_SCALAR_TO_VECTOR(gap_init, vGapI);
   SIMD_COPY_SCALAR_TO_VECTOR(gap_ext, vGapE);
-  
+
 
   /* initialize storage vector to 0 */
   SIMD_ZERO_VECTOR(vMax);
@@ -285,7 +285,7 @@ static int alignSmiWatIntStriped(unsigned int *maxscor,
 
     /* zero out F */
     SIMD_ZERO_VECTOR(vF);
-    
+
     /* load the next h value,
      * initialise element on right to conceptual 0 */
     vH = _mm512_load_epi32(vHSp + segsiz - 1);
@@ -314,7 +314,7 @@ static int alignSmiWatIntStriped(unsigned int *maxscor,
       vMax = _mm512_max_epi32(vMax, vH);
 
 #ifdef alignment_matrix_debug
-      /*       //printfSIMDV(&vMax, oubufp, "vMax", 0); */      
+      /*       //printfSIMDV(&vMax, oubufp, "vMax", 0); */
       /* find largest score in the vMax vector */
       SIMD_MAXELEMV(vMax, vMaxBuf, vTmpBuf);
       _mm512_mask_packstorelo_epi32(&score, mSEL1, vMaxBuf);
@@ -372,7 +372,7 @@ static int alignSmiWatIntStriped(unsigned int *maxscor,
     /* lazy_Floop_ctr = 0; */
     while (cmpval != 0x0000
 	   /* && lazy_Floop_ctr < 32 */
-	   ) { 
+	   ) {
 #else
     while (cmpval != 0x0000) {
 #endif
@@ -383,7 +383,7 @@ static int alignSmiWatIntStriped(unsigned int *maxscor,
 
       /* save vH values */
       _mm512_store_epi32 (vHSp + j, vH);
-      
+
       /*  update vE in case the new vH value would change it */
       vH = _mm512_sub_epi32 (vH, vGapI);
       vE = _mm512_max_epi32 (vE, vH);
@@ -431,9 +431,9 @@ static int alignSmiWatIntStriped(unsigned int *maxscor,
 
   SIMD_MAXELEMV_DESTRUCT(vMax, vTmp);
   _mm512_mask_packstorelo_epi32(&score, mSEL1, vMax);
-  
+
   *maxscor = (unsigned int) score;
-#ifdef alignment_matrix_debug  
+#ifdef alignment_matrix_debug
   free(oubuf_allocp);
 #endif
   return errcode;
@@ -441,7 +441,7 @@ static int alignSmiWatIntStriped(unsigned int *maxscor,
 
 #else /* #ifdef SCORE_SIMD_IMIC */
 static int alignSmiWatShortStriped(unsigned short *maxscor,
-			    const AliBuffer *abp, 
+			    const AliBuffer *abp,
 			    const ScoreProfile *spp,
 #ifdef alignment_matrix_debug
 			    const char *psqp,
@@ -475,11 +475,11 @@ static int alignSmiWatShortStriped(unsigned short *maxscor,
   if (!((vEp) && (vHSp) && (vHLp)))
     return ERRCODE_ASSERT;
 
-  vProfp = (const SIMDV_t *) scoreGetStripedProfile(NULL, 
+  vProfp = (const SIMDV_t *) scoreGetStripedProfile(NULL,
 #ifdef alignment_matrix_debug
 				  &qlen,
 #else
-				  NULL, 
+				  NULL,
 #endif
 				  &gap_init, &gap_ext, NULL, &segsiz,
 				  SCORPROF_STRIPED_16, spp);
@@ -492,7 +492,7 @@ static int alignSmiWatShortStriped(unsigned short *maxscor,
   /* should be able to do this with _mm_set1_epi16(short b) */
   SIMD_COPY_SCALAR_TO_VECTOR(gap_init, vGapI);
   SIMD_COPY_SCALAR_TO_VECTOR(gap_ext, vGapE);
-  
+
   /*  load vMaxScore with the zeros.  since we are using signed */
   /*  math, we will bias the maxscore to -32768 so we have the */
   /*  full range of the short.
@@ -516,15 +516,15 @@ static int alignSmiWatShortStriped(unsigned short *maxscor,
 
   for (i=0; i<uslen; i++) {
     vScorep = vProfp + (usqp[i]&SEQCOD_ALPHA_MASK) * segsiz;
-    
+
     /* zero out F */
     SIMD_NEGBIAS_VECTOR(vF);
-    
+
     /* load the next h value */
     vH = _mm_load_si128 (vHSp + segsiz - 1);
     vH = _mm_slli_si128 (vH, 2); /* shift left 2 bytes (for short) */
     vH = _mm_or_si128 (vH, vMin); /* initialise new short on right to -32768 (conceptual 0) */
-	
+
     /* swap the two H vectors */
     vp = vHLp;
     vHLp = vHSp;
@@ -587,8 +587,8 @@ static int alignSmiWatShortStriped(unsigned short *maxscor,
     vF = _mm_or_si128 (vF, vMin);
     vTmp = _mm_subs_epi16 (vH, vGapI);
     vTmp = _mm_cmpgt_epi16(vF, vTmp);
-    cmpval  = _mm_movemask_epi8 (vTmp); /* Creates a 16-bit mask from the most significant bits of 
-					 * the 16 signed or unsigned 8-bit integers in vTemp and 
+    cmpval  = _mm_movemask_epi8 (vTmp); /* Creates a 16-bit mask from the most significant bits of
+					 * the 16 signed or unsigned 8-bit integers in vTemp and
 					 * zero extends the upper bits. */
 
     /* lazy F-loop */
@@ -598,7 +598,7 @@ static int alignSmiWatShortStriped(unsigned short *maxscor,
 
       /* save vH values */
       _mm_store_si128 (vHSp + j, vH);
-      
+
       /*  update vE incase the new vH value would change it */
       vH = _mm_subs_epi16 (vH, vGapI);
       vE = _mm_max_epi16 (vE, vH);
@@ -649,7 +649,7 @@ static int alignSmiWatShortStriped(unsigned short *maxscor,
     errcode = ERRCODE_SUCCESS;
     *maxscor = (unsigned short) score;
   }
-  
+
   return errcode;
 }
 
@@ -694,11 +694,11 @@ static int alignSmiWatByteStriped(UCHAR *maxscor,
   if (!((vEp) && (vHSp) && (vHLp)))
     return ERRCODE_ASSERT;
 
-  vProfp = (const __m128i *) scoreGetStripedProfile(NULL, 
+  vProfp = (const __m128i *) scoreGetStripedProfile(NULL,
 #ifdef alignment_matrix_debug
 				  &qlen,
 #else
-				  NULL, 
+				  NULL,
 #endif
 				  &gap_init, &gap_ext, &bias, &segsiz,
 				  SCORPROF_STRIPED_8, spp);
@@ -710,7 +710,7 @@ static int alignSmiWatByteStriped(UCHAR *maxscor,
   COPY_BYTE_TO_REGISTER_VALUE(bias, vBias);
   COPY_BYTE_TO_REGISTER_VALUE(gap_init, vGapI);
   COPY_BYTE_TO_REGISTER_VALUE(gap_ext, vGapE);
-  
+
   /* variables initialised to 0 */
   SIMD_ZERO_VECTOR(vMax);
   SIMD_ZERO_VECTOR(vZero);
@@ -723,14 +723,14 @@ static int alignSmiWatByteStriped(UCHAR *maxscor,
 
   for (i=0; i<uslen; i++) {
     vScorep = vProfp + (usqp[i]&SEQCOD_ALPHA_MASK) * segsiz;
-    
+
     /* zero out F */
     SIMD_ZERO_VECTOR(vF);
-    
+
     /* load the next h value */
     vH = _mm_load_si128 (vHSp + segsiz - 1);
     vH = _mm_slli_si128 (vH, 1);
-	
+
     /* swap the two H vectors */
     vp = vHLp;
     vHLp = vHSp;
@@ -751,7 +751,7 @@ static int alignSmiWatByteStriped(UCHAR *maxscor,
 #ifdef alignment_matrix_debug
       /* find largest score in the maxscorv vector */
       SIMD_MAXELEMV_8BIT(vMax, vMaxBuf, vTmpBuf);
-      
+
       score = _mm_extract_epi16 (vMaxBuf, 0);
       score &= BYTEMASK;
       //printf("sse_score = %i\n", score);
@@ -796,8 +796,8 @@ static int alignSmiWatByteStriped(UCHAR *maxscor,
     vTmp = _mm_subs_epu8 (vF, vTmp);
     vTmp = _mm_cmpeq_epi8 (vTmp, vZero); /* Where 8-bit integers are equal, all bits are set (0xff)
 					  * otherwise unset (0x00). */
-    cmpval = _mm_movemask_epi8 (vTmp);  /* Creates a 16-bit mask from the most significant bits of 
-					 * the 16 signed or unsigned 8-bit integers in vTemp and 
+    cmpval = _mm_movemask_epi8 (vTmp);  /* Creates a 16-bit mask from the most significant bits of
+					 * the 16 signed or unsigned 8-bit integers in vTemp and
 					 * zero extends the upper bits. */
 
     /* lazy F-loop */
@@ -807,7 +807,7 @@ static int alignSmiWatByteStriped(UCHAR *maxscor,
 
       /* save vH values */
       _mm_store_si128 (vHSp + j, vH);
-      
+
       /*  update vE incase the new vH value would change it */
       vH = _mm_subs_epu8 (vH, vGapI);
       vE = _mm_max_epu8 (vE, vH);
@@ -865,10 +865,10 @@ static int alignSmiWatByteStriped(UCHAR *maxscor,
  ********************** Public SIMD Alignment Methods *************************
  ******************************************************************************/
 
-int swSIMDAlignStriped(ALIDPMSCOR_t *maxscor, 
+int swSIMDAlignStriped(ALIDPMSCOR_t *maxscor,
 		       const AliBuffer *abp,
-		       const ScoreProfile *profp, 
-#ifdef alignment_matrix_debug 
+		       const ScoreProfile *profp,
+#ifdef alignment_matrix_debug
 		       const SeqCodec *codecp,
 		       const char *profiled_seqp,
 #endif
@@ -878,7 +878,7 @@ int swSIMDAlignStriped(ALIDPMSCOR_t *maxscor,
   int errcode;
 #ifdef SCORE_SIMD_IMIC
   unsigned int scor;
-#else 
+#else
   unsigned char bytscor;
   unsigned short shortscor;
 #endif
@@ -886,13 +886,13 @@ int swSIMDAlignStriped(ALIDPMSCOR_t *maxscor,
   *maxscor = 0;
 
 #ifdef SCORE_SIMD_IMIC
-  errcode = alignSmiWatIntStriped(&scor, 
-				  abp, 
+  errcode = alignSmiWatIntStriped(&scor,
+				  abp,
 				  profp,
 #ifdef alignment_matrix_debug
 				  profiled_seqp,
 				  codecp,
-#endif 
+#endif
 				  unprofiled_seqp,
 				  unprofiled_seqlen);
   if (!errcode) {
@@ -903,32 +903,31 @@ int swSIMDAlignStriped(ALIDPMSCOR_t *maxscor,
   }
 
 #else
-  errcode = alignSmiWatByteStriped(&bytscor, 
-				   abp, 
+  errcode = alignSmiWatByteStriped(&bytscor,
+				   abp,
 				   profp,
 #ifdef alignment_matrix_debug
 				   profiled_seqp,
 				   codecp,
-#endif 
+#endif
 				   unprofiled_seqp,
 				   unprofiled_seqlen);
   if (errcode == ERRCODE_SWATEXCEED) {
-    errcode = alignSmiWatShortStriped(&shortscor, 
-				      abp, 
+    errcode = alignSmiWatShortStriped(&shortscor,
+				      abp,
 				      profp,
 #ifdef alignment_matrix_debug
 				      profiled_seqp,
 				      codecp,
-#endif 
+#endif
 				      unprofiled_seqp,
 				      unprofiled_seqlen);
-    if (!errcode) 
+    if (!errcode)
       *maxscor = (int) shortscor;
   } else if (!errcode) {
     *maxscor = (int) bytscor;
   }
-#endif 
+#endif
 
   return errcode;
 }
-

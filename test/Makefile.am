@@ -8,7 +8,7 @@ AM_CFLAGS = -I../src/ -I../test
 
 if ICC_COMPILER
 if ICC_MMIC
-AM_CFLAGS += -mmic	
+AM_CFLAGS += -mmic
 endif
 if ICC_NOLIMITH
 AM_CFLAGS += -D_GCC_LIMITS_H_
@@ -51,12 +51,12 @@ HIT_SRC = ../src/sort.c ../src/sort.h \
 	../src/hashhit.c ../src/hashhit.h
 
 SGM_SRC = ${HIT_SRC} ../src/array.c ../src/array.h ../src/vdef.h \
-         ../src/segment.c ../src/segment.h 
+         ../src/segment.c ../src/segment.h
 
 MAP_SRC = ../src/results.c ../src/results.h \
 	../src/resultpairs.c ../src/resultpairs.h \
 	../src/insert.c ../src/insert.h \
-	../src/report.c ../src/report.h ../src/rmap.c ../src/rmap.h 
+	../src/report.c ../src/report.h ../src/rmap.c ../src/rmap.h
 
 
 SMALT_SRC = ../src/smalt.c ../src/menu.c ../src/menu.h \
@@ -89,6 +89,10 @@ TESTS += ${TEST_DRIVERS}
 
 if WITH_BAMBAMC
 TESTS += ioform_test.py xali_test.py
+endif
+
+if WITH_BAMBAMC
+	TESTS += ioform_test.py
 endif
 
 if WITH_SAMTOOLS_EXEC
@@ -130,10 +134,9 @@ endif
 
 
 if WITH_TESTALL
-
 check_PROGRAMS += ${EXTRA_PROGRAMS}
 
-if WITH_SIMD	
+if WITH_SIMD
 check_PROGRAMS += swsimd_test # mergesort_test
 endif
 if WITH_SAMTOOLS
@@ -247,11 +250,13 @@ nodist_smalt_basq_SOURCES = ../src/smalt.c ../src/menu.c ../src/menu.h \
 smalt_basq_CFLAGS = $(AM_CFLAGS) $(BAMBAMC_INCL)
 smalt_basq_CPPFLAGS = -DRESULTS_BASQUAL
 smalt_basq_LDADD = $(SGM_LIB) $(BAMBAMC_DEPS) -lm -lpthread $(ZLIB_LDFLAG)
-smalt_basq_LDFLAGS = $(APPLELDFLAGS) $(BAMBAMC_LDFLG) 
+smalt_basq_LDFLAGS = $(APPLELDFLAGS) $(BAMBAMC_LDFLG)
 
 # extracting quality values for statistical analysis
 nodist_basqual_test_SOURCES = basqual_test.c ../misc/basqual.c ../misc/basqual.h
+
 basqual_test_CFLAGS = $(AM_CFLAGS) -I../misc
+
 basqual_test_LDADD = $(SEQ_LIB) $(ZLIB_LDFLAG)
 
 # generic interface to sequence input formats
@@ -286,4 +291,3 @@ bambam_test_LDADD = $(BAMBAMC_DEPS)
 #bambam_test_CFLAGS = -I../src $(filter-out -std=%, $(BAMBAMC_CFLAGS))
 #bambam_test_LDFLAGS = $(BAMBAMC_LIBS)
 endif
-

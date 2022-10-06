@@ -39,7 +39,7 @@ def checkLabels(cigfilnam, label_pairs, mateno_check=True):
     from formats import Cigar, openFile, getNextCigarPair
     cigA = Cigar()
     cigB = Cigar()
-    
+
     infil = openFile(cigfilnam)
     for lb in label_pairs:
         (isOK, isEOF) = getNextCigarPair(infil, cigA, cigB, mateno_check)
@@ -50,14 +50,14 @@ def checkLabels(cigfilnam, label_pairs, mateno_check=True):
             exit("unexpeced cigar mapping labels %s%s (%s) for read pair %s" % \
                  (cigA.mapcls, cigB.mapcls, lb, cigA.qnam))
     return
-        
+
 def reverseComplement(df, filnam_in, filnam_out):
     from sys import exit
     from subprocess import call
 
     df.call([RCPROGNAM, filnam_in, filnam_out],
             "when reverse complementing reads in file '%s'" % (filnam_in))
-   
+
 def smalt_index(df, index_name, fasta_name, kmer, nskip):
     from sys import exit
     from subprocess import call
@@ -72,9 +72,9 @@ def smalt_index(df, index_name, fasta_name, kmer, nskip):
 def smalt_map(df,oufilnam, indexnam, readfil, matefil="", option=[]):
     from sys import exit
     from subprocess import call
- 
+
     tup = [PROGNAM, 'map']
-    
+
     if option:
         tup.extend(option)
     tup.extend(
@@ -92,22 +92,22 @@ def process(df, indexnam, oufilnam, readnamA, readnamB, option_label_pairs, mate
 
 if __name__ == '__main__':
     from testdata import DataFiles
-    
+
     df = DataFiles()
-    
+
     refnam = df.joinData(REF_FASTA_NAME)
     readnamA = df.joinData(READ_PREFIX + "_1.fq")
     readnamB = df.joinData(READ_PREFIX + "_2.fq")
     indexnam = df.addIndex(TMPFIL_PREFIX)
-    
+
     oufilnam = df.addTMP(TMPFIL_PREFIX + ".cig")
     readnamRCA = df.addTMP(TMPFIL_PREFIX + "rc_1.fq")
     readnamRCB = df.addTMP(TMPFIL_PREFIX + "rc_2.fq")
-    
+
     smalt_index(df,indexnam, refnam, KMER, NSKIP)
     process(df,indexnam, oufilnam, readnamA, readnamB, OPTION_LABEL_PAIRS_ORIG)
 
-    #print "reverse complement 2nd read ..."
+    #print ("reverse complement 2nd read ...")
     reverseComplement(df,readnamB, readnamRCB)
     process(df,indexnam, oufilnam, readnamA, readnamRCB, OPTION_LABEL_PAIRS_RC2ND)
 

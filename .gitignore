@@ -1,0 +1,10 @@
+*.[oa]
+*~
+**/Makefile
+config.h
+config.log
+config.status
+stamp-h1
+test/tmp
+*/.deps/
+*/__pycache__/

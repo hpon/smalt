@@ -3,7 +3,7 @@
 #############################################################################
 #############################################################################
 #                                                                           #
-#  Copyright (C) 2013 - 2014 Genome Research Ltd.                           # 
+#  Copyright (C) 2013 - 2014 Genome Research Ltd.                           #
 #                                                                           #
 #  Author: Hannes Ponstingl (hp3@sanger.ac.uk)                              #
 #                                                                           #
@@ -38,32 +38,32 @@ class DataFiles:
         self.datafiles = []
         self.logfil_out = openFile(self.tmpfiles[0], 'w')
         self.logfil_err = openFile(self.tmpfiles[1], 'w')
-        
+
         self.addPackedSourceFiles(df)
-        
+
     def __delete_(self):
         self.logfil_out.flush()
         self.logfil_out.close()
         self.logfil_err.flush()
         self.logfil_err.close()
-        
+
     def joinData(self, filnam):
         from os import path
         return path.join(DataFiles.INPUTDIR, filnam)
-    
+
     def addPackedSourceFiles(self, filnams):
         for fn in filnams:
             self.unpack(fn)
-        
+
     def unpack(self, filnam):
         from os import path
 
         fn_from = path.join(DataFiles.INPUTDIR, filnam)
         if len(filnam) < 4 or filnam[-3:] != '.gz': fn_from = fn_from + '.gz'
         fn_to = path.join(DataFiles.WORKDIR, filnam)
-        infil = openFile(fn_from, 'r')
-        oufil = openFile(fn_to, 'w')
-        self.logfil_out.write("unpacking '%s' -> '%s'\n" % (fn_from, fn_to))
+        infil = openFile(fn_from, 'rt')
+        oufil = openFile(fn_to, 'wt')
+        self.logfil_out.write("unpacking '{:s}' -> '{:s}'\n".format(fn_from, fn_to))
         while 1:
             lin = infil.readline()
             if not lin:
@@ -82,7 +82,7 @@ class DataFiles:
             if f not in self.tmpfiles:
                 self.tmpfiles.append(f)
         return fn
-    
+
     def addTMP(self, filnam):
         from os import path
         fn = path.join(DataFiles.WORKDIR, filnam)
@@ -91,37 +91,44 @@ class DataFiles:
         return fn
 
     def call(self, tup, errmsg="", oufilnam=None):
-        from subprocess import call
-    
+        from subprocess import check_call, CalledProcessError
+
         if oufilnam:
             oufil = openFile(oufilnam, 'w')
         else:
             oufil = self.logfil_out
-            
+
         self.addLog(tup)
-        rc = call(tup, stdout=oufil, stderr=self.logfil_err)
-        
+        try:
+            check_call(tup, stdout=oufil, stderr=self.logfil_err)
+        except CalledProcessError as dfserr:
+            if oufilnam:
+                oufil.close()
+
+            if not errmsg:
+                errmsg = "when calling {:s}".format(tup[0])
+
+            self.exitErr("ERROR {:s}: returned with code {:d}".format(errmsg, dfserr.returncode))
+
         if oufilnam:
             oufil.close()
 
-        if rc != 0:
-            if not errmsg:
-                errmsg = "when calling %s" % (tup[0])
-            self.exitErr("ERROR %s: returned with code %i" % (errmsg, rc))
         self.logfil_out.flush()
         self.logfil_err.flush()
-                
+
+        return
+
     def addLog(self, tup):
         if not tup:
             return
-        self.logfil_out.write("%s" % tup[0])
+        self.logfil_out.write("{:s}".format(tup[0]))
         if len(tup) > 1:
             for t in tup[1:]:
-                self.logfil_out.write(" %s" % t)
+                self.logfil_out.write(" {:s}".format(t))
         self.logfil_out.write("\n")
         self.logfil_err.flush()
         return
-    
+
     def addErr(self, msg):
         self.logfil_err.write(msg + "\n")
         self.logfil_out.flush()
@@ -131,7 +138,7 @@ class DataFiles:
         from sys import exit
         self.addErr(msg)
         exit(msg)
-        
+
     def cleanup(self, is_verbose=False):
         from os import access, F_OK, remove, removedirs
         self.logfil_out.close()
@@ -139,15 +146,15 @@ class DataFiles:
         for filnam in (self.datafiles + self.tmpfiles):
             if access(filnam, F_OK):
                 remove(filnam)
-                if is_verbose: print "Removed file '%s'" % filnam
+                if is_verbose: print("Removed file '{:s}'".format(filnam))
             else:
-                print "Could not access file '%s'" % filnam
+                print("Could not access file '{:s}'".format(filnam))
         self.datafiles = []
         self.tmpfiles = []
         try:
             removedirs(DataFiles.WORKDIR)
         except:
-            "Could not remove temporary directory %s" % DataFiles.WORKDIR
+            print("Could not remove temporary directory {:s}".format(DataFiles.WORKDIR))
 
 def openFile(filnam, mode = 'r'):
     import gzip
@@ -159,7 +166,7 @@ def openFile(filnam, mode = 'r'):
         else:
             oufil = open(filnam, mode)
     except:
-        print "ERROR when opening file '%s'" % filnam
+        print("ERROR when opening file '{:s}'".format(filnam))
         exit(1)
 
     return oufil
@@ -178,12 +185,11 @@ def areFilesIdentical(filnamA, filnamB, ignore_key=""):
         if not linA or not linB:
             okflg = not linA and not linB
             break
-        
+
         if linA != linB and \
                (kl < 1 or \
                 linA[:kl] != linB[:kl] or \
                 linA[:kl] != ignore_key):
             okflg = False
-        
-    return okflg
 
+    return okflg

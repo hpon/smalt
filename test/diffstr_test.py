@@ -14,35 +14,34 @@ CIGSTR = re.compile("\nCIGAR_SSAHA\s+([MID\s\d]+)\s*\nCIGAR_EXT\s+(\S+)\s*\nCIGA
 #CIGSTR = re.compile("^CIGAR_SAM", re.MULTILINE)
 def checkDiffStr(diffstr):
     from sys import exit
-    from subprocess import check_output, CalledProcessError 
+    from subprocess import check_output, CalledProcessError
 
-    
+
     tup = (PROGNAM, diffstr[0])
 
     try:
-        rc = check_output(tup)
+        rc = check_output(tup, universal_newlines=True)
     except CalledProcessError as dfserr:
-        exit("%s %s returned %i" % (PROGNAM, diffstr[0], dfserr.returncode))
+        exit("{:s} {:s} returned {:d}".format(PROGNAM, diffstr[0], dfserr.returncode))
 
 
     m = CIGSTR.search(rc)
     if m:
         if m.group(4) != diffstr[0]:
-            exit("DIFF strings do not agree: '%s' vs '%s'" % (m.group(4), diffstr[0]))
+            exit("DIFF strings do not agree: '{:s}' vs '{:s}'".format(m.group(4), diffstr[0]))
         if m.group(3) != diffstr[1]:
-            exit("DIFF strings do not agree: '%s' vs '%s'" % (m.group(3), diffstr[1]))        
+            exit("DIFF strings do not agree: '{:s}' vs '{:s}'".format(m.group(3), diffstr[1]))
         if m.group(2) != diffstr[1]:
-            exit("DIFF strings do not agree: '%s' vs '%s'" % (m.group(2), diffstr[1]))
+            exit("DIFF strings do not agree: '{:s}' vs '{:s}'".format(m.group(2), diffstr[1]))
         if m.group(1).strip() != diffstr[2]:
-            exit("DIFF strings do not agree: '%s' vs '%s'" % (m.group(1), diffstr[2]))         
+            exit("DIFF strings do not agree: '{:s}' vs '{:s}'".format(m.group(1), diffstr[2]))
     else:
-        print "Not matched\n**%s**\n" % rc
+        print ("Not matched\n**{:s}**\n".format(rc))
 
-    
+
 if __name__ == '__main__':
 
     for dat in DIFFFSTR_DATA:
         checkDiffStr(dat)
-    
+
     exit(0)
-    
